@@ -10,8 +10,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:app/features/catalog/presentation/category_chip.dart';
 import 'package:app/features/rdv/presentation/widgets/step_indicator.dart';
 
-Widget _wrap(Widget child) =>
-    MaterialApp(home: Scaffold(body: Center(child: child)));
+Widget _wrap(Widget child) => MaterialApp(
+  home: Scaffold(body: Center(child: child)),
+);
 
 void main() {
   setUpAll(() {
