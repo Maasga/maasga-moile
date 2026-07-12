@@ -1,16 +1,61 @@
-# app
+# MAASGA Mobile
 
-A new Flutter project.
+Application mobile Flutter (Android V1) de MAASGA — confort climatique : catalogue
+produits, prise de rendez-vous, simulateur BTU, espace client, maintenance et
+paiement, alignée sur le backend web MAASGA existant.
 
-## Getting Started
+## Stack
 
-This project is a starting point for a Flutter application.
+- **Flutter** (Dart, SDK `^3.9.2`) — cible principale **Android**
+- **Riverpod** (état), **go_router** (navigation), **Dio** + cookie jar (réseau)
+- **flutter_secure_storage** (token), **Firebase Messaging** (push)
+- **Google Maps / Geolocator**, **Google Sign-In**, génération **PDF**
 
-A few resources to get you started if this is your first Flutter project:
+## Démarrage
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+```bash
+flutter pub get
+flutter run                 # appareil / émulateur Android
+```
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+### Configuration (build)
+
+Les valeurs sensibles/environnement passent par `--dart-define` (voir
+`lib/core/config/env.dart`) :
+
+```bash
+flutter run \
+  --dart-define=API_BASE_URL=https://maasga-website.pages.dev \
+  --dart-define=GOOGLE_WEB_CLIENT_ID=... \
+  --dart-define=GOOGLE_ANDROID_CLIENT_ID=...
+```
+
+## Build release signé
+
+1. Générer un keystore :
+   ```bash
+   keytool -genkey -v -keystore ~/maasga-upload.jks \
+     -keyalg RSA -keysize 2048 -validity 10000 -alias upload
+   ```
+2. Copier `android/key.properties.example` → `android/key.properties` (non versionné)
+   et renseigner les valeurs.
+3. `flutter build appbundle --release`
+
+Sans `android/key.properties`, les builds release retombent sur les clés **debug**
+(dev local uniquement, non publiable sur le Play Store).
+
+> ⚠️ La clé Google Maps du `AndroidManifest.xml` doit être restreinte
+> (package `com.maasga.app` + empreinte SHA-1) dans Google Cloud Console.
+
+## Tests & qualité
+
+```bash
+flutter analyze
+flutter test
+```
+
+## Backlog / améliorations
+
+Voir `IMPLEMENTATION_BACKLOG.md`. Pistes ouvertes : mise à jour groupée des
+dépendances, CI (analyze + test + build APK), tests d'intégration auth/catalogue,
+minification R8/ProGuard (à valider), config release iOS si multiplateforme.

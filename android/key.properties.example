@@ -1,0 +1,13 @@
+# Copiez ce fichier en `android/key.properties` (NON versionné) pour signer les
+# builds release. Générez d'abord un keystore :
+#
+#   keytool -genkey -v -keystore ~/maasga-upload.jks \
+#     -keyalg RSA -keysize 2048 -validity 10000 -alias upload
+#
+# Puis renseignez les valeurs ci-dessous. Sans ce fichier, les builds release
+# retombent sur les clés debug (dev local uniquement, non publiable).
+
+storePassword=CHANGE_ME
+keyPassword=CHANGE_ME
+keyAlias=upload
+storeFile=/chemin/absolu/vers/maasga-upload.jks
