@@ -63,12 +63,15 @@ class _RdvScreenState extends ConsumerState<RdvScreen> {
       final profile = await repo.getProfile();
       if (profile != null && mounted) {
         setState(() {
-          if (_nameCtrl.text.isEmpty)
+          if (_nameCtrl.text.isEmpty) {
             _nameCtrl.text = profile['name']?.toString() ?? '';
-          if (_emailCtrl.text.isEmpty)
+          }
+          if (_emailCtrl.text.isEmpty) {
             _emailCtrl.text = profile['email']?.toString() ?? '';
-          if (_phoneCtrl.text.isEmpty)
+          }
+          if (_phoneCtrl.text.isEmpty) {
             _phoneCtrl.text = profile['phone']?.toString() ?? '';
+          }
           _selectedQuartier ??= profile['quartier']?.toString();
         });
       }

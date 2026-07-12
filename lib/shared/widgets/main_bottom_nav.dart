@@ -16,21 +16,25 @@ class MainBottomNav extends ConsumerWidget {
 
   int _indexFromPath() {
     if (currentPath.startsWith('/catalog') ||
-        currentPath.startsWith('/catalogue'))
+        currentPath.startsWith('/catalogue')) {
       return 1;
+    }
     if (currentPath.startsWith('/simulator') ||
-        currentPath.startsWith('/simulateur'))
+        currentPath.startsWith('/simulateur')) {
       return 2;
+    }
     if (currentPath.startsWith('/rdv') ||
         currentPath.startsWith('/rendez-vous') ||
         currentPath.startsWith('/service') ||
-        currentPath.startsWith('/support'))
+        currentPath.startsWith('/support')) {
       return 3;
+    }
     if (currentPath.startsWith('/maintenance')) return 4;
     if (currentPath.startsWith('/cart')) return 5;
     if (currentPath.startsWith('/client-space') ||
-        currentPath.startsWith('/espace-client'))
+        currentPath.startsWith('/espace-client')) {
       return 6;
+    }
     return 0;
   }
 

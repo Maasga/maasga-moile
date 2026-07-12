@@ -24,7 +24,7 @@ class BrandScroll extends StatelessWidget {
               height: 30,
               width: 70,
               fit: BoxFit.contain,
-              errorBuilder: (_, __, ___) => Container(),
+              errorBuilder: (_, _, _) => Container(),
             ),
           );
         },

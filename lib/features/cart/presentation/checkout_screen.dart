@@ -127,7 +127,8 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     });
 
     try {
-      List<Placemark> placemarks = await placemarkFromCoordinates(
+      // geocoding >= 5 : l'API est désormais une méthode d'instance de Geocoding.
+      List<Placemark> placemarks = await Geocoding().placemarkFromCoordinates(
         pos.latitude,
         pos.longitude,
       );
@@ -143,10 +144,11 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
   Future<void> _getCurrentLocation() async {
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      if (mounted)
+      if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Service de localisation désactivé')),
         );
+      }
       return;
     }
 
@@ -562,7 +564,7 @@ class _QuartierSearchDialogState extends State<_QuartierSearchDialog> {
           Expanded(
             child: ListView.separated(
               itemCount: filtered.length,
-              separatorBuilder: (_, __) => const Divider(height: 1),
+              separatorBuilder: (_, _) => const Divider(height: 1),
               itemBuilder: (context, index) {
                 final q = filtered[index];
                 final isSelected = q == widget.currentSelection;

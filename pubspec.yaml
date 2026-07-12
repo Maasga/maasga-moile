@@ -50,12 +50,12 @@ dependencies:
   webview_flutter: ^4.13.1
   google_sign_in: ^7.2.0
   google_sign_in_web: ^1.1.3
-  google_fonts: ^6.1.0
+  google_fonts: ^8.1.0
   carousel_slider: ^5.0.0
-  smooth_page_indicator: ^1.1.0
+  smooth_page_indicator: ^2.0.1
   google_maps_flutter: ^2.14.2
   geolocator: ^14.0.2
-  geocoding: ^4.0.0
+  geocoding: ^5.0.0
   google_nav_bar: ^5.0.6
   animations: ^2.1.2
   another_flutter_splash_screen: ^1.2.1
@@ -65,7 +65,7 @@ dependencies:
   pdf: ^3.11.1
   printing: ^5.13.2
   bottom_picker: ^4.1.1
-  calendar_date_picker2: ^2.0.1
+  calendar_date_picker2: ^3.0.0
   shared_preferences: ^2.5.5
   lottie: ^3.3.3
   skeletonizer: ^2.1.3
@@ -82,7 +82,7 @@ dev_dependencies:
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^5.0.0
+  flutter_lints: ^6.0.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

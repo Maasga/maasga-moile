@@ -49,7 +49,7 @@ class CartItemCard extends StatelessWidget {
               child: Image.asset(
                 AssetUtils.getAssetPath(line.product.image),
                 fit: BoxFit.contain,
-                errorBuilder: (_, __, ___) =>
+                errorBuilder: (_, _, _) =>
                     Image.asset('assets/products/product_placeholder.png'),
               ),
             ),

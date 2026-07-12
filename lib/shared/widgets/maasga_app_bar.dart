@@ -109,7 +109,7 @@ class MaasgaAppBar extends ConsumerWidget implements PreferredSizeWidget {
                   tooltip: 'Changer le thème',
                 ),
 
-                if (trailingAction != null) trailingAction!,
+                ?trailingAction,
 
                 Stack(
                   clipBehavior: Clip.none,

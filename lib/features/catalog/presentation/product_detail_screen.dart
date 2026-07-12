@@ -69,15 +69,16 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
   }
 
   Widget _buildImageWidget(String imgUrl, BoxFit fit) {
-    if (imgUrl.isEmpty || imgUrl == '??')
+    if (imgUrl.isEmpty || imgUrl == '??') {
       return Image.asset('assets/products/product_placeholder.png', fit: fit);
+    }
     if (imgUrl.trim().startsWith('data:image')) {
       try {
         final base64Str = imgUrl.split(',').last;
         return Image.memory(
           base64Decode(base64Str),
           fit: fit,
-          errorBuilder: (_, __, ___) =>
+          errorBuilder: (_, _, _) =>
               Image.asset('assets/products/product_placeholder.png', fit: fit),
         );
       } catch (e) {
@@ -87,14 +88,14 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
       return Image.network(
         imgUrl,
         fit: fit,
-        errorBuilder: (_, __, ___) =>
+        errorBuilder: (_, _, _) =>
             Image.asset('assets/products/product_placeholder.png', fit: fit),
       );
     } else {
       return Image.asset(
         AssetUtils.getAssetPath(imgUrl),
         fit: fit,
-        errorBuilder: (_, __, ___) =>
+        errorBuilder: (_, _, _) =>
             Image.asset('assets/products/product_placeholder.png', fit: fit),
       );
     }

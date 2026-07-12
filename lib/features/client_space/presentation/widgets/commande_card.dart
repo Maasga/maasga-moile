@@ -24,30 +24,36 @@ class CommandeCard extends StatelessWidget {
 
   Color _getStatusBgColor(CommandeStatus status) {
     if (status == CommandeStatus.installed) return const Color(0xFFE8F5E9);
-    if (status == CommandeStatus.paid || status == CommandeStatus.devisValide)
+    if (status == CommandeStatus.paid || status == CommandeStatus.devisValide) {
       return const Color(0xFFE0F7FA);
+    }
     if (status == CommandeStatus.livre) return const Color(0xFFE0F2F1);
     if (status == CommandeStatus.validationTerrain ||
-        status == CommandeStatus.devisEnAttente)
+        status == CommandeStatus.devisEnAttente) {
       return const Color(0xFFFFF3E0);
+    }
     if (status == CommandeStatus.cancelled ||
-        status == CommandeStatus.devisRefuse)
+        status == CommandeStatus.devisRefuse) {
       return const Color(0xFFFFEBEE);
+    }
     if (status == CommandeStatus.refunded) return const Color(0xFFF3E5F5);
     return Colors.grey.shade100;
   }
 
   Color _getStatusTextColor(CommandeStatus status) {
     if (status == CommandeStatus.installed) return const Color(0xFF2E7D32);
-    if (status == CommandeStatus.paid || status == CommandeStatus.devisValide)
+    if (status == CommandeStatus.paid || status == CommandeStatus.devisValide) {
       return const Color(0xFF0288D1);
+    }
     if (status == CommandeStatus.livre) return const Color(0xFF00897B);
     if (status == CommandeStatus.validationTerrain ||
-        status == CommandeStatus.devisEnAttente)
+        status == CommandeStatus.devisEnAttente) {
       return const Color(0xFFEF6C00);
+    }
     if (status == CommandeStatus.cancelled ||
-        status == CommandeStatus.devisRefuse)
+        status == CommandeStatus.devisRefuse) {
       return const Color(0xFFC62828);
+    }
     if (status == CommandeStatus.refunded) return const Color(0xFF7B1FA2);
     return Colors.grey.shade700;
   }
@@ -83,7 +89,7 @@ class CommandeCard extends StatelessWidget {
                     commande.productImage ??
                         'assets/products/product_placeholder.png',
                     fit: BoxFit.contain,
-                    errorBuilder: (_, __, ___) => const Icon(
+                    errorBuilder: (_, _, _) => const Icon(
                       Icons.ac_unit,
                       size: 24,
                       color: Color(0xFF1B3A8D),

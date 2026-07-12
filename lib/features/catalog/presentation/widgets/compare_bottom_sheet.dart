@@ -268,7 +268,7 @@ class _CompareBottomSheetState extends ConsumerState<CompareBottomSheet> {
         child: Image.asset(
           AssetUtils.getAssetPath(image),
           fit: BoxFit.contain,
-          errorBuilder: (_, __, ___) =>
+          errorBuilder: (_, _, _) =>
               Image.asset('assets/products/product_placeholder.png'),
         ),
       ),

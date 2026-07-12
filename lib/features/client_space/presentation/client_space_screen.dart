@@ -37,7 +37,7 @@ class ClientSpaceScreen extends ConsumerWidget {
           return dashboard.when(
             data: (data) => _LoggedInView(data: data),
             loading: () => const Center(child: CircularProgressIndicator()),
-            error: (err, __) {
+            error: (err, _) {
               return Center(
                 child: Padding(
                   padding: const EdgeInsets.all(24.0),
@@ -92,7 +92,7 @@ class ClientSpaceScreen extends ConsumerWidget {
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, __) => Center(child: Text('Erreur session: $err')),
+        error: (err, _) => Center(child: Text('Erreur session: $err')),
       ),
       bottomNavigationBar: const MainBottomNav(currentPath: '/client-space'),
     );
