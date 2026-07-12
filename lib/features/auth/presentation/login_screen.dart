@@ -76,12 +76,19 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         const CircleAvatar(
                           radius: 34,
                           backgroundColor: MaasgaTokens.bgMuted,
-                          child: Icon(Icons.ac_unit, color: MaasgaTokens.blue700, size: 30),
+                          child: Icon(
+                            Icons.ac_unit,
+                            color: MaasgaTokens.blue700,
+                            size: 30,
+                          ),
                         ),
                         const SizedBox(height: 14),
                         const Text(
                           'Connexion',
-                          style: TextStyle(fontSize: 28, fontWeight: FontWeight.w800),
+                          style: TextStyle(
+                            fontSize: 28,
+                            fontWeight: FontWeight.w800,
+                          ),
                         ),
                         const SizedBox(height: 6),
                         const Text('Accédez à votre espace MAASGA'),
@@ -91,8 +98,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           style: MaasgaTokens.inputTextStyle,
                           decoration: const InputDecoration(
                             labelText: 'Email ou téléphone',
-                            labelStyle: TextStyle(color: MaasgaTokens.textSecondary),
-                            prefixIcon: Icon(Icons.person_outline, color: MaasgaTokens.blue700),
+                            labelStyle: TextStyle(
+                              color: MaasgaTokens.textSecondary,
+                            ),
+                            prefixIcon: Icon(
+                              Icons.person_outline,
+                              color: MaasgaTokens.blue700,
+                            ),
                             filled: true,
                             fillColor: Colors.white,
                           ),
@@ -104,45 +116,61 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           style: MaasgaTokens.inputTextStyle,
                           decoration: const InputDecoration(
                             labelText: 'Mot de passe',
-                            labelStyle: TextStyle(color: MaasgaTokens.textSecondary),
-                            prefixIcon: Icon(Icons.lock_outline, color: MaasgaTokens.blue700),
+                            labelStyle: TextStyle(
+                              color: MaasgaTokens.textSecondary,
+                            ),
+                            prefixIcon: Icon(
+                              Icons.lock_outline,
+                              color: MaasgaTokens.blue700,
+                            ),
                             filled: true,
                             fillColor: Colors.white,
                           ),
                         ),
                         if (_error != null) ...[
                           const SizedBox(height: 12),
-                          Text(_error!, style: const TextStyle(color: Colors.red)),
+                          Text(
+                            _error!,
+                            style: const TextStyle(color: Colors.red),
+                          ),
                         ],
                         const SizedBox(height: 18),
                         SizedBox(
                           width: double.infinity,
                           child: MaasgaPrimaryButton(
-                            label: auth.isLoading ? 'Connexion...' : 'Se connecter',
+                            label: auth.isLoading
+                                ? 'Connexion...'
+                                : 'Se connecter',
                             enabled: !auth.isLoading,
                             onPressed: () {
                               final id = _identifierCtrl.text.trim();
                               final pass = _passwordCtrl.text.trim();
                               if (id.isEmpty || pass.isEmpty) {
-                                setState(() => _error = 'Veuillez saisir vos identifiants.');
+                                setState(
+                                  () => _error =
+                                      'Veuillez saisir vos identifiants.',
+                                );
                                 return;
                               }
-                              ref.read(authControllerProvider.notifier).login(
-                                    identifier: id,
-                                    password: pass,
-                                  );
+                              ref
+                                  .read(authControllerProvider.notifier)
+                                  .login(identifier: id, password: pass);
                             },
                           ),
                         ),
                         const SizedBox(height: 10),
                         TextButton(
                           onPressed: () => context.push('/auth/register'),
-                          child: const Text('Pas encore de compte ? Créer un compte'),
+                          child: const Text(
+                            'Pas encore de compte ? Créer un compte',
+                          ),
                         ),
                         const SizedBox(height: 8),
                         buildGoogleSignInButton(
                           onTokenReceived: (token) async {
-                            await ref.read(authControllerProvider.notifier).loginWithGoogle(accessToken: token);
+                            await ref
+                                .read(authControllerProvider.notifier)
+                                .loginWithGoogle(accessToken: token);
                           },
                           onError: (e) {
                             setState(() => _error = e);

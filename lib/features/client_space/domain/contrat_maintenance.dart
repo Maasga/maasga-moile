@@ -46,7 +46,8 @@ class ContratMaintenance {
   final String? invoiceUrl;
 
   factory ContratMaintenance.fromJson(Map<String, dynamic> json) {
-    final visitesList = (json['visites'] as List<dynamic>?)
+    final visitesList =
+        (json['visites'] as List<dynamic>?)
             ?.map((v) => VisiteContrat.fromJson(v as Map<String, dynamic>))
             .toList() ??
         [];

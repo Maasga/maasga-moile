@@ -32,35 +32,52 @@ class ClientDashboardRepository {
   Future<ClientDashboardData> fetchDashboard() async {
     final response = await _dio.get('/api/mobile/client-dashboard');
     final data = response.data as Map<String, dynamic>? ?? const {};
-    
+
     return ClientDashboardData(
-      profile: UserProfile.fromJson((data['client'] as Map?)?.cast<String, dynamic>() ?? {}),
-      orders: (data['orders'] as List<dynamic>?)?.map((o) => Commande.fromJson(o)).toList() ?? [],
-      rdvs: (data['rdvs'] as List<dynamic>?)?.map((r) => RendezVous.fromJson(r)).toList() ?? [],
-      maintenanceContracts: (data['maintenanceContracts'] as List<dynamic>?)?.map((m) => ContratMaintenance.fromJson(m)).toList() ?? [],
+      profile: UserProfile.fromJson(
+        (data['client'] as Map?)?.cast<String, dynamic>() ?? {},
+      ),
+      orders:
+          (data['orders'] as List<dynamic>?)
+              ?.map((o) => Commande.fromJson(o))
+              .toList() ??
+          [],
+      rdvs:
+          (data['rdvs'] as List<dynamic>?)
+              ?.map((r) => RendezVous.fromJson(r))
+              .toList() ??
+          [],
+      maintenanceContracts:
+          (data['maintenanceContracts'] as List<dynamic>?)
+              ?.map((m) => ContratMaintenance.fromJson(m))
+              .toList() ??
+          [],
       freeMaintenances: data['freeMaintenances'] as List<dynamic>? ?? [],
       payments: data['payments'] as List<dynamic>? ?? const [],
     );
   }
 
-  Future<void> handleDevisAction(String orderId, String action, {String? reason}) async {
-    await _dio.post('/api/mobile/order/$orderId/devis-action', data: {
-      'action': action,
-      'reason': reason,
-    });
+  Future<void> handleDevisAction(
+    String orderId,
+    String action, {
+    String? reason,
+  }) async {
+    await _dio.post(
+      '/api/mobile/order/$orderId/devis-action',
+      data: {'action': action, 'reason': reason},
+    );
   }
-
-
 }
 
-final clientDashboardRepositoryProvider = FutureProvider<ClientDashboardRepository>((
+final clientDashboardRepositoryProvider =
+    FutureProvider<ClientDashboardRepository>((ref) async {
+      final dio = await ref.watch(dioProvider.future);
+      return ClientDashboardRepository(dio);
+    });
+
+final clientDashboardProvider = FutureProvider<ClientDashboardData>((
   ref,
 ) async {
-  final dio = await ref.watch(dioProvider.future);
-  return ClientDashboardRepository(dio);
-});
-
-final clientDashboardProvider = FutureProvider<ClientDashboardData>((ref) async {
   final repo = await ref.watch(clientDashboardRepositoryProvider.future);
   return repo.fetchDashboard();
 });

@@ -69,9 +69,7 @@ class AuthController extends AsyncNotifier<bool> {
     state = const AsyncData(false);
   }
 
-  Future<void> loginWithGoogle({
-    required String accessToken,
-  }) async {
+  Future<void> loginWithGoogle({required String accessToken}) async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
       final repo = await ref.read(authRepositoryProvider.future);

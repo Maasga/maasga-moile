@@ -47,7 +47,9 @@ class ActivityRepository {
   }
 }
 
-final activityRepositoryProvider = FutureProvider<ActivityRepository>((ref) async {
+final activityRepositoryProvider = FutureProvider<ActivityRepository>((
+  ref,
+) async {
   final dio = await ref.watch(dioProvider.future);
   return ActivityRepository(dio);
 });

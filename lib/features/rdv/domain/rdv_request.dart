@@ -42,8 +42,12 @@ class RdvRequest {
       'lng': lng,
       'address': address,
       'date': date.toIso8601String().split('T')[0], // YYYY-MM-DD
-      'start_time': startTime != null ? '${startTime!.hour.toString().padLeft(2, '0')}:${startTime!.minute.toString().padLeft(2, '0')}' : null,
-      'end_time': endTime != null ? '${endTime!.hour.toString().padLeft(2, '0')}:${endTime!.minute.toString().padLeft(2, '0')}' : null,
+      'start_time': startTime != null
+          ? '${startTime!.hour.toString().padLeft(2, '0')}:${startTime!.minute.toString().padLeft(2, '0')}'
+          : null,
+      'end_time': endTime != null
+          ? '${endTime!.hour.toString().padLeft(2, '0')}:${endTime!.minute.toString().padLeft(2, '0')}'
+          : null,
       'notes': notes,
       'consented': consented,
     };

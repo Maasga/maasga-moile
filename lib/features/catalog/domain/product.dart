@@ -44,7 +44,9 @@ class Product {
       stock: (json['stock'] as num?)?.toInt() ?? 0,
       category: json['category'] as String? ?? 'Mural/Split',
       power: json['power'] as String? ?? '1cv',
-      specs: (json['features'] as List<dynamic>? ?? json['specs'] as List<dynamic>?)
+      specs:
+          (json['features'] as List<dynamic>? ??
+                  json['specs'] as List<dynamic>?)
               ?.map((e) => '$e')
               .where((e) => e.trim().isNotEmpty)
               .toList() ??
@@ -56,13 +58,20 @@ class Product {
       image: json['image'] as String? ?? '',
       imageUrl: json['imageUrl'] as String? ?? json['image_url'] as String?,
       btu: (json['btu'] as num?)?.toInt(),
-      images: (json['media'] as List<dynamic>? ?? json['images'] as List<dynamic>?)?.map((e) {
-        if (e is Map) return e['url']?.toString() ?? '';
-        return '$e';
-      }).where((s) => s.isNotEmpty).toList() ?? [],
+      images:
+          (json['media'] as List<dynamic>? ?? json['images'] as List<dynamic>?)
+              ?.map((e) {
+                if (e is Map) return e['url']?.toString() ?? '';
+                return '$e';
+              })
+              .where((s) => s.isNotEmpty)
+              .toList() ??
+          [],
       oldPrice: (json['old_price'] as num?)?.toInt(),
       description: json['description'] as String? ?? '',
-      technicalSpecs: (json['techSpecs'] as Map<String, dynamic>? ?? json['technical_specs'] as Map<String, dynamic>?)
+      technicalSpecs:
+          (json['techSpecs'] as Map<String, dynamic>? ??
+                  json['technical_specs'] as Map<String, dynamic>?)
               ?.map((k, v) => MapEntry(k, '$v')) ??
           {},
     );

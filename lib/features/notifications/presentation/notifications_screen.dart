@@ -27,15 +27,22 @@ class NotificationsScreen extends ConsumerWidget {
       title: 'Mon Activité',
       bottomNavigationBar: const MainBottomNav(currentPath: '/home'),
       child: activityAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator(color: Color(0xFF1B3A8D))),
-        error: (err, _) => Center(child: Text('Erreur: $err', style: GoogleFonts.poppins())),
+        loading: () => const Center(
+          child: CircularProgressIndicator(color: Color(0xFF1B3A8D)),
+        ),
+        error: (err, _) =>
+            Center(child: Text('Erreur: $err', style: GoogleFonts.poppins())),
         data: (activities) {
           if (activities.isEmpty) {
             return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.notifications_off_outlined, size: 64, color: Colors.grey),
+                  const Icon(
+                    Icons.notifications_off_outlined,
+                    size: 64,
+                    color: Colors.grey,
+                  ),
                   const SizedBox(height: 16),
                   Text(
                     'Aucune activité pour le moment',
@@ -57,27 +64,39 @@ class NotificationsScreen extends ConsumerWidget {
 
                 return Card(
                   margin: const EdgeInsets.only(bottom: 12),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                   child: ListTile(
                     leading: CircleAvatar(
-                      backgroundColor: isOrder 
+                      backgroundColor: isOrder
                           ? const Color(0xFF1B3A8D).withValues(alpha: 0.1)
                           : const Color(0xFFFF6F00).withValues(alpha: 0.1),
                       child: Icon(
-                        isOrder ? Icons.shopping_bag_outlined : Icons.calendar_today_outlined,
-                        color: isOrder ? const Color(0xFF1B3A8D) : const Color(0xFFFF6F00),
+                        isOrder
+                            ? Icons.shopping_bag_outlined
+                            : Icons.calendar_today_outlined,
+                        color: isOrder
+                            ? const Color(0xFF1B3A8D)
+                            : const Color(0xFFFF6F00),
                         size: 20,
                       ),
                     ),
                     title: Text(
                       isOrder ? 'Commande #${activity.id}' : 'Rendez-vous',
-                      style: GoogleFonts.poppins(fontWeight: FontWeight.w600, fontSize: 14),
+                      style: GoogleFonts.poppins(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                      ),
                     ),
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          activity.notes ?? (isOrder ? 'Achat de climatiseur' : 'Visite technique'),
+                          activity.notes ??
+                              (isOrder
+                                  ? 'Achat de climatiseur'
+                                  : 'Visite technique'),
                           style: GoogleFonts.poppins(fontSize: 12),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -85,14 +104,22 @@ class NotificationsScreen extends ConsumerWidget {
                         const SizedBox(height: 2),
                         Text(
                           _formatDate(activity.createdAt),
-                          style: GoogleFonts.poppins(fontSize: 10, color: Colors.grey),
+                          style: GoogleFonts.poppins(
+                            fontSize: 10,
+                            color: Colors.grey,
+                          ),
                         ),
                       ],
                     ),
                     trailing: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
-                        color: _getStatusColor(activity.status).withValues(alpha: 0.1),
+                        color: _getStatusColor(
+                          activity.status,
+                        ).withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(

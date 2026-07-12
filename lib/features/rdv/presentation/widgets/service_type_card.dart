@@ -57,11 +57,7 @@ class ServiceTypeCard extends StatelessWidget {
                   color: isSelected ? selectedIconBg : const Color(0xFFF5F5F5),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Icon(
-                  icon,
-                  color: primaryBlue,
-                  size: 26,
-                ),
+                child: Icon(icon, color: primaryBlue, size: 26),
               ),
               const SizedBox(width: 14),
               Expanded(

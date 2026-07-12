@@ -29,7 +29,6 @@ class RdvFormStep extends StatefulWidget {
   final String? address;
   final Function(bool?) onConsentChanged;
 
-
   const RdvFormStep({
     super.key,
     required this.selectedServiceType,
@@ -88,16 +87,19 @@ class _RdvFormStepState extends State<RdvFormStep> {
         ),
       };
     });
-    
+
     String? address;
     try {
-      List<Placemark> placemarks = await placemarkFromCoordinates(pos.latitude, pos.longitude);
+      List<Placemark> placemarks = await placemarkFromCoordinates(
+        pos.latitude,
+        pos.longitude,
+      );
       if (placemarks.isNotEmpty) {
         final p = placemarks.first;
         address = '${p.street}, ${p.subLocality}, ${p.locality}';
       }
     } catch (_) {}
-    
+
     widget.onLocationChanged(pos, address);
   }
 
@@ -113,7 +115,7 @@ class _RdvFormStepState extends State<RdvFormStep> {
 
     final position = await Geolocator.getCurrentPosition();
     final latLng = LatLng(position.latitude, position.longitude);
-    
+
     _mapController?.animateCamera(CameraUpdate.newLatLngZoom(latLng, 15));
     _updateLocation(latLng);
   }
@@ -154,29 +156,29 @@ class _RdvFormStepState extends State<RdvFormStep> {
               ),
               child: Row(
                 children: [
-                   const Icon(Icons.info_outline, color: primaryBlue, size: 20),
-                   const SizedBox(width: 10),
-                   Expanded(
-                     child: Text(
-                       widget.selectedServiceType,
-                       style: GoogleFonts.poppins(
-                         fontSize: 14,
-                         fontWeight: FontWeight.w600,
-                         color: primaryBlue,
-                       ),
-                     ),
-                   ),
-                   TextButton(
-                     onPressed: widget.onBack,
-                     child: Text(
-                       'Modifier',
-                       style: GoogleFonts.poppins(
-                         fontSize: 13,
-                         fontWeight: FontWeight.w600,
-                         color: primaryBlue,
-                       ),
-                     ),
-                   ),
+                  const Icon(Icons.info_outline, color: primaryBlue, size: 20),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      widget.selectedServiceType,
+                      style: GoogleFonts.poppins(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: primaryBlue,
+                      ),
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: widget.onBack,
+                    child: Text(
+                      'Modifier',
+                      style: GoogleFonts.poppins(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: primaryBlue,
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -185,8 +187,12 @@ class _RdvFormStepState extends State<RdvFormStep> {
             _buildLabel('Nom complet *'),
             TextFormField(
               controller: widget.nameCtrl,
-              decoration: _buildInputDecoration('Votre nom et prénom', Icons.person_outline),
-              validator: (v) => v == null || v.isEmpty ? 'Champ obligatoire' : null,
+              decoration: _buildInputDecoration(
+                'Votre nom et prénom',
+                Icons.person_outline,
+              ),
+              validator: (v) =>
+                  v == null || v.isEmpty ? 'Champ obligatoire' : null,
               style: GoogleFonts.poppins(fontSize: 14),
             ),
             const SizedBox(height: 16),
@@ -195,7 +201,10 @@ class _RdvFormStepState extends State<RdvFormStep> {
             Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 14,
+                  ),
                   decoration: BoxDecoration(
                     color: const Color(0xFFF5F5F5),
                     borderRadius: const BorderRadius.only(
@@ -206,7 +215,10 @@ class _RdvFormStepState extends State<RdvFormStep> {
                   ),
                   child: Text(
                     '+226',
-                    style: GoogleFonts.poppins(fontWeight: FontWeight.w600, fontSize: 13),
+                    style: GoogleFonts.poppins(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 13,
+                    ),
                   ),
                 ),
                 Expanded(
@@ -214,14 +226,15 @@ class _RdvFormStepState extends State<RdvFormStep> {
                     controller: widget.phoneCtrl,
                     keyboardType: TextInputType.phone,
                     decoration: _buildInputDecoration(
-                      'XX XX XX XX', 
+                      'XX XX XX XX',
                       Icons.phone,
                       radius: const BorderRadius.only(
                         topRight: Radius.circular(12),
                         bottomRight: Radius.circular(12),
                       ),
                     ),
-                    validator: (v) => v == null || v.length < 8 ? '8 chiffres minimum' : null,
+                    validator: (v) =>
+                        v == null || v.length < 8 ? '8 chiffres minimum' : null,
                     style: GoogleFonts.poppins(fontSize: 14),
                   ),
                 ),
@@ -233,7 +246,10 @@ class _RdvFormStepState extends State<RdvFormStep> {
             TextFormField(
               controller: widget.emailCtrl,
               keyboardType: TextInputType.emailAddress,
-              decoration: _buildInputDecoration('votre@email.com', Icons.email_outlined),
+              decoration: _buildInputDecoration(
+                'votre@email.com',
+                Icons.email_outlined,
+              ),
               style: GoogleFonts.poppins(fontSize: 14),
             ),
             const SizedBox(height: 16),
@@ -243,11 +259,16 @@ class _RdvFormStepState extends State<RdvFormStep> {
               onTap: _showQuartierPicker,
               child: IgnorePointer(
                 child: TextFormField(
-                  controller: TextEditingController(text: widget.selectedQuartier),
-                  decoration: _buildInputDecoration('Sélectionner votre quartier', Icons.location_city_outlined).copyWith(
-                    suffixIcon: const Icon(Icons.arrow_drop_down),
+                  controller: TextEditingController(
+                    text: widget.selectedQuartier,
                   ),
-                  validator: (v) => v == null || v.isEmpty ? 'Veuillez choisir un quartier' : null,
+                  decoration: _buildInputDecoration(
+                    'Sélectionner votre quartier',
+                    Icons.location_city_outlined,
+                  ).copyWith(suffixIcon: const Icon(Icons.arrow_drop_down)),
+                  validator: (v) => v == null || v.isEmpty
+                      ? 'Veuillez choisir un quartier'
+                      : null,
                   style: GoogleFonts.poppins(fontSize: 14),
                 ),
               ),
@@ -262,26 +283,32 @@ class _RdvFormStepState extends State<RdvFormStep> {
                 border: Border.all(color: const Color(0xFFD8EAFB)),
               ),
               clipBehavior: Clip.antiAlias,
-              child: kIsWeb 
-                ? Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Text(
-                        'La carte interactive n\'est pas disponible en version Web. Veuillez indiquer votre adresse précise ci-dessous.',
-                        textAlign: TextAlign.center,
-                        style: GoogleFonts.poppins(fontSize: 12, color: Colors.grey),
+              child: kIsWeb
+                  ? Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Text(
+                          'La carte interactive n\'est pas disponible en version Web. Veuillez indiquer votre adresse précise ci-dessous.',
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.poppins(
+                            fontSize: 12,
+                            color: Colors.grey,
+                          ),
+                        ),
                       ),
+                    )
+                  : GoogleMap(
+                      initialCameraPosition: CameraPosition(
+                        target: _initialPos,
+                        zoom: 12,
+                      ),
+                      onMapCreated: (c) => _mapController = c,
+                      onTap: _updateLocation,
+                      markers: _markers,
+                      myLocationEnabled: true,
+                      myLocationButtonEnabled: false,
+                      zoomControlsEnabled: false,
                     ),
-                  )
-                : GoogleMap(
-                    initialCameraPosition: CameraPosition(target: _initialPos, zoom: 12),
-                    onMapCreated: (c) => _mapController = c,
-                    onTap: _updateLocation,
-                    markers: _markers,
-                    myLocationEnabled: true,
-                    myLocationButtonEnabled: false,
-                    zoomControlsEnabled: false,
-                  ),
             ),
             Row(
               children: [
@@ -313,7 +340,10 @@ class _RdvFormStepState extends State<RdvFormStep> {
                     Expanded(
                       child: Text(
                         widget.address ?? 'Position sélectionnée',
-                        style: GoogleFonts.poppins(fontSize: 12, color: primaryBlue),
+                        style: GoogleFonts.poppins(
+                          fontSize: 12,
+                          color: primaryBlue,
+                        ),
                       ),
                     ),
                   ],
@@ -327,7 +357,7 @@ class _RdvFormStepState extends State<RdvFormStep> {
                 final today = DateTime.now();
                 final first = DateTime(today.year, today.month, today.day);
                 final initial = first.add(const Duration(days: 1));
-                
+
                 final results = await showCalendarDatePicker2Dialog(
                   context: context,
                   config: CalendarDatePicker2WithActionButtonsConfig(
@@ -349,11 +379,17 @@ class _RdvFormStepState extends State<RdvFormStep> {
                     currentDate: today,
                     cancelButton: Text(
                       'Annuler',
-                      style: GoogleFonts.poppins(color: primaryBlue, fontWeight: FontWeight.w600),
+                      style: GoogleFonts.poppins(
+                        color: primaryBlue,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                     okButton: Text(
                       'Valider',
-                      style: GoogleFonts.poppins(color: primaryBlue, fontWeight: FontWeight.w600),
+                      style: GoogleFonts.poppins(
+                        color: primaryBlue,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                   dialogSize: const Size(325, 400),
@@ -361,12 +397,17 @@ class _RdvFormStepState extends State<RdvFormStep> {
                   value: [widget.selectedDate ?? initial],
                 );
 
-                if (results != null && results.isNotEmpty && results[0] != null) {
+                if (results != null &&
+                    results.isNotEmpty &&
+                    results[0] != null) {
                   widget.onDateChanged(results[0]!);
                 }
               },
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 14,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(12),
@@ -374,15 +415,24 @@ class _RdvFormStepState extends State<RdvFormStep> {
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.calendar_today_outlined, color: Color(0xFF757575), size: 20),
+                    const Icon(
+                      Icons.calendar_today_outlined,
+                      color: Color(0xFF757575),
+                      size: 20,
+                    ),
                     const SizedBox(width: 12),
                     Text(
-                      widget.selectedDate == null 
-                          ? 'Sélectionner une date' 
-                          : DateFormat('EEEE d MMMM yyyy', 'fr_FR').format(widget.selectedDate!),
+                      widget.selectedDate == null
+                          ? 'Sélectionner une date'
+                          : DateFormat(
+                              'EEEE d MMMM yyyy',
+                              'fr_FR',
+                            ).format(widget.selectedDate!),
                       style: GoogleFonts.poppins(
                         fontSize: 14,
-                        color: widget.selectedDate == null ? const Color(0xFF9E9E9E) : const Color(0xFF1A1A1A),
+                        color: widget.selectedDate == null
+                            ? const Color(0xFF9E9E9E)
+                            : const Color(0xFF1A1A1A),
                       ),
                     ),
                     const Spacer(),
@@ -396,7 +446,10 @@ class _RdvFormStepState extends State<RdvFormStep> {
             _buildLabel('Horaire souhaité'),
             Text(
               "Choisissez l'intervalle de disponibilité",
-              style: GoogleFonts.poppins(fontSize: 11, color: const Color(0xFF9E9E9E)),
+              style: GoogleFonts.poppins(
+                fontSize: 11,
+                color: const Color(0xFF9E9E9E),
+              ),
             ),
             const SizedBox(height: 8),
             Row(
@@ -413,7 +466,10 @@ class _RdvFormStepState extends State<RdvFormStep> {
               controller: widget.notesCtrl,
               maxLines: 4,
               maxLength: 500,
-              decoration: _buildInputDecoration('Décrivez votre projet ou problème...', null),
+              decoration: _buildInputDecoration(
+                'Décrivez votre projet ou problème...',
+                null,
+              ),
               style: GoogleFonts.poppins(fontSize: 14),
             ),
 
@@ -426,7 +482,7 @@ class _RdvFormStepState extends State<RdvFormStep> {
                   height: 24,
                   child: Checkbox(
                     value: widget.isConsented,
-                   onChanged: widget.onConsentChanged,
+                    onChanged: widget.onConsentChanged,
                     activeColor: primaryBlue,
                   ),
                 ),
@@ -434,7 +490,10 @@ class _RdvFormStepState extends State<RdvFormStep> {
                 Expanded(
                   child: Text(
                     "J'accepte d'être contacté(e) par MAASGA concernant ma demande. Mes données sont utilisées uniquement pour le suivi de ma demande.",
-                    style: GoogleFonts.poppins(fontSize: 11, color: const Color(0xFF757575)),
+                    style: GoogleFonts.poppins(
+                      fontSize: 11,
+                      color: const Color(0xFF757575),
+                    ),
                   ),
                 ),
               ],
@@ -460,12 +519,21 @@ class _RdvFormStepState extends State<RdvFormStep> {
     );
   }
 
-  InputDecoration _buildInputDecoration(String hint, IconData? icon, {BorderRadius? radius}) {
+  InputDecoration _buildInputDecoration(
+    String hint,
+    IconData? icon, {
+    BorderRadius? radius,
+  }) {
     final borderRadius = radius ?? BorderRadius.circular(12);
     return InputDecoration(
       hintText: hint,
-      hintStyle: GoogleFonts.poppins(color: const Color(0xFF9E9E9E), fontSize: 13),
-      prefixIcon: icon != null ? Icon(icon, color: const Color(0xFF757575), size: 20) : null,
+      hintStyle: GoogleFonts.poppins(
+        color: const Color(0xFF9E9E9E),
+        fontSize: 13,
+      ),
+      prefixIcon: icon != null
+          ? Icon(icon, color: const Color(0xFF757575), size: 20)
+          : null,
       filled: true,
       fillColor: Colors.white,
       enabledBorder: OutlineInputBorder(
@@ -493,7 +561,11 @@ class _RdvFormStepState extends State<RdvFormStep> {
       onTap: () async {
         final picked = await showTimePicker(
           context: context,
-          initialTime: time ?? (isStart ? const TimeOfDay(hour: 8, minute: 0) : const TimeOfDay(hour: 17, minute: 0)),
+          initialTime:
+              time ??
+              (isStart
+                  ? const TimeOfDay(hour: 8, minute: 0)
+                  : const TimeOfDay(hour: 17, minute: 0)),
         );
         if (picked != null) widget.onTimeChanged(picked, isStart);
       },
@@ -506,13 +578,19 @@ class _RdvFormStepState extends State<RdvFormStep> {
         ),
         child: Row(
           children: [
-            const Icon(Icons.access_time_outlined, color: Color(0xFF757575), size: 20),
+            const Icon(
+              Icons.access_time_outlined,
+              color: Color(0xFF757575),
+              size: 20,
+            ),
             const SizedBox(width: 8),
             Text(
               time == null ? (isStart ? 'Début' : 'Fin') : time.format(context),
               style: GoogleFonts.poppins(
                 fontSize: 13,
-                color: time == null ? const Color(0xFF9E9E9E) : const Color(0xFF1A1A1A),
+                color: time == null
+                    ? const Color(0xFF9E9E9E)
+                    : const Color(0xFF1A1A1A),
               ),
             ),
           ],
@@ -526,7 +604,10 @@ class _QuartierSearchDialog extends StatefulWidget {
   final String? currentSelection;
   final Function(String) onSelected;
 
-  const _QuartierSearchDialog({required this.currentSelection, required this.onSelected});
+  const _QuartierSearchDialog({
+    required this.currentSelection,
+    required this.onSelected,
+  });
 
   @override
   State<_QuartierSearchDialog> createState() => _QuartierSearchDialogState();
@@ -534,7 +615,7 @@ class _QuartierSearchDialog extends StatefulWidget {
 
 class _QuartierSearchDialogState extends State<_QuartierSearchDialog> {
   String _search = '';
-  
+
   @override
   Widget build(BuildContext context) {
     final filtered = ouagaNeighborhoods
@@ -551,9 +632,22 @@ class _QuartierSearchDialogState extends State<_QuartierSearchDialog> {
       child: Column(
         children: [
           const SizedBox(height: 12),
-          Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2))),
+          Container(
+            width: 40,
+            height: 4,
+            decoration: BoxDecoration(
+              color: Colors.grey[300],
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
           const SizedBox(height: 20),
-          Text('Sélectionner votre quartier', style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w600)),
+          Text(
+            'Sélectionner votre quartier',
+            style: GoogleFonts.poppins(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
           const SizedBox(height: 16),
           TextField(
             onChanged: (v) => setState(() => _search = v),
@@ -562,7 +656,10 @@ class _QuartierSearchDialogState extends State<_QuartierSearchDialog> {
               prefixIcon: const Icon(Icons.search),
               filled: true,
               fillColor: const Color(0xFFF5F5F5),
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide.none,
+              ),
             ),
           ),
           const SizedBox(height: 12),
@@ -574,8 +671,21 @@ class _QuartierSearchDialogState extends State<_QuartierSearchDialog> {
                 final q = filtered[index];
                 final isSelected = q == widget.currentSelection;
                 return ListTile(
-                  title: Text(q, style: GoogleFonts.poppins(fontSize: 14, color: isSelected ? const Color(0xFF1B3A8D) : Colors.black87, fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400)),
-                  trailing: isSelected ? const Icon(Icons.check, color: Color(0xFF1B3A8D)) : null,
+                  title: Text(
+                    q,
+                    style: GoogleFonts.poppins(
+                      fontSize: 14,
+                      color: isSelected
+                          ? const Color(0xFF1B3A8D)
+                          : Colors.black87,
+                      fontWeight: isSelected
+                          ? FontWeight.w600
+                          : FontWeight.w400,
+                    ),
+                  ),
+                  trailing: isSelected
+                      ? const Icon(Icons.check, color: Color(0xFF1B3A8D))
+                      : null,
                   onTap: () => widget.onSelected(q),
                 );
               },

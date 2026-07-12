@@ -16,8 +16,11 @@ class RdvConfirmationStep extends StatelessWidget {
 
   Future<void> _launchWhatsApp() async {
     final phone = '22655996418';
-    final message = 'Bonjour MAASGA, je viens d\'envoyer une demande de rendez-vous pour : ${request.serviceType}.';
-    final url = Uri.parse('https://wa.me/$phone?text=${Uri.encodeComponent(message)}');
+    final message =
+        'Bonjour MAASGA, je viens d\'envoyer une demande de rendez-vous pour : ${request.serviceType}.';
+    final url = Uri.parse(
+      'https://wa.me/$phone?text=${Uri.encodeComponent(message)}',
+    );
     if (await canLaunchUrl(url)) {
       await launchUrl(url, mode: LaunchMode.externalApplication);
     }

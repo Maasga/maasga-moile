@@ -107,20 +107,36 @@ class ComparisonTable extends StatelessWidget {
   TableRow _buildHeaderRow() {
     return TableRow(
       decoration: const BoxDecoration(color: Color(0xFF1B3A8D)),
-      children: ['', 'Trim.', 'Sem.', 'Ann.'].map((text) => Padding(
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
-        child: Text(
-          text,
-          textAlign: TextAlign.center,
-          style: GoogleFonts.poppins(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600),
-        ),
-      )).toList(),
+      children: ['', 'Trim.', 'Sem.', 'Ann.']
+          .map(
+            (text) => Padding(
+              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
+              child: Text(
+                text,
+                textAlign: TextAlign.center,
+                style: GoogleFonts.poppins(
+                  color: Colors.white,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          )
+          .toList(),
     );
   }
 
-  TableRow _buildDataRow(String label, String v1, String v2, String v3, {bool isAlt = false}) {
+  TableRow _buildDataRow(
+    String label,
+    String v1,
+    String v2,
+    String v3, {
+    bool isAlt = false,
+  }) {
     return TableRow(
-      decoration: BoxDecoration(color: isAlt ? const Color(0xFFF8F9FF) : Colors.white),
+      decoration: BoxDecoration(
+        color: isAlt ? const Color(0xFFF8F9FF) : Colors.white,
+      ),
       children: [
         _cell(label, isLabel: true),
         _cell(v1),
@@ -130,9 +146,17 @@ class ComparisonTable extends StatelessWidget {
     );
   }
 
-  TableRow _buildCheckRow(String label, bool c1, bool c2, bool c3, {bool isAlt = false}) {
+  TableRow _buildCheckRow(
+    String label,
+    bool c1,
+    bool c2,
+    bool c3, {
+    bool isAlt = false,
+  }) {
     return TableRow(
-      decoration: BoxDecoration(color: isAlt ? const Color(0xFFF8F9FF) : Colors.white),
+      decoration: BoxDecoration(
+        color: isAlt ? const Color(0xFFF8F9FF) : Colors.white,
+      ),
       children: [
         _cell(label, isLabel: true),
         _checkCell(c1),
@@ -151,7 +175,11 @@ class ComparisonTable extends StatelessWidget {
         style: GoogleFonts.poppins(
           fontSize: 12,
           fontWeight: isLabel ? FontWeight.w500 : FontWeight.w600,
-          color: isLabel ? const Color(0xFF1A1A1A) : (text == '—' ? const Color(0xFFD0D0D0) : const Color(0xFF1B3A8D)),
+          color: isLabel
+              ? const Color(0xFF1A1A1A)
+              : (text == '—'
+                    ? const Color(0xFFD0D0D0)
+                    : const Color(0xFF1B3A8D)),
         ),
       ),
     );
@@ -161,9 +189,15 @@ class ComparisonTable extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
       child: Center(
-        child: checked 
-          ? const Icon(Icons.check_circle, color: Color(0xFF43A047), size: 16)
-          : Text('—', style: GoogleFonts.poppins(color: const Color(0xFFD0D0D0), fontSize: 12)),
+        child: checked
+            ? const Icon(Icons.check_circle, color: Color(0xFF43A047), size: 16)
+            : Text(
+                '—',
+                style: GoogleFonts.poppins(
+                  color: const Color(0xFFD0D0D0),
+                  fontSize: 12,
+                ),
+              ),
       ),
     );
   }
@@ -221,11 +255,18 @@ class PaymentOptionCard extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w600, color: const Color(0xFF1A1A1A)),
+                    style: GoogleFonts.poppins(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: const Color(0xFF1A1A1A),
+                    ),
                   ),
                   Text(
                     subtitle,
-                    style: GoogleFonts.poppins(fontSize: 11, color: const Color(0xFF757575)),
+                    style: GoogleFonts.poppins(
+                      fontSize: 11,
+                      color: const Color(0xFF757575),
+                    ),
                   ),
                 ],
               ),

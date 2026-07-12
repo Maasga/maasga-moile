@@ -15,12 +15,22 @@ class MainBottomNav extends ConsumerWidget {
   static const _unselected = Color(0xFF9E9E9E);
 
   int _indexFromPath() {
-    if (currentPath.startsWith('/catalog') || currentPath.startsWith('/catalogue')) return 1;
-    if (currentPath.startsWith('/simulator') || currentPath.startsWith('/simulateur')) return 2;
-    if (currentPath.startsWith('/rdv') || currentPath.startsWith('/rendez-vous') || currentPath.startsWith('/service') || currentPath.startsWith('/support')) return 3;
+    if (currentPath.startsWith('/catalog') ||
+        currentPath.startsWith('/catalogue'))
+      return 1;
+    if (currentPath.startsWith('/simulator') ||
+        currentPath.startsWith('/simulateur'))
+      return 2;
+    if (currentPath.startsWith('/rdv') ||
+        currentPath.startsWith('/rendez-vous') ||
+        currentPath.startsWith('/service') ||
+        currentPath.startsWith('/support'))
+      return 3;
     if (currentPath.startsWith('/maintenance')) return 4;
     if (currentPath.startsWith('/cart')) return 5;
-    if (currentPath.startsWith('/client-space') || currentPath.startsWith('/espace-client')) return 6;
+    if (currentPath.startsWith('/client-space') ||
+        currentPath.startsWith('/espace-client'))
+      return 6;
     return 0;
   }
 
@@ -33,10 +43,7 @@ class MainBottomNav extends ConsumerWidget {
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
         boxShadow: [
-          BoxShadow(
-            blurRadius: 20,
-            color: Colors.black.withValues(alpha: .1),
-          )
+          BoxShadow(blurRadius: 20, color: Colors.black.withValues(alpha: .1)),
         ],
       ),
       child: SafeArea(
@@ -69,38 +76,69 @@ class MainBottomNav extends ConsumerWidget {
               const GButton(
                 icon: Icons.home_outlined,
                 text: 'Accueil',
-                textStyle: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: _primaryBlue),
+                textStyle: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: _primaryBlue,
+                ),
               ),
               const GButton(
                 icon: Icons.grid_view_outlined,
                 text: 'Catalogue',
-                textStyle: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: _primaryBlue),
+                textStyle: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: _primaryBlue,
+                ),
               ),
               const GButton(
                 icon: Icons.calculate_outlined,
                 text: 'Simul.',
-                textStyle: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: _primaryBlue),
+                textStyle: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: _primaryBlue,
+                ),
               ),
               const GButton(
                 icon: Icons.build_outlined,
                 text: 'Services',
-                textStyle: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: _primaryBlue),
+                textStyle: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: _primaryBlue,
+                ),
               ),
               const GButton(
                 icon: Icons.verified_user_outlined,
                 text: 'Contrat',
-                textStyle: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: _primaryBlue),
+                textStyle: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: _primaryBlue,
+                ),
               ),
               GButton(
                 icon: Icons.shopping_cart_outlined,
                 text: 'Panier',
-                leading: _CartIcon(cartCount: cartCount, isSelected: _indexFromPath() == 5),
-                textStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: _primaryBlue),
+                leading: _CartIcon(
+                  cartCount: cartCount,
+                  isSelected: _indexFromPath() == 5,
+                ),
+                textStyle: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: _primaryBlue,
+                ),
               ),
               const GButton(
                 icon: Icons.person_outline,
                 text: 'Profil',
-                textStyle: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: _primaryBlue),
+                textStyle: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: _primaryBlue,
+                ),
               ),
             ],
           ),
@@ -119,13 +157,15 @@ class _CartIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const badgeColor = Color(0xFFE53935);
-    final iconColor = isSelected ? const Color(0xFF1B3A8D) : const Color(0xFF9E9E9E);
+    final iconColor = isSelected
+        ? const Color(0xFF1B3A8D)
+        : const Color(0xFF9E9E9E);
 
     return Stack(
       clipBehavior: Clip.none,
       children: [
         Icon(
-          isSelected ? Icons.shopping_cart : Icons.shopping_cart_outlined, 
+          isSelected ? Icons.shopping_cart : Icons.shopping_cart_outlined,
           color: iconColor,
           size: 22,
         ),
@@ -140,10 +180,7 @@ class _CartIcon extends StatelessWidget {
                 color: badgeColor,
                 border: Border.all(color: Colors.white, width: 1),
               ),
-              constraints: const BoxConstraints(
-                minWidth: 14,
-                minHeight: 14,
-              ),
+              constraints: const BoxConstraints(minWidth: 14, minHeight: 14),
               alignment: Alignment.center,
               child: Text(
                 cartCount > 9 ? '9' : '$cartCount',

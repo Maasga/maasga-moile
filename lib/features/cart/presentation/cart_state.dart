@@ -22,7 +22,10 @@ class CartNotifier extends Notifier<List<CartLine>> {
     }
     final updated = [...state];
     final line = updated[index];
-    updated[index] = CartLine(product: line.product, quantity: line.quantity + 1);
+    updated[index] = CartLine(
+      product: line.product,
+      quantity: line.quantity + 1,
+    );
     state = updated;
   }
 
@@ -34,7 +37,10 @@ class CartNotifier extends Notifier<List<CartLine>> {
     if (line.quantity <= 1) {
       updated.removeAt(index);
     } else {
-      updated[index] = CartLine(product: line.product, quantity: line.quantity - 1);
+      updated[index] = CartLine(
+        product: line.product,
+        quantity: line.quantity - 1,
+      );
     }
     state = updated;
   }
@@ -42,7 +48,9 @@ class CartNotifier extends Notifier<List<CartLine>> {
   void clear() => state = [];
 }
 
-final cartProvider = NotifierProvider<CartNotifier, List<CartLine>>(CartNotifier.new);
+final cartProvider = NotifierProvider<CartNotifier, List<CartLine>>(
+  CartNotifier.new,
+);
 
 final cartTotalProvider = Provider<int>((ref) {
   return ref.watch(cartProvider).fold(0, (sum, line) => sum + line.total);

@@ -25,9 +25,7 @@ void main() {
   testWidgets('L\'app démarre sur le splash puis redirige', (tester) async {
     await tester.pumpWidget(
       ProviderScope(
-        overrides: [
-          cookieJarProvider.overrideWith((ref) async => CookieJar()),
-        ],
+        overrides: [cookieJarProvider.overrideWith((ref) async => CookieJar())],
         child: const MaasgaMobileApp(),
       ),
     );

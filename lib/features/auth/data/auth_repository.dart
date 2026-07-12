@@ -25,7 +25,9 @@ class AuthRepository {
         await _storage.write(key: 'maasga_token', value: token as String);
       }
     } on DioException catch (e) {
-      debugPrint('AUTH LOGIN ERROR: ${e.response?.statusCode} - ${e.response?.data}');
+      debugPrint(
+        'AUTH LOGIN ERROR: ${e.response?.statusCode} - ${e.response?.data}',
+      );
       rethrow;
     }
   }
@@ -54,19 +56,22 @@ class AuthRepository {
         await _storage.write(key: 'maasga_token', value: token as String);
       }
     } on DioException catch (e) {
-      debugPrint('AUTH REGISTER ERROR: ${e.response?.statusCode} - ${e.response?.data}');
+      debugPrint(
+        'AUTH REGISTER ERROR: ${e.response?.statusCode} - ${e.response?.data}',
+      );
       rethrow;
     }
   }
 
-  Future<void> loginWithGoogle({
-    required String accessToken,
-  }) async {
+  Future<void> loginWithGoogle({required String accessToken}) async {
     await _dio.post(
       '/api/auth/google/mobile',
       data: {'accessToken': accessToken},
       options: Options(
-        headers: {'Content-Type': 'application/json', 'Accept': 'application/json'},
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
       ),
     );
   }
@@ -88,7 +93,8 @@ class AuthRepository {
     try {
       final response = await _dio.get('/api/mobile/profile');
       if (response.statusCode == 200 && response.data != null) {
-        return response.data['user'] as Map<String, dynamic>? ?? response.data as Map<String, dynamic>?;
+        return response.data['user'] as Map<String, dynamic>? ??
+            response.data as Map<String, dynamic>?;
       }
     } catch (_) {}
     return null;

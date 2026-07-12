@@ -21,19 +21,22 @@ class OnboardingScreen extends StatelessWidget {
       pages: [
         PageViewModel(
           title: "La Plus Grosse Base de Données",
-          body: "L'accès exclusif au catalogue le plus complet du Burkina Faso. Toutes les marques et spécifications techniques à portée de main.",
+          body:
+              "L'accès exclusif au catalogue le plus complet du Burkina Faso. Toutes les marques et spécifications techniques à portée de main.",
           image: _buildImage('assets/logo_maasga.png'),
           decoration: pageDecoration,
         ),
         PageViewModel(
           title: "Simulateur Intelligent",
-          body: "Calculez précisément vos besoins en BTU pour un confort optimal et des économies d'énergie garanties.",
+          body:
+              "Calculez précisément vos besoins en BTU pour un confort optimal et des économies d'énergie garanties.",
           image: _buildIcon(Icons.calculate_outlined),
           decoration: pageDecoration,
         ),
         PageViewModel(
           title: "Expertise MAASGA",
-          body: "Bénéficiez d'un accompagnement complet : de la sélection rigoureuse à l'installation professionnelle.",
+          body:
+              "Bénéficiez d'un accompagnement complet : de la sélection rigoureuse à l'installation professionnelle.",
           image: _buildIcon(Icons.verified_user_outlined),
           decoration: pageDecoration,
           footer: Padding(
@@ -43,11 +46,16 @@ class OnboardingScreen extends StatelessWidget {
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF1B3A8D),
                 minimumSize: const Size(200, 50),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
               child: Text(
                 'C\'est parti !',
-                style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.w600),
+                style: GoogleFonts.poppins(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
           ),
@@ -56,9 +64,21 @@ class OnboardingScreen extends StatelessWidget {
       onDone: () => context.go('/auth/login'),
       onSkip: () => context.go('/auth/login'),
       showSkipButton: true,
-      skip: Text('Passer', style: GoogleFonts.poppins(fontWeight: FontWeight.w600, color: const Color(0xFF1B3A8D))),
+      skip: Text(
+        'Passer',
+        style: GoogleFonts.poppins(
+          fontWeight: FontWeight.w600,
+          color: const Color(0xFF1B3A8D),
+        ),
+      ),
       next: const Icon(Icons.arrow_forward, color: Color(0xFF1B3A8D)),
-      done: Text('Terminer', style: GoogleFonts.poppins(fontWeight: FontWeight.w700, color: const Color(0xFF1B3A8D))),
+      done: Text(
+        'Terminer',
+        style: GoogleFonts.poppins(
+          fontWeight: FontWeight.w700,
+          color: const Color(0xFF1B3A8D),
+        ),
+      ),
       curve: Curves.fastLinearToSlowEaseIn,
       dotsDecorator: const DotsDecorator(
         size: Size(10.0, 10.0),

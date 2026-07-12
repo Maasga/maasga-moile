@@ -23,7 +23,7 @@ class _SimulatorScreenState extends ConsumerState<SimulatorScreen> {
   String? _selectedSurfaceChip;
   final _longueurCtrl = TextEditingController();
   final _largeurCtrl = TextEditingController();
-  
+
   String _selectedHauteur = 'Standard';
   String _selectedFenetres = '1';
   String _selectedExposition = 'Modérée';
@@ -52,10 +52,18 @@ class _SimulatorScreenState extends ConsumerState<SimulatorScreen> {
     } else if (_selectedSurfaceChip != null) {
       // Use middle of range
       switch (_selectedSurfaceChip) {
-        case '9 - 15 m²': surface = 12; break;
-        case '15 - 25 m²': surface = 20; break;
-        case '25 - 40 m²': surface = 32.5; break;
-        case '40 - 60 m²': surface = 50; break;
+        case '9 - 15 m²':
+          surface = 12;
+          break;
+        case '15 - 25 m²':
+          surface = 20;
+          break;
+        case '25 - 40 m²':
+          surface = 32.5;
+          break;
+        case '40 - 60 m²':
+          surface = 50;
+          break;
       }
     }
 
@@ -110,31 +118,31 @@ class _SimulatorScreenState extends ConsumerState<SimulatorScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildIntroCard(),
-                  
+
                   _SectionCard(
                     icon: Icons.square_foot_outlined,
                     title: 'Surface de votre pièce ?',
                     child: _buildSurfaceSection(),
                   ),
-                  
+
                   _SectionCard(
                     icon: Icons.height_outlined,
                     title: 'Hauteur du plafond',
                     child: _buildHeightSection(),
                   ),
-                  
+
                   _SectionCard(
                     icon: Icons.window_outlined,
                     title: 'Nombre de fenêtres / ouvertures',
                     child: _buildWindowsSection(),
                   ),
-                  
+
                   _SectionCard(
                     icon: Icons.wb_sunny_outlined,
                     title: 'Exposition solaire de la pièce',
                     child: _buildExpositionSection(),
                   ),
-                  
+
                   _SectionCard(
                     icon: Icons.meeting_room_outlined,
                     title: 'Type de pièce',
@@ -142,18 +150,30 @@ class _SimulatorScreenState extends ConsumerState<SimulatorScreen> {
                   ),
 
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
                     child: ElevatedButton.icon(
                       onPressed: _calculate,
-                      icon: const Icon(Icons.calculate_outlined, color: Colors.white),
+                      icon: const Icon(
+                        Icons.calculate_outlined,
+                        color: Colors.white,
+                      ),
                       label: Text(
                         'Calculer la puissance recommandée',
-                        style: GoogleFonts.poppins(fontWeight: FontWeight.w600, fontSize: 15, color: Colors.white),
+                        style: GoogleFonts.poppins(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 15,
+                          color: Colors.white,
+                        ),
                       ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF1B3A8D),
                         minimumSize: const Size(double.infinity, 54),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
                       ),
                     ),
                   ),
@@ -164,7 +184,7 @@ class _SimulatorScreenState extends ConsumerState<SimulatorScreen> {
                   ],
 
                   _buildGuideSection(),
-                  
+
                   const SizedBox(height: 32),
                 ],
               ),
@@ -193,11 +213,18 @@ class _SimulatorScreenState extends ConsumerState<SimulatorScreen> {
               children: [
                 Text(
                   'Outil gratuit · Résultat immédiat',
-                  style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w600, color: const Color(0xFF1B3A8D)),
+                  style: GoogleFonts.poppins(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: const Color(0xFF1B3A8D),
+                  ),
                 ),
                 Text(
                   'Remplissez les champs pour calculer la puissance idéale pour votre pièce.',
-                  style: GoogleFonts.poppins(fontSize: 12, color: const Color(0xFF757575)),
+                  style: GoogleFonts.poppins(
+                    fontSize: 12,
+                    color: const Color(0xFF757575),
+                  ),
                 ),
               ],
             ),
@@ -218,7 +245,13 @@ class _SimulatorScreenState extends ConsumerState<SimulatorScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Sélection rapide', style: GoogleFonts.poppins(fontSize: 11, color: const Color(0xFF9E9E9E))),
+        Text(
+          'Sélection rapide',
+          style: GoogleFonts.poppins(
+            fontSize: 11,
+            color: const Color(0xFF9E9E9E),
+          ),
+        ),
         const SizedBox(height: 8),
         GridView.builder(
           shrinkWrap: true,
@@ -244,10 +277,14 @@ class _SimulatorScreenState extends ConsumerState<SimulatorScreen> {
               child: Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: isSelected ? const Color(0xFFE8EEFF) : const Color(0xFFF5F5F5),
+                  color: isSelected
+                      ? const Color(0xFFE8EEFF)
+                      : const Color(0xFFF5F5F5),
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(
-                    color: isSelected ? const Color(0xFF1B3A8D) : const Color(0xFFE0E0E0),
+                    color: isSelected
+                        ? const Color(0xFF1B3A8D)
+                        : const Color(0xFFE0E0E0),
                     width: isSelected ? 2 : 1,
                   ),
                 ),
@@ -260,12 +297,17 @@ class _SimulatorScreenState extends ConsumerState<SimulatorScreen> {
                       style: GoogleFonts.poppins(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
-                        color: isSelected ? const Color(0xFF1B3A8D) : const Color(0xFF1A1A1A),
+                        color: isSelected
+                            ? const Color(0xFF1B3A8D)
+                            : const Color(0xFF1A1A1A),
                       ),
                     ),
                     Text(
                       chip['desc']!,
-                      style: GoogleFonts.poppins(fontSize: 10, color: const Color(0xFF757575)),
+                      style: GoogleFonts.poppins(
+                        fontSize: 10,
+                        color: const Color(0xFF757575),
+                      ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -281,13 +323,25 @@ class _SimulatorScreenState extends ConsumerState<SimulatorScreen> {
             const Expanded(child: Divider()),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10),
-              child: Text('ou saisir manuellement', style: GoogleFonts.poppins(fontSize: 11, color: const Color(0xFF9E9E9E))),
+              child: Text(
+                'ou saisir manuellement',
+                style: GoogleFonts.poppins(
+                  fontSize: 11,
+                  color: const Color(0xFF9E9E9E),
+                ),
+              ),
             ),
             const Expanded(child: Divider()),
           ],
         ),
         const SizedBox(height: 12),
-        Text('Dimensions exactes', style: GoogleFonts.poppins(fontSize: 11, color: const Color(0xFF9E9E9E))),
+        Text(
+          'Dimensions exactes',
+          style: GoogleFonts.poppins(
+            fontSize: 11,
+            color: const Color(0xFF9E9E9E),
+          ),
+        ),
         const SizedBox(height: 8),
         Row(
           children: [
@@ -305,32 +359,49 @@ class _SimulatorScreenState extends ConsumerState<SimulatorScreen> {
             padding: const EdgeInsets.only(top: 8),
             child: Text(
               '→ Surface calculée : ${(double.tryParse(_longueurCtrl.text) ?? 0) * (double.tryParse(_largeurCtrl.text) ?? 0)} m²',
-              style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w500, color: const Color(0xFF1B3A8D)),
+              style: GoogleFonts.poppins(
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                color: const Color(0xFF1B3A8D),
+              ),
             ),
           ),
       ],
     );
   }
 
-  Widget _buildNumberField(TextEditingController ctrl, String label, String hint) {
+  Widget _buildNumberField(
+    TextEditingController ctrl,
+    String label,
+    String hint,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w500)),
+        Text(
+          label,
+          style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w500),
+        ),
         const SizedBox(height: 4),
         TextField(
           controller: ctrl,
           keyboardType: const TextInputType.numberWithOptions(decimal: true),
           onChanged: (val) {
-             if (val.isNotEmpty) setState(() => _selectedSurfaceChip = null);
+            if (val.isNotEmpty) setState(() => _selectedSurfaceChip = null);
           },
           decoration: InputDecoration(
             hintText: hint,
             suffixText: 'm',
             filled: true,
             fillColor: const Color(0xFFF5F5F5),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 12,
+              vertical: 10,
+            ),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide.none,
+            ),
           ),
           style: GoogleFonts.poppins(fontSize: 13),
         ),
@@ -357,14 +428,35 @@ class _SimulatorScreenState extends ConsumerState<SimulatorScreen> {
               margin: const EdgeInsets.only(right: 8),
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
               decoration: BoxDecoration(
-                color: isSelected ? const Color(0xFFE8EEFF) : const Color(0xFFF5F5F5),
+                color: isSelected
+                    ? const Color(0xFFE8EEFF)
+                    : const Color(0xFFF5F5F5),
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: isSelected ? const Color(0xFF1B3A8D) : const Color(0xFFE0E0E0)),
+                border: Border.all(
+                  color: isSelected
+                      ? const Color(0xFF1B3A8D)
+                      : const Color(0xFFE0E0E0),
+                ),
               ),
               child: Column(
                 children: [
-                  Text(opt['lbl']!, style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w600, color: isSelected ? const Color(0xFF1B3A8D) : const Color(0xFF1A1A1A))),
-                  Text(opt['val']!, style: GoogleFonts.poppins(fontSize: 10, color: const Color(0xFF757575))),
+                  Text(
+                    opt['lbl']!,
+                    style: GoogleFonts.poppins(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: isSelected
+                          ? const Color(0xFF1B3A8D)
+                          : const Color(0xFF1A1A1A),
+                    ),
+                  ),
+                  Text(
+                    opt['val']!,
+                    style: GoogleFonts.poppins(
+                      fontSize: 10,
+                      color: const Color(0xFF757575),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -387,11 +479,26 @@ class _SimulatorScreenState extends ConsumerState<SimulatorScreen> {
             alignment: Alignment.center,
             margin: const EdgeInsets.only(right: 8),
             decoration: BoxDecoration(
-              color: isSelected ? const Color(0xFFE8EEFF) : const Color(0xFFF5F5F5),
+              color: isSelected
+                  ? const Color(0xFFE8EEFF)
+                  : const Color(0xFFF5F5F5),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: isSelected ? const Color(0xFF1B3A8D) : const Color(0xFFE0E0E0)),
+              border: Border.all(
+                color: isSelected
+                    ? const Color(0xFF1B3A8D)
+                    : const Color(0xFFE0E0E0),
+              ),
             ),
-            child: Text(opt, style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600, color: isSelected ? const Color(0xFF1B3A8D) : const Color(0xFF1A1A1A))),
+            child: Text(
+              opt,
+              style: GoogleFonts.poppins(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: isSelected
+                    ? const Color(0xFF1B3A8D)
+                    : const Color(0xFF1A1A1A),
+              ),
+            ),
           ),
         );
       }).toList(),
@@ -414,10 +521,14 @@ class _SimulatorScreenState extends ConsumerState<SimulatorScreen> {
             margin: const EdgeInsets.only(bottom: 8),
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: isSelected ? const Color(0xFFE8EEFF) : const Color(0xFFF5F5F5),
+              color: isSelected
+                  ? const Color(0xFFE8EEFF)
+                  : const Color(0xFFF5F5F5),
               borderRadius: BorderRadius.circular(10),
               border: Border.all(
-                color: isSelected ? const Color(0xFF1B3A8D) : const Color(0xFFE0E0E0),
+                color: isSelected
+                    ? const Color(0xFF1B3A8D)
+                    : const Color(0xFFE0E0E0),
                 width: isSelected ? 2 : 1,
               ),
             ),
@@ -428,10 +539,22 @@ class _SimulatorScreenState extends ConsumerState<SimulatorScreen> {
                   height: 20,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    border: Border.all(color: const Color(0xFF1B3A8D), width: 1.5),
+                    border: Border.all(
+                      color: const Color(0xFF1B3A8D),
+                      width: 1.5,
+                    ),
                   ),
-                  child: isSelected 
-                      ? Center(child: Container(width: 10, height: 10, decoration: const BoxDecoration(color: Color(0xFF1B3A8D), shape: BoxShape.circle)))
+                  child: isSelected
+                      ? Center(
+                          child: Container(
+                            width: 10,
+                            height: 10,
+                            decoration: const BoxDecoration(
+                              color: Color(0xFF1B3A8D),
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                        )
                       : null,
                 ),
                 const SizedBox(width: 12),
@@ -439,8 +562,20 @@ class _SimulatorScreenState extends ConsumerState<SimulatorScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(opt['val']!, style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w600)),
-                      Text(opt['desc']!, style: GoogleFonts.poppins(fontSize: 11, color: const Color(0xFF757575))),
+                      Text(
+                        opt['val']!,
+                        style: GoogleFonts.poppins(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      Text(
+                        opt['desc']!,
+                        style: GoogleFonts.poppins(
+                          fontSize: 11,
+                          color: const Color(0xFF757575),
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -465,11 +600,26 @@ class _SimulatorScreenState extends ConsumerState<SimulatorScreen> {
               margin: const EdgeInsets.only(right: 8),
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               decoration: BoxDecoration(
-                color: isSelected ? const Color(0xFFE8EEFF) : const Color(0xFFF5F5F5),
+                color: isSelected
+                    ? const Color(0xFFE8EEFF)
+                    : const Color(0xFFF5F5F5),
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: isSelected ? const Color(0xFF1B3A8D) : const Color(0xFFE0E0E0)),
+                border: Border.all(
+                  color: isSelected
+                      ? const Color(0xFF1B3A8D)
+                      : const Color(0xFFE0E0E0),
+                ),
               ),
-              child: Text(opt, style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w600, color: isSelected ? const Color(0xFF1B3A8D) : const Color(0xFF1A1A1A))),
+              child: Text(
+                opt,
+                style: GoogleFonts.poppins(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: isSelected
+                      ? const Color(0xFF1B3A8D)
+                      : const Color(0xFF1A1A1A),
+                ),
+              ),
             ),
           );
         }).toList(),
@@ -479,7 +629,7 @@ class _SimulatorScreenState extends ConsumerState<SimulatorScreen> {
 
   Widget _buildResultCard({Key? key}) {
     final isMulti = _surfaceCalculated > 60 || _btuArrondi > 36000;
-    
+
     return Container(
       key: key,
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -489,7 +639,11 @@ class _SimulatorScreenState extends ConsumerState<SimulatorScreen> {
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: const Color(0xFF43A047), width: 2),
         boxShadow: [
-          BoxShadow(color: const Color(0xFF43A047).withValues(alpha: 0.15), blurRadius: 15, offset: const Offset(0, 5)),
+          BoxShadow(
+            color: const Color(0xFF43A047).withValues(alpha: 0.15),
+            blurRadius: 15,
+            offset: const Offset(0, 5),
+          ),
         ],
       ),
       child: Column(
@@ -499,64 +653,108 @@ class _SimulatorScreenState extends ConsumerState<SimulatorScreen> {
               Container(
                 width: 36,
                 height: 36,
-                decoration: const BoxDecoration(color: Color(0xFFE8F5E9), shape: BoxShape.circle),
-                child: const Icon(Icons.check_circle, color: Color(0xFF43A047), size: 22),
+                decoration: const BoxDecoration(
+                  color: Color(0xFFE8F5E9),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.check_circle,
+                  color: Color(0xFF43A047),
+                  size: 22,
+                ),
               ),
               const SizedBox(width: 10),
-              Text('Résultat Recommandé', style: GoogleFonts.poppins(fontSize: 15, fontWeight: FontWeight.w600, color: const Color(0xFF43A047))),
+              Text(
+                'Résultat Recommandé',
+                style: GoogleFonts.poppins(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                  color: const Color(0xFF43A047),
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 16),
           Text(
             '$_btuArrondi BTU / $_cvRecommande',
-            style: GoogleFonts.poppins(fontSize: 26, fontWeight: FontWeight.bold, color: const Color(0xFF1B3A8D)),
+            style: GoogleFonts.poppins(
+              fontSize: 26,
+              fontWeight: FontWeight.bold,
+              color: const Color(0xFF1B3A8D),
+            ),
           ),
           const SizedBox(height: 8),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.meeting_room_outlined, color: Color(0xFF757575), size: 16),
+              const Icon(
+                Icons.meeting_room_outlined,
+                color: Color(0xFF757575),
+                size: 16,
+              ),
               const SizedBox(width: 4),
               Text(
                 'Adapté pour votre $_selectedTypePiece',
-                style: GoogleFonts.poppins(fontSize: 12, color: const Color(0xFF757575)),
+                style: GoogleFonts.poppins(
+                  fontSize: 12,
+                  color: const Color(0xFF757575),
+                ),
               ),
             ],
           ),
           const SizedBox(height: 20),
           Container(
             padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(color: const Color(0xFFF5F5F5), borderRadius: BorderRadius.circular(12)),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF5F5F5),
+              borderRadius: BorderRadius.circular(12),
+            ),
             child: Column(
               children: [
-                _buildResultDetail('Surface analysée', '${_surfaceCalculated.toStringAsFixed(1)} m²'),
+                _buildResultDetail(
+                  'Surface analysée',
+                  '${_surfaceCalculated.toStringAsFixed(1)} m²',
+                ),
                 const Divider(height: 16),
                 _buildResultDetail('Majoration Ouagadougou', '+12%'),
                 const Divider(height: 16),
-                _buildResultDetail('BTU calculé exact', '${_btuExact.round()} BTU'),
+                _buildResultDetail(
+                  'BTU calculé exact',
+                  '${_btuExact.round()} BTU',
+                ),
               ],
             ),
           ),
-          
+
           if (isMulti)
-             Container(
-               margin: const EdgeInsets.only(top: 12),
-               padding: const EdgeInsets.all(12),
-               decoration: BoxDecoration(color: const Color(0xFFFFF3E0), borderRadius: BorderRadius.circular(12)),
-               child: Row(
-                 children: [
-                   const Icon(Icons.info_outline, color: Color(0xFFFB8C00), size: 20),
-                   const SizedBox(width: 8),
-                   Expanded(
-                     child: Text(
-                       'Installation multi-unités recommandée pour cette surface.',
-                       style: GoogleFonts.poppins(fontSize: 12, color: const Color(0xFFFB8C00)),
-                     ),
-                   ),
-                 ],
-               ),
-             ),
-             
+            Container(
+              margin: const EdgeInsets.only(top: 12),
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: const Color(0xFFFFF3E0),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Row(
+                children: [
+                  const Icon(
+                    Icons.info_outline,
+                    color: Color(0xFFFB8C00),
+                    size: 20,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Installation multi-unités recommandée pour cette surface.',
+                      style: GoogleFonts.poppins(
+                        fontSize: 12,
+                        color: const Color(0xFFFB8C00),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
           const SizedBox(height: 20),
           ElevatedButton.icon(
             onPressed: () {
@@ -569,15 +767,27 @@ class _SimulatorScreenState extends ConsumerState<SimulatorScreen> {
                 'maxPrice': 2000000.0,
                 'category': null,
               });
-              context.push('/catalog'); 
+              context.push('/catalog');
             },
-            icon: const Icon(Icons.grid_view_outlined, color: Colors.white, size: 20),
-            label: Text('Voir les climatiseurs compatibles', style: GoogleFonts.poppins(fontWeight: FontWeight.w600, fontSize: 14)),
+            icon: const Icon(
+              Icons.grid_view_outlined,
+              color: Colors.white,
+              size: 20,
+            ),
+            label: Text(
+              'Voir les climatiseurs compatibles',
+              style: GoogleFonts.poppins(
+                fontWeight: FontWeight.w600,
+                fontSize: 14,
+              ),
+            ),
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF1B3A8D),
               foregroundColor: Colors.white,
               minimumSize: const Size(double.infinity, 50),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
           ),
           const SizedBox(height: 10),
@@ -587,11 +797,20 @@ class _SimulatorScreenState extends ConsumerState<SimulatorScreen> {
               context.push('/rdv');
             },
             icon: const Icon(Icons.design_services_outlined, size: 20),
-            label: Text('Demander un devis personnalisé', style: GoogleFonts.poppins(fontWeight: FontWeight.w600, fontSize: 14, color: const Color(0xFF1B3A8D))),
+            label: Text(
+              'Demander un devis personnalisé',
+              style: GoogleFonts.poppins(
+                fontWeight: FontWeight.w600,
+                fontSize: 14,
+                color: const Color(0xFF1B3A8D),
+              ),
+            ),
             style: OutlinedButton.styleFrom(
               side: const BorderSide(color: Color(0xFF1B3A8D)),
               minimumSize: const Size(double.infinity, 50),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
           ),
         ],
@@ -603,8 +822,21 @@ class _SimulatorScreenState extends ConsumerState<SimulatorScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: GoogleFonts.poppins(fontSize: 12, color: const Color(0xFF757575))),
-        Text(value, style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w600, color: const Color(0xFF1A1A1A))),
+        Text(
+          label,
+          style: GoogleFonts.poppins(
+            fontSize: 12,
+            color: const Color(0xFF757575),
+          ),
+        ),
+        Text(
+          value,
+          style: GoogleFonts.poppins(
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+            color: const Color(0xFF1A1A1A),
+          ),
+        ),
       ],
     );
   }
@@ -615,29 +847,59 @@ class _SimulatorScreenState extends ConsumerState<SimulatorScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Guide rapide BTU', style: GoogleFonts.poppins(fontSize: 15, fontWeight: FontWeight.w600)),
+          Text(
+            'Guide rapide BTU',
+            style: GoogleFonts.poppins(
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
           const SizedBox(height: 12),
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(16),
-              boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 10)],
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.04),
+                  blurRadius: 10,
+                ),
+              ],
             ),
             child: Column(
               children: [
-                _buildGuideItem('9 000 BTU / 1 CV · 9 – 15 m²', 'Chambre, bureau individuel'),
-                _buildGuideItem('12 000 BTU / 1.5 CV · 15 – 25 m²', 'Salon, chambre principale'),
-                _buildGuideItem('18 000 BTU / 2 CV · 25 – 40 m²', 'Grand salon, open space'),
-                _buildGuideItem('24 000 BTU / 3 CV · 35 – 55 m²', 'Grand commerce, restaurant'),
-                _buildGuideItem('36 000 BTU / 5 CV · 55 – 80 m²', 'Grande salle, boutique', isLast: true),
+                _buildGuideItem(
+                  '9 000 BTU / 1 CV · 9 – 15 m²',
+                  'Chambre, bureau individuel',
+                ),
+                _buildGuideItem(
+                  '12 000 BTU / 1.5 CV · 15 – 25 m²',
+                  'Salon, chambre principale',
+                ),
+                _buildGuideItem(
+                  '18 000 BTU / 2 CV · 25 – 40 m²',
+                  'Grand salon, open space',
+                ),
+                _buildGuideItem(
+                  '24 000 BTU / 3 CV · 35 – 55 m²',
+                  'Grand commerce, restaurant',
+                ),
+                _buildGuideItem(
+                  '36 000 BTU / 5 CV · 55 – 80 m²',
+                  'Grande salle, boutique',
+                  isLast: true,
+                ),
               ],
             ),
           ),
           const SizedBox(height: 16),
           Container(
             padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(color: const Color(0xFFFFF8E1), borderRadius: BorderRadius.circular(10)),
+            decoration: BoxDecoration(
+              color: const Color(0xFFFFF8E1),
+              borderRadius: BorderRadius.circular(10),
+            ),
             child: Row(
               children: [
                 const Icon(Icons.wb_sunny, color: Color(0xFFFB8C00), size: 16),
@@ -645,7 +907,10 @@ class _SimulatorScreenState extends ConsumerState<SimulatorScreen> {
                 Expanded(
                   child: Text(
                     'En climat tropical (Ouagadougou), une majoration de 12% est automatiquement appliquée au calcul.',
-                    style: GoogleFonts.poppins(fontSize: 11, color: const Color(0xFF757575)),
+                    style: GoogleFonts.poppins(
+                      fontSize: 11,
+                      color: const Color(0xFF757575),
+                    ),
                   ),
                 ),
               ],
@@ -660,17 +925,40 @@ class _SimulatorScreenState extends ConsumerState<SimulatorScreen> {
     return Container(
       padding: const EdgeInsets.all(10),
       margin: EdgeInsets.only(bottom: isLast ? 0 : 8),
-      decoration: BoxDecoration(color: const Color(0xFFF8F9FF), borderRadius: BorderRadius.circular(10)),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF8F9FF),
+        borderRadius: BorderRadius.circular(10),
+      ),
       child: Row(
         children: [
-          Container(width: 8, height: 8, decoration: BoxDecoration(color: const Color(0xFF1B3A8D), borderRadius: BorderRadius.circular(4))),
+          Container(
+            width: 8,
+            height: 8,
+            decoration: BoxDecoration(
+              color: const Color(0xFF1B3A8D),
+              borderRadius: BorderRadius.circular(4),
+            ),
+          ),
           const SizedBox(width: 10),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w600, color: const Color(0xFF1B3A8D))),
-                Text(subtitle, style: GoogleFonts.poppins(fontSize: 11, color: const Color(0xFF757575))),
+                Text(
+                  title,
+                  style: GoogleFonts.poppins(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: const Color(0xFF1B3A8D),
+                  ),
+                ),
+                Text(
+                  subtitle,
+                  style: GoogleFonts.poppins(
+                    fontSize: 11,
+                    color: const Color(0xFF757575),
+                  ),
+                ),
               ],
             ),
           ),
@@ -685,7 +973,11 @@ class _SectionCard extends StatelessWidget {
   final String title;
   final Widget child;
 
-  const _SectionCard({required this.icon, required this.title, required this.child});
+  const _SectionCard({
+    required this.icon,
+    required this.title,
+    required this.child,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -695,7 +987,13 @@ class _SectionCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 10, offset: const Offset(0, 4))],
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -704,7 +1002,14 @@ class _SectionCard extends StatelessWidget {
             children: [
               Icon(icon, size: 20, color: const Color(0xFF1B3A8D)),
               const SizedBox(width: 8),
-              Text(title, style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w600, color: const Color(0xFF1A1A1A))),
+              Text(
+                title,
+                style: GoogleFonts.poppins(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: const Color(0xFF1A1A1A),
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 12),

@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-final themeControllerProvider = NotifierProvider<ThemeController, ThemeMode>(() {
-  return ThemeController();
-});
+final themeControllerProvider = NotifierProvider<ThemeController, ThemeMode>(
+  () {
+    return ThemeController();
+  },
+);
 
 class ThemeController extends Notifier<ThemeMode> {
   static const _key = 'theme_mode';
@@ -32,7 +34,7 @@ class ThemeController extends Notifier<ThemeMode> {
   Future<void> toggleTheme() async {
     final current = state;
     ThemeMode next;
-    
+
     if (current == ThemeMode.light) {
       next = ThemeMode.dark;
     } else if (current == ThemeMode.dark) {
@@ -44,7 +46,7 @@ class ThemeController extends Notifier<ThemeMode> {
     }
 
     state = next;
-    
+
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setInt(_key, next.index);

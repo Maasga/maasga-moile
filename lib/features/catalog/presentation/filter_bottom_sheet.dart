@@ -44,7 +44,7 @@ class _FilterBottomSheetState extends ConsumerState<FilterBottomSheet> {
     'PANASONIC',
     'TOSHIBA',
     'MAASGA',
-    'MITSUBISHI'
+    'MITSUBISHI',
   ];
   final List<String> _categoryOptions = ['Split / Mural', 'Armoire'];
 
@@ -83,11 +83,7 @@ class _FilterBottomSheetState extends ConsumerState<FilterBottomSheet> {
     );
   }
 
-  Widget _buildChip(
-    String label,
-    bool isSelected,
-    VoidCallback onTap,
-  ) {
+  Widget _buildChip(String label, bool isSelected, VoidCallback onTap) {
     return GestureDetector(
       onTap: onTap,
       child: Container(

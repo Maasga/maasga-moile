@@ -25,17 +25,38 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
   final _nameCtrl = TextEditingController();
   final _phoneCtrl = TextEditingController();
   final _quartierCtrl = TextEditingController();
-  
+
   bool _loading = false;
   String? _error;
 
   // Payment state
-  String _selectedPayment = 'cash'; // 'cash', 'ligdicash', 'wave', 'mobile_money'
+  String _selectedPayment =
+      'cash'; // 'cash', 'ligdicash', 'wave', 'mobile_money'
   final List<Map<String, dynamic>> _paymentMethods = [
-    {'id': 'cash', 'name': 'Espèces', 'icon': Icons.payments_outlined, 'color': Colors.green},
-    {'id': 'ligdicash', 'name': 'LigdiCash', 'icon': Icons.wallet_outlined, 'color': Colors.orange},
-    {'id': 'wave', 'name': 'Wave', 'icon': Icons.water_drop_outlined, 'color': Colors.blue},
-    {'id': 'mobile_money', 'name': 'Mobile Money', 'icon': Icons.phone_android_outlined, 'color': Colors.yellow.shade800},
+    {
+      'id': 'cash',
+      'name': 'Espèces',
+      'icon': Icons.payments_outlined,
+      'color': Colors.green,
+    },
+    {
+      'id': 'ligdicash',
+      'name': 'LigdiCash',
+      'icon': Icons.wallet_outlined,
+      'color': Colors.orange,
+    },
+    {
+      'id': 'wave',
+      'name': 'Wave',
+      'icon': Icons.water_drop_outlined,
+      'color': Colors.blue,
+    },
+    {
+      'id': 'mobile_money',
+      'name': 'Mobile Money',
+      'icon': Icons.phone_android_outlined,
+      'color': Colors.yellow.shade800,
+    },
   ];
 
   // Location state
@@ -44,7 +65,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
   String? _preciseAddress;
   Set<Marker> _markers = {};
   final LatLng _initialPos = const LatLng(12.3647, -1.5335); // Ouagadougou
-  
+
   @override
   void initState() {
     super.initState();
@@ -104,9 +125,12 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
         ),
       };
     });
-    
+
     try {
-      List<Placemark> placemarks = await placemarkFromCoordinates(pos.latitude, pos.longitude);
+      List<Placemark> placemarks = await placemarkFromCoordinates(
+        pos.latitude,
+        pos.longitude,
+      );
       if (placemarks.isNotEmpty) {
         final p = placemarks.first;
         setState(() {
@@ -119,7 +143,10 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
   Future<void> _getCurrentLocation() async {
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Service de localisation désactivé')));
+      if (mounted)
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Service de localisation désactivé')),
+        );
       return;
     }
 
@@ -131,7 +158,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
 
     final position = await Geolocator.getCurrentPosition();
     final latLng = LatLng(position.latitude, position.longitude);
-    
+
     _mapController?.animateCamera(CameraUpdate.newLatLngZoom(latLng, 16));
     _updateLocation(latLng);
   }
@@ -140,7 +167,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
   Widget build(BuildContext context) {
     final cart = ref.watch(cartProvider);
     final total = ref.watch(cartTotalProvider);
-    
+
     return MaasgaShell(
       title: 'Validation Commande',
       showDrawer: false,
@@ -149,36 +176,49 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
         children: [
           _buildLabel('Nom complet'),
           TextField(
-            controller: _nameCtrl, 
-            decoration: _buildInputDecoration('Votre nom', Icons.person_outline),
+            controller: _nameCtrl,
+            decoration: _buildInputDecoration(
+              'Votre nom',
+              Icons.person_outline,
+            ),
             style: GoogleFonts.poppins(fontSize: 14),
           ),
           const SizedBox(height: 16),
-          
+
           _buildLabel('Téléphone'),
           TextField(
             controller: _phoneCtrl,
             keyboardType: TextInputType.phone,
-            decoration: _buildInputDecoration('XX XX XX XX', Icons.phone_outlined),
+            decoration: _buildInputDecoration(
+              'XX XX XX XX',
+              Icons.phone_outlined,
+            ),
             style: GoogleFonts.poppins(fontSize: 14),
           ),
           const SizedBox(height: 16),
-          
+
           _buildLabel('Quartier (Ouagadougou)'),
           InkWell(
             onTap: _showQuartierPicker,
             child: IgnorePointer(
               child: TextField(
                 controller: _quartierCtrl,
-                decoration: _buildInputDecoration('Sélectionner votre quartier', Icons.location_city_outlined).copyWith(
-                  suffixIcon: const Icon(Icons.arrow_drop_down, color: Color(0xFF1B3A8D)),
-                ),
+                decoration:
+                    _buildInputDecoration(
+                      'Sélectionner votre quartier',
+                      Icons.location_city_outlined,
+                    ).copyWith(
+                      suffixIcon: const Icon(
+                        Icons.arrow_drop_down,
+                        color: Color(0xFF1B3A8D),
+                      ),
+                    ),
                 style: GoogleFonts.poppins(fontSize: 14),
               ),
             ),
           ),
           const SizedBox(height: 16),
-          
+
           _buildLabel('Localisation précise (Pin Map)'),
           Container(
             height: 180,
@@ -188,7 +228,10 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
             ),
             clipBehavior: Clip.antiAlias,
             child: GoogleMap(
-              initialCameraPosition: CameraPosition(target: _initialPos, zoom: 12),
+              initialCameraPosition: CameraPosition(
+                target: _initialPos,
+                zoom: 12,
+              ),
               onMapCreated: (c) => _mapController = c,
               onTap: _updateLocation,
               markers: _markers,
@@ -198,7 +241,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
             ),
           ),
           const SizedBox(height: 8),
-          
+
           Row(
             children: [
               const Icon(Icons.my_location, color: Color(0xFF1B3A8D), size: 18),
@@ -226,12 +269,19 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.location_on, color: Color(0xFF1B3A8D), size: 16),
+                  const Icon(
+                    Icons.location_on,
+                    color: Color(0xFF1B3A8D),
+                    size: 16,
+                  ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       _preciseAddress!,
-                      style: GoogleFonts.poppins(fontSize: 11, color: const Color(0xFF1B3A8D)),
+                      style: GoogleFonts.poppins(
+                        fontSize: 11,
+                        color: const Color(0xFF1B3A8D),
+                      ),
                     ),
                   ),
                 ],
@@ -241,7 +291,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
           const SizedBox(height: 8),
           _buildLabel('Méthode de Paiement'),
           _buildPaymentSelector(),
-          
+
           const SizedBox(height: 24),
           Card(
             elevation: 0,
@@ -256,30 +306,39 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Total à régler', 
-                    style: GoogleFonts.poppins(fontWeight: FontWeight.w500, color: const Color(0xFF757575)),
+                    'Total à régler',
+                    style: GoogleFonts.poppins(
+                      fontWeight: FontWeight.w500,
+                      color: const Color(0xFF757575),
+                    ),
                   ),
                   Text(
-                    '$total FCFA', 
-                    style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w800, color: const Color(0xFF1B3A8D)),
+                    '$total FCFA',
+                    style: GoogleFonts.poppins(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w800,
+                      color: const Color(0xFF1B3A8D),
+                    ),
                   ),
                 ],
               ),
             ),
           ),
-          
+
           if (_error != null) ...[
             const SizedBox(height: 8),
             Text(
-              _error!, 
+              _error!,
               style: GoogleFonts.poppins(color: Colors.red, fontSize: 13),
               textAlign: TextAlign.center,
             ),
           ],
-          
+
           const SizedBox(height: 24),
           MaasgaPrimaryButton(
-            label: _loading ? 'Traitement en cours...' : 'Confirmer ma commande',
+            label: _loading
+                ? 'Traitement en cours...'
+                : 'Confirmer ma commande',
             enabled: cart.isNotEmpty && !_loading,
             onPressed: () => _submitOrder(context, ref, cart),
           ),
@@ -334,7 +393,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
       itemBuilder: (context, index) {
         final method = _paymentMethods[index];
         final isSelected = _selectedPayment == method['id'];
-        
+
         return InkWell(
           onTap: () => setState(() => _selectedPayment = method['id']),
           borderRadius: BorderRadius.circular(12),
@@ -343,21 +402,31 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
               color: isSelected ? const Color(0xFFF0F4FF) : Colors.white,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: isSelected ? const Color(0xFF1B3A8D) : const Color(0xFFD8EAFB),
+                color: isSelected
+                    ? const Color(0xFF1B3A8D)
+                    : const Color(0xFFD8EAFB),
                 width: isSelected ? 2 : 1,
               ),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(method['icon'] as IconData, color: isSelected ? const Color(0xFF1B3A8D) : method['color'] as Color, size: 18),
+                Icon(
+                  method['icon'] as IconData,
+                  color: isSelected
+                      ? const Color(0xFF1B3A8D)
+                      : method['color'] as Color,
+                  size: 18,
+                ),
                 const SizedBox(width: 8),
                 Text(
                   method['name'] as String,
                   style: GoogleFonts.poppins(
                     fontSize: 12,
                     fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                    color: isSelected ? const Color(0xFF1B3A8D) : Colors.black87,
+                    color: isSelected
+                        ? const Color(0xFF1B3A8D)
+                        : Colors.black87,
                   ),
                 ),
               ],
@@ -373,7 +442,9 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     WidgetRef ref,
     List<CartLine> lines,
   ) async {
-    if (_nameCtrl.text.isEmpty || _phoneCtrl.text.isEmpty || _quartierCtrl.text.isEmpty) {
+    if (_nameCtrl.text.isEmpty ||
+        _phoneCtrl.text.isEmpty ||
+        _quartierCtrl.text.isEmpty) {
       setState(() => _error = 'Veuillez remplir les champs obligatoires');
       return;
     }
@@ -382,13 +453,15 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
       _loading = true;
       _error = null;
     });
-    
+
     try {
       final dio = await ref.read(dioProvider.future);
       final quantity = lines.fold<int>(0, (sum, line) => sum + line.quantity);
       final total = ref.read(cartTotalProvider);
-      
-      final paymentLabel = _paymentMethods.firstWhere((m) => m['id'] == _selectedPayment)['name'];
+
+      final paymentLabel = _paymentMethods.firstWhere(
+        (m) => m['id'] == _selectedPayment,
+      )['name'];
 
       await dio.post(
         '/api/mobile/commandes',
@@ -408,10 +481,10 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
       );
 
       if (!context.mounted) return;
-      
+
       // Invalider le dashbord pour rafraîchir la liste des commandes
       ref.invalidate(clientDashboardProvider);
-      
+
       ref.read(cartProvider.notifier).clear();
       context.go('/client-space');
     } catch (e) {
@@ -426,7 +499,10 @@ class _QuartierSearchDialog extends StatefulWidget {
   final String currentSelection;
   final Function(String) onSelected;
 
-  const _QuartierSearchDialog({required this.currentSelection, required this.onSelected});
+  const _QuartierSearchDialog({
+    required this.currentSelection,
+    required this.onSelected,
+  });
 
   @override
   State<_QuartierSearchDialog> createState() => _QuartierSearchDialogState();
@@ -434,7 +510,7 @@ class _QuartierSearchDialog extends StatefulWidget {
 
 class _QuartierSearchDialogState extends State<_QuartierSearchDialog> {
   String _search = '';
-  
+
   @override
   Widget build(BuildContext context) {
     final filtered = ouagaNeighborhoods
@@ -451,11 +527,21 @@ class _QuartierSearchDialogState extends State<_QuartierSearchDialog> {
       child: Column(
         children: [
           const SizedBox(height: 12),
-          Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2))),
+          Container(
+            width: 40,
+            height: 4,
+            decoration: BoxDecoration(
+              color: Colors.grey[300],
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
           const SizedBox(height: 20),
           Text(
-            'Choisir un quartier', 
-            style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w600)
+            'Choisir un quartier',
+            style: GoogleFonts.poppins(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+            ),
           ),
           const SizedBox(height: 16),
           TextField(
@@ -465,7 +551,10 @@ class _QuartierSearchDialogState extends State<_QuartierSearchDialog> {
               prefixIcon: const Icon(Icons.search),
               filled: true,
               fillColor: const Color(0xFFF5F5F5),
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide.none,
+              ),
             ),
             style: GoogleFonts.poppins(fontSize: 14),
           ),
@@ -479,14 +568,20 @@ class _QuartierSearchDialogState extends State<_QuartierSearchDialog> {
                 final isSelected = q == widget.currentSelection;
                 return ListTile(
                   title: Text(
-                    q, 
+                    q,
                     style: GoogleFonts.poppins(
-                      fontSize: 14, 
-                      color: isSelected ? const Color(0xFF1B3A8D) : Colors.black87, 
-                      fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400
-                    )
+                      fontSize: 14,
+                      color: isSelected
+                          ? const Color(0xFF1B3A8D)
+                          : Colors.black87,
+                      fontWeight: isSelected
+                          ? FontWeight.w600
+                          : FontWeight.w400,
+                    ),
                   ),
-                  trailing: isSelected ? const Icon(Icons.check, color: Color(0xFF1B3A8D)) : null,
+                  trailing: isSelected
+                      ? const Icon(Icons.check, color: Color(0xFF1B3A8D))
+                      : null,
                   onTap: () => widget.onSelected(q),
                 );
               },

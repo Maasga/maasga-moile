@@ -12,11 +12,31 @@ class SettingsScreen extends StatelessWidget {
       child: ListView(
         padding: const EdgeInsets.all(16),
         children: const [
-          _Section(title: 'Langue', subtitle: 'Français', icon: Icons.language_outlined),
-          _Section(title: 'Notifications', subtitle: 'Actives', icon: Icons.notifications_outlined),
-          _Section(title: 'Sécurité', subtitle: 'PIN / biométrie (bientôt)', icon: Icons.security_outlined),
-          _Section(title: 'Thème', subtitle: 'Clair', icon: Icons.light_mode_outlined),
-          _Section(title: 'Version', subtitle: 'MAASGA Mobile v1', icon: Icons.info_outline),
+          _Section(
+            title: 'Langue',
+            subtitle: 'Français',
+            icon: Icons.language_outlined,
+          ),
+          _Section(
+            title: 'Notifications',
+            subtitle: 'Actives',
+            icon: Icons.notifications_outlined,
+          ),
+          _Section(
+            title: 'Sécurité',
+            subtitle: 'PIN / biométrie (bientôt)',
+            icon: Icons.security_outlined,
+          ),
+          _Section(
+            title: 'Thème',
+            subtitle: 'Clair',
+            icon: Icons.light_mode_outlined,
+          ),
+          _Section(
+            title: 'Version',
+            subtitle: 'MAASGA Mobile v1',
+            icon: Icons.info_outline,
+          ),
         ],
       ),
     );
@@ -24,7 +44,11 @@ class SettingsScreen extends StatelessWidget {
 }
 
 class _Section extends StatelessWidget {
-  const _Section({required this.title, required this.subtitle, required this.icon});
+  const _Section({
+    required this.title,
+    required this.subtitle,
+    required this.icon,
+  });
 
   final String title;
   final String subtitle;

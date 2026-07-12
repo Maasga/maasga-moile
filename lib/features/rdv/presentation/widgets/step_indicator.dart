@@ -58,7 +58,9 @@ class StepIndicator extends StatelessWidget {
           style: GoogleFonts.poppins(
             fontSize: 10,
             fontWeight: isActiveIndex ? FontWeight.w600 : FontWeight.w400,
-            color: isActiveIndex ? const Color(0xFF1B3A8D) : const Color(0xFF9E9E9E),
+            color: isActiveIndex
+                ? const Color(0xFF1B3A8D)
+                : const Color(0xFF9E9E9E),
           ),
         ),
       ],

@@ -12,7 +12,9 @@ class HomeRepository {
     try {
       final response = await _dio.get('/api/mobile/banners');
       final list = response.data as List<dynamic>? ?? const [];
-      return list.map((e) => Promo.fromJson(e as Map<String, dynamic>)).toList();
+      return list
+          .map((e) => Promo.fromJson(e as Map<String, dynamic>))
+          .toList();
     } catch (e) {
       // Fallback or rethrow based on strategy
       return [];

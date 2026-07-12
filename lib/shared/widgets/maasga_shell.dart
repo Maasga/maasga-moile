@@ -29,7 +29,9 @@ class MaasgaShell extends StatelessWidget {
         decoration: const BoxDecoration(gradient: MaasgaTokens.pageGradient),
         child: SafeArea(child: child),
       ),
-      bottomNavigationBar: bottomNavigationBar ?? MainBottomNav(currentPath: GoRouterState.of(context).uri.toString()),
+      bottomNavigationBar:
+          bottomNavigationBar ??
+          MainBottomNav(currentPath: GoRouterState.of(context).uri.toString()),
     );
   }
 }

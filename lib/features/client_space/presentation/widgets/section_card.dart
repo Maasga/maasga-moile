@@ -60,7 +60,10 @@ class SectionCard extends StatelessWidget {
                 if (count != null) ...[
                   const Spacer(),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 2,
+                    ),
                     decoration: BoxDecoration(
                       color: const Color(0xFF1B3A8D),
                       borderRadius: BorderRadius.circular(12),

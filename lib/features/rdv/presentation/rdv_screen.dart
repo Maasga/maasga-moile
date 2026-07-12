@@ -63,9 +63,12 @@ class _RdvScreenState extends ConsumerState<RdvScreen> {
       final profile = await repo.getProfile();
       if (profile != null && mounted) {
         setState(() {
-          if (_nameCtrl.text.isEmpty) _nameCtrl.text = profile['name']?.toString() ?? '';
-          if (_emailCtrl.text.isEmpty) _emailCtrl.text = profile['email']?.toString() ?? '';
-          if (_phoneCtrl.text.isEmpty) _phoneCtrl.text = profile['phone']?.toString() ?? '';
+          if (_nameCtrl.text.isEmpty)
+            _nameCtrl.text = profile['name']?.toString() ?? '';
+          if (_emailCtrl.text.isEmpty)
+            _emailCtrl.text = profile['email']?.toString() ?? '';
+          if (_phoneCtrl.text.isEmpty)
+            _phoneCtrl.text = profile['phone']?.toString() ?? '';
           _selectedQuartier ??= profile['quartier']?.toString();
         });
       }
@@ -136,7 +139,7 @@ class _RdvScreenState extends ConsumerState<RdvScreen> {
     try {
       final repo = await ref.read(rdvRepositoryProvider.future);
       await repo.submitRdv(request);
-      
+
       // Invalider les fournisseurs pour rafraîchir les données dans l'espace client
       ref.invalidate(clientDashboardProvider);
       ref.invalidate(userActivityProvider);
@@ -149,9 +152,9 @@ class _RdvScreenState extends ConsumerState<RdvScreen> {
     } catch (e) {
       setState(() => _isLoading = false);
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erreur: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Erreur: $e')));
       }
     }
   }
@@ -170,11 +173,7 @@ class _RdvScreenState extends ConsumerState<RdvScreen> {
               controller: _pageController,
               physics: const NeverScrollableScrollPhysics(),
               onPageChanged: (idx) => setState(() => _currentStep = idx),
-              children: [
-                _buildStep1(),
-                _buildStep2(),
-                _buildStep3(),
-              ],
+              children: [_buildStep1(), _buildStep2(), _buildStep3()],
             ),
           ),
           if (_currentStep < 2) _buildFooter(),
@@ -189,22 +188,22 @@ class _RdvScreenState extends ConsumerState<RdvScreen> {
       (
         icon: Icons.design_services_outlined,
         title: 'Devis / Dimensionnement',
-        desc: 'Un technicien visite votre espace et vous fait un devis précis'
+        desc: 'Un technicien visite votre espace et vous fait un devis précis',
       ),
       (
         icon: Icons.construction_outlined,
         title: 'Installation',
-        desc: 'Pose professionnelle de votre climatiseur par nos experts'
+        desc: 'Pose professionnelle de votre climatiseur par nos experts',
       ),
       (
         icon: Icons.build_circle_outlined,
         title: 'Maintenance / Entretien',
-        desc: 'Nettoyage et vérification de votre climatiseur existant'
+        desc: 'Nettoyage et vérification de votre climatiseur existant',
       ),
       (
         icon: Icons.warning_amber_outlined,
         title: 'Dépannage / Réparation urgente',
-        desc: 'Intervention rapide pour panne ou dysfonctionnement'
+        desc: 'Intervention rapide pour panne ou dysfonctionnement',
       ),
     ];
 
@@ -223,13 +222,15 @@ class _RdvScreenState extends ConsumerState<RdvScreen> {
           ),
         ),
         const SizedBox(height: 8),
-        ...types.map((type) => ServiceTypeCard(
-              icon: type.icon,
-              title: type.title,
-              description: type.desc,
-              isSelected: _selectedServiceType == type.title,
-              onTap: () => setState(() => _selectedServiceType = type.title),
-            )),
+        ...types.map(
+          (type) => ServiceTypeCard(
+            icon: type.icon,
+            title: type.title,
+            description: type.desc,
+            isSelected: _selectedServiceType == type.title,
+            onTap: () => setState(() => _selectedServiceType = type.title),
+          ),
+        ),
       ],
     );
   }
@@ -283,7 +284,11 @@ class _RdvScreenState extends ConsumerState<RdvScreen> {
       decoration: const BoxDecoration(
         color: Colors.white,
         boxShadow: [
-          BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, -2)),
+          BoxShadow(
+            color: Colors.black12,
+            blurRadius: 4,
+            offset: Offset(0, -2),
+          ),
         ],
       ),
       child: SafeArea(
@@ -295,12 +300,16 @@ class _RdvScreenState extends ConsumerState<RdvScreen> {
                   backgroundColor: _primaryBlue,
                   disabledBackgroundColor: const Color(0xFFE0E0E0),
                   minimumSize: const Size(double.infinity, 50),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
                 child: Text(
                   'Continuer',
                   style: GoogleFonts.poppins(
-                    color: _selectedServiceType != null ? Colors.white : const Color(0xFF9E9E9E),
+                    color: _selectedServiceType != null
+                        ? Colors.white
+                        : const Color(0xFF9E9E9E),
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -313,7 +322,9 @@ class _RdvScreenState extends ConsumerState<RdvScreen> {
                       onPressed: _previousPage,
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                         side: const BorderSide(color: _primaryBlue),
                       ),
                       child: Text(
@@ -333,13 +344,18 @@ class _RdvScreenState extends ConsumerState<RdvScreen> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: _primaryBlue,
                         padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
                       child: _isLoading
                           ? const SizedBox(
                               height: 20,
                               width: 20,
-                              child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 2,
+                              ),
                             )
                           : Text(
                               'Confirmer ma demande',

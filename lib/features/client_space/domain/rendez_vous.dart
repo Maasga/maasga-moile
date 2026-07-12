@@ -7,11 +7,16 @@ enum RdvStatus {
 
   String get label {
     switch (this) {
-      case enAttente: return 'En attente';
-      case confirme: return 'Confirmé';
-      case effectue: return 'Effectué';
-      case annule: return 'Annulé';
-      case unknown: return 'Inconnu';
+      case enAttente:
+        return 'En attente';
+      case confirme:
+        return 'Confirmé';
+      case effectue:
+        return 'Effectué';
+      case annule:
+        return 'Annulé';
+      case unknown:
+        return 'Inconnu';
     }
   }
 

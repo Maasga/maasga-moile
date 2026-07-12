@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 
 class BrandScroll extends StatelessWidget {
-  const BrandScroll({
-    super.key,
-    required this.brandAssetPaths,
-  });
+  const BrandScroll({super.key, required this.brandAssetPaths});
 
   final List<String> brandAssetPaths;
 
@@ -35,4 +32,3 @@ class BrandScroll extends StatelessWidget {
     );
   }
 }
-

@@ -61,8 +61,7 @@ final dioProvider = FutureProvider<Dio>((ref) async {
 });
 
 final plainHttpProvider = Provider<Dio>((ref) {
-  return Dio(BaseOptions(
-    baseUrl: Env.apiBaseUrl,
-    extra: {'withCredentials': true},
-  ));
+  return Dio(
+    BaseOptions(baseUrl: Env.apiBaseUrl, extra: {'withCredentials': true}),
+  );
 });

@@ -9,7 +9,10 @@ class CatalogRepository {
   final Dio _dio;
 
   Future<List<Product>> getProducts() async {
-    final response = await _dio.get('/api/mobile/products', queryParameters: {'available': 'true'});
+    final response = await _dio.get(
+      '/api/mobile/products',
+      queryParameters: {'available': 'true'},
+    );
     final list = response.data as List<dynamic>? ?? const [];
     return list
         .map((e) => Product.fromJson(e as Map<String, dynamic>))
@@ -17,13 +20,11 @@ class CatalogRepository {
         .toList();
   }
 
-
-
   Product _normalizeProductFromSite(Product p) {
     final category = _inferCategory(p);
     final power = _inferPower(p.btu);
     final specs = _buildSpecs(p);
-    
+
     // Combine main image and gallery images accurately
     final List<String> displayImages = [];
     if (p.imageUrl != null && p.imageUrl!.isNotEmpty && p.imageUrl != '??') {
@@ -31,29 +32,31 @@ class CatalogRepository {
     } else if (p.image.isNotEmpty && p.image != '??') {
       displayImages.add(p.image);
     }
-    
+
     for (var img in p.images) {
       if (img.isNotEmpty && img != '??' && !displayImages.contains(img)) {
         displayImages.add(img);
       }
     }
-    
+
     if (displayImages.isEmpty) {
       displayImages.add('assets/products/product_placeholder.png');
     }
 
     // Dummy technical specs for demo fallback
-    final techSpecs = p.technicalSpecs.isNotEmpty ? p.technicalSpecs : {
-      'Marque': p.brand,
-      'Modèle': p.name,
-      'Puissance BTU': '${p.btu ?? 12000}',
-      'Puissance CV': power.toUpperCase(),
-      'Gaz Frigorigène': 'R32',
-      'WiFi': 'Intégré',
-      'Classe Énergétique': 'A+++ / A++',
-      'Niveau Sonore': '21 dB(A)',
-      'Garantie': '2 ans',
-    };
+    final techSpecs = p.technicalSpecs.isNotEmpty
+        ? p.technicalSpecs
+        : {
+            'Marque': p.brand,
+            'Modèle': p.name,
+            'Puissance BTU': '${p.btu ?? 12000}',
+            'Puissance CV': power.toUpperCase(),
+            'Gaz Frigorigène': 'R32',
+            'WiFi': 'Intégré',
+            'Classe Énergétique': 'A+++ / A++',
+            'Niveau Sonore': '21 dB(A)',
+            'Garantie': '2 ans',
+          };
 
     return Product(
       id: p.id,
@@ -69,8 +72,8 @@ class CatalogRepository {
       btu: p.btu,
       images: displayImages,
       oldPrice: p.oldPrice ?? (p.price * 1.2).toInt(),
-      description: p.description.isNotEmpty 
-          ? p.description 
+      description: p.description.isNotEmpty
+          ? p.description
           : 'Découvrez le confort ultime avec le ${p.name}. Ce climatiseur de haute performance allie puissance, silence et efficacité énergétique pour votre intérieur.',
       technicalSpecs: techSpecs,
     );
@@ -109,7 +112,9 @@ class CatalogRepository {
   }
 }
 
-final catalogRepositoryProvider = FutureProvider<CatalogRepository>((ref) async {
+final catalogRepositoryProvider = FutureProvider<CatalogRepository>((
+  ref,
+) async {
   final dio = await ref.watch(dioProvider.future);
   return CatalogRepository(dio);
 });
@@ -118,4 +123,3 @@ final productsProvider = FutureProvider<List<Product>>((ref) async {
   final repo = await ref.watch(catalogRepositoryProvider.future);
   return repo.getProducts();
 });
-

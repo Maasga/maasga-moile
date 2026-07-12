@@ -12,14 +12,17 @@ class MaintenanceRepository {
       final response = await _dio.post('/api/maintenance/request', data: data);
       return response.data as Map<String, dynamic>;
     } on DioException catch (e) {
-      throw e.response?.data?['error'] ?? 'Une erreur est survenue lors de l\'envoi de votre demande.';
+      throw e.response?.data?['error'] ??
+          'Une erreur est survenue lors de l\'envoi de votre demande.';
     } catch (e) {
       throw 'Erreur réseau. Veuillez réessayer.';
     }
   }
 }
 
-final maintenanceRepositoryProvider = FutureProvider<MaintenanceRepository>((ref) async {
+final maintenanceRepositoryProvider = FutureProvider<MaintenanceRepository>((
+  ref,
+) async {
   final dio = await ref.watch(dioProvider.future);
   return MaintenanceRepository(dio);
 });

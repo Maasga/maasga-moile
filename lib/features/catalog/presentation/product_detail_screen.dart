@@ -18,14 +18,16 @@ class ProductDetailScreen extends ConsumerStatefulWidget {
   final Product product;
 
   @override
-  ConsumerState<ProductDetailScreen> createState() => _ProductDetailScreenState();
+  ConsumerState<ProductDetailScreen> createState() =>
+      _ProductDetailScreenState();
 }
 
 class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
   int _selectedImageIndex = 0;
   bool _isFavorite = false;
   int _quantity = 1;
-  final CarouselSliderController _carouselController = CarouselSliderController();
+  final CarouselSliderController _carouselController =
+      CarouselSliderController();
 
   void _incrementQty() => setState(() => _quantity++);
   void _decrementQty() {
@@ -36,7 +38,9 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
     setState(() => _isFavorite = !_isFavorite);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(_isFavorite ? 'Ajouté aux favoris' : 'Retiré des favoris'),
+        content: Text(
+          _isFavorite ? 'Ajouté aux favoris' : 'Retiré des favoris',
+        ),
         duration: const Duration(seconds: 1),
       ),
     );
@@ -65,14 +69,16 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
   }
 
   Widget _buildImageWidget(String imgUrl, BoxFit fit) {
-    if (imgUrl.isEmpty || imgUrl == '??') return Image.asset('assets/products/product_placeholder.png', fit: fit);
+    if (imgUrl.isEmpty || imgUrl == '??')
+      return Image.asset('assets/products/product_placeholder.png', fit: fit);
     if (imgUrl.trim().startsWith('data:image')) {
       try {
         final base64Str = imgUrl.split(',').last;
         return Image.memory(
           base64Decode(base64Str),
           fit: fit,
-          errorBuilder: (_, __, ___) => Image.asset('assets/products/product_placeholder.png', fit: fit),
+          errorBuilder: (_, __, ___) =>
+              Image.asset('assets/products/product_placeholder.png', fit: fit),
         );
       } catch (e) {
         return Image.asset('assets/products/product_placeholder.png', fit: fit);
@@ -81,13 +87,15 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
       return Image.network(
         imgUrl,
         fit: fit,
-        errorBuilder: (_, __, ___) => Image.asset('assets/products/product_placeholder.png', fit: fit),
+        errorBuilder: (_, __, ___) =>
+            Image.asset('assets/products/product_placeholder.png', fit: fit),
       );
     } else {
       return Image.asset(
         AssetUtils.getAssetPath(imgUrl),
         fit: fit,
-        errorBuilder: (_, __, ___) => Image.asset('assets/products/product_placeholder.png', fit: fit),
+        errorBuilder: (_, __, ___) =>
+            Image.asset('assets/products/product_placeholder.png', fit: fit),
       );
     }
   }
@@ -125,7 +133,9 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
               _buildProductInfo(),
               _buildTechnicalBrief(),
               _buildFullSheetButton(),
-              const SliverToBoxAdapter(child: SizedBox(height: 120)), // Space for fixed bottom bar
+              const SliverToBoxAdapter(
+                child: SizedBox(height: 120),
+              ), // Space for fixed bottom bar
             ],
           ),
           _buildBottomAction(),
@@ -167,7 +177,10 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
     );
   }
 
-  Widget _buildCircleButton({required IconData icon, required VoidCallback onTap}) {
+  Widget _buildCircleButton({
+    required IconData icon,
+    required VoidCallback onTap,
+  }) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -258,13 +271,18 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: isSelected ? const Color(0xFF1B3A8D) : const Color(0xFFE0E0E0),
+                    color: isSelected
+                        ? const Color(0xFF1B3A8D)
+                        : const Color(0xFFE0E0E0),
                     width: isSelected ? 2 : 1,
                   ),
                 ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(10),
-                  child: _buildImageWidget(widget.product.images[index], BoxFit.cover),
+                  child: _buildImageWidget(
+                    widget.product.images[index],
+                    BoxFit.cover,
+                  ),
                 ),
               ),
             );
@@ -275,9 +293,12 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
   }
 
   Widget _buildProductInfo() {
-    final discount = widget.product.oldPrice != null 
-      ? (((widget.product.oldPrice! - widget.product.price) / widget.product.oldPrice!) * 100).round()
-      : 0;
+    final discount = widget.product.oldPrice != null
+        ? (((widget.product.oldPrice! - widget.product.price) /
+                      widget.product.oldPrice!) *
+                  100)
+              .round()
+        : 0;
 
     return SliverToBoxAdapter(
       child: Container(
@@ -321,7 +342,9 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                     ),
                     child: Icon(
                       _isFavorite ? Icons.favorite : Icons.favorite_border,
-                      color: _isFavorite ? const Color(0xFFE53935) : const Color(0xFF9E9E9E),
+                      color: _isFavorite
+                          ? const Color(0xFFE53935)
+                          : const Color(0xFF9E9E9E),
                       size: 24,
                     ),
                   ),
@@ -351,7 +374,10 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                   ),
                   const Spacer(),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: const Color(0xFFE8F5E9),
                       borderRadius: BorderRadius.circular(8),
@@ -403,10 +429,26 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                 mainAxisSpacing: 12,
               ),
               children: const [
-                SpecCard(icon: Icons.energy_savings_leaf_outlined, value: 'A+++ / A++', label: 'Classe Énergétique'),
-                SpecCard(icon: Icons.volume_down_outlined, value: '21 dB(A)', label: 'Niveau Sonore'),
-                SpecCard(icon: Icons.air_outlined, value: 'HEPA H13', label: 'Système Filtration'),
-                SpecCard(icon: Icons.wifi_outlined, value: 'Smart Link', label: 'Connectivité App'),
+                SpecCard(
+                  icon: Icons.energy_savings_leaf_outlined,
+                  value: 'A+++ / A++',
+                  label: 'Classe Énergétique',
+                ),
+                SpecCard(
+                  icon: Icons.volume_down_outlined,
+                  value: '21 dB(A)',
+                  label: 'Niveau Sonore',
+                ),
+                SpecCard(
+                  icon: Icons.air_outlined,
+                  value: 'HEPA H13',
+                  label: 'Système Filtration',
+                ),
+                SpecCard(
+                  icon: Icons.wifi_outlined,
+                  value: 'Smart Link',
+                  label: 'Connectivité App',
+                ),
               ],
             ),
           ],
@@ -423,7 +465,9 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
           onPressed: _showFicheComplete,
           style: OutlinedButton.styleFrom(
             side: const BorderSide(color: Color(0xFF1B3A8D), width: 2),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(14),
+            ),
             minimumSize: const Size(double.infinity, 54),
           ),
           child: Text(
@@ -446,7 +490,12 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
       left: 0,
       right: 0,
       child: Container(
-        padding: EdgeInsets.fromLTRB(16, 12, 16, MediaQuery.of(context).padding.bottom + 12),
+        padding: EdgeInsets.fromLTRB(
+          16,
+          12,
+          16,
+          MediaQuery.of(context).padding.bottom + 12,
+        ),
         decoration: BoxDecoration(
           color: Colors.white,
           boxShadow: [
@@ -468,15 +517,26 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
               ),
               child: Row(
                 children: [
-                  _buildQtyBtn(icon: Icons.remove, isRemove: true, onTap: _decrementQty),
+                  _buildQtyBtn(
+                    icon: Icons.remove,
+                    isRemove: true,
+                    onTap: _decrementQty,
+                  ),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 12),
                     child: Text(
                       '$_quantity',
-                      style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.bold),
+                      style: GoogleFonts.poppins(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
-                  _buildQtyBtn(icon: Icons.add, isRemove: false, onTap: _incrementQty),
+                  _buildQtyBtn(
+                    icon: Icons.add,
+                    isRemove: false,
+                    onTap: _incrementQty,
+                  ),
                 ],
               ),
             ),
@@ -484,14 +544,24 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
             Expanded(
               child: ElevatedButton.icon(
                 onPressed: _addToCart,
-                icon: const Icon(Icons.shopping_cart_outlined, size: 20, color: Colors.white),
+                icon: const Icon(
+                  Icons.shopping_cart_outlined,
+                  size: 20,
+                  color: Colors.white,
+                ),
                 label: Text(
                   'Ajouter au Panier',
-                  style: GoogleFonts.poppins(fontSize: 15, fontWeight: FontWeight.w600, color: Colors.white),
+                  style: GoogleFonts.poppins(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
                 ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF1B3A8D),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
                   minimumSize: const Size(double.infinity, 54),
                 ),
               ),
@@ -502,7 +572,11 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
     );
   }
 
-  Widget _buildQtyBtn({required IconData icon, required bool isRemove, required VoidCallback onTap}) {
+  Widget _buildQtyBtn({
+    required IconData icon,
+    required bool isRemove,
+    required VoidCallback onTap,
+  }) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -511,9 +585,15 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
         decoration: BoxDecoration(
           color: isRemove ? Colors.white : const Color(0xFF1B3A8D),
           shape: BoxShape.circle,
-          border: isRemove ? Border.all(color: const Color(0xFF1B3A8D), width: 2) : null,
+          border: isRemove
+              ? Border.all(color: const Color(0xFF1B3A8D), width: 2)
+              : null,
         ),
-        child: Icon(icon, size: 18, color: isRemove ? const Color(0xFF1B3A8D) : Colors.white),
+        child: Icon(
+          icon,
+          size: 18,
+          color: isRemove ? const Color(0xFF1B3A8D) : Colors.white,
+        ),
       ),
     );
   }

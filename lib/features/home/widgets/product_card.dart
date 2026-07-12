@@ -52,7 +52,8 @@ class ProductCard extends StatelessWidget {
                     width: 160,
                     height: 110,
                     fit: BoxFit.contain,
-                    errorBuilder: (_, __, ___) => Image.asset('assets/products/product_placeholder.png'),
+                    errorBuilder: (_, __, ___) =>
+                        Image.asset('assets/products/product_placeholder.png'),
                   ),
                 ),
               ),
@@ -112,4 +113,3 @@ class ProductCard extends StatelessWidget {
     );
   }
 }
-

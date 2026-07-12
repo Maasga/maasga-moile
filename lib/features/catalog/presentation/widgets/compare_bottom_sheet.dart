@@ -68,7 +68,11 @@ class _CompareBottomSheetState extends ConsumerState<CompareBottomSheet> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.compare_arrows, color: Color(0xFF1B3A8D), size: 20),
+              const Icon(
+                Icons.compare_arrows,
+                color: Color(0xFF1B3A8D),
+                size: 20,
+              ),
               const SizedBox(width: 8),
               Text(
                 'VS',
@@ -86,7 +90,9 @@ class _CompareBottomSheetState extends ConsumerState<CompareBottomSheet> {
           Expanded(
             child: productsAsync.when(
               data: (products) {
-                final comparable = products.where((p) => p.id != widget.currentProduct.id).toList();
+                final comparable = products
+                    .where((p) => p.id != widget.currentProduct.id)
+                    .toList();
                 return Column(
                   children: [
                     Expanded(
@@ -94,14 +100,17 @@ class _CompareBottomSheetState extends ConsumerState<CompareBottomSheet> {
                         groupValue: _selectedCompareProduct?.id,
                         onChanged: (id) {
                           setState(() {
-                            _selectedCompareProduct = comparable.firstWhere((p) => p.id == id);
+                            _selectedCompareProduct = comparable.firstWhere(
+                              (p) => p.id == id,
+                            );
                           });
                         },
                         child: ListView.builder(
                           itemCount: comparable.length,
                           itemBuilder: (context, index) {
                             final product = comparable[index];
-                            final isSelected = _selectedCompareProduct?.id == product.id;
+                            final isSelected =
+                                _selectedCompareProduct?.id == product.id;
                             return _buildCompareItem(product, isSelected);
                           },
                         ),
@@ -127,7 +136,9 @@ class _CompareBottomSheetState extends ConsumerState<CompareBottomSheet> {
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF1B3A8D),
               minimumSize: const Size(double.infinity, 52),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
             child: Text(
               'Voir les deux produits',
@@ -207,7 +218,9 @@ class _CompareBottomSheetState extends ConsumerState<CompareBottomSheet> {
           color: isSelected ? const Color(0xFFF0F4FF) : Colors.white,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isSelected ? const Color(0xFF1B3A8D) : const Color(0xFFE0E0E0),
+            color: isSelected
+                ? const Color(0xFF1B3A8D)
+                : const Color(0xFFE0E0E0),
             width: isSelected ? 2 : 1,
           ),
         ),
@@ -238,10 +251,7 @@ class _CompareBottomSheetState extends ConsumerState<CompareBottomSheet> {
                 ],
               ),
             ),
-            Radio<int>(
-              value: product.id,
-              activeColor: const Color(0xFF1B3A8D),
-            ),
+            Radio<int>(value: product.id, activeColor: const Color(0xFF1B3A8D)),
           ],
         ),
       ),
@@ -258,7 +268,8 @@ class _CompareBottomSheetState extends ConsumerState<CompareBottomSheet> {
         child: Image.asset(
           AssetUtils.getAssetPath(image),
           fit: BoxFit.contain,
-          errorBuilder: (_, __, ___) => Image.asset('assets/products/product_placeholder.png'),
+          errorBuilder: (_, __, ___) =>
+              Image.asset('assets/products/product_placeholder.png'),
         ),
       ),
     );
@@ -268,8 +279,16 @@ class _CompareBottomSheetState extends ConsumerState<CompareBottomSheet> {
     if (_selectedCompareProduct == null) return const SizedBox.shrink();
 
     final specs = [
-      {'label': 'Prix', 'p1': '${widget.currentProduct.price}', 'p2': '${_selectedCompareProduct!.price}'},
-      {'label': 'BTU', 'p1': '${widget.currentProduct.btu ?? 12000}', 'p2': '${_selectedCompareProduct!.btu ?? 12000}'},
+      {
+        'label': 'Prix',
+        'p1': '${widget.currentProduct.price}',
+        'p2': '${_selectedCompareProduct!.price}',
+      },
+      {
+        'label': 'BTU',
+        'p1': '${widget.currentProduct.btu ?? 12000}',
+        'p2': '${_selectedCompareProduct!.btu ?? 12000}',
+      },
       {'label': 'Classe Ener.', 'p1': 'A+++', 'p2': 'A++'},
       {'label': 'Sonore', 'p1': '21 dB', 'p2': '24 dB'},
     ];
@@ -285,7 +304,10 @@ class _CompareBottomSheetState extends ConsumerState<CompareBottomSheet> {
         children: [
           Text(
             'Comparaison Rapide',
-            style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w600),
+            style: GoogleFonts.poppins(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+            ),
           ),
           const SizedBox(height: 12),
           Table(
@@ -303,13 +325,15 @@ class _CompareBottomSheetState extends ConsumerState<CompareBottomSheet> {
                   _tableHeader('Comparé'),
                 ],
               ),
-              ...specs.map((s) => TableRow(
-                children: [
-                  _tableCell(s['label']!, isLabel: true),
-                  _tableCell(s['p1']!),
-                  _tableCell(s['p2']!),
-                ],
-              )),
+              ...specs.map(
+                (s) => TableRow(
+                  children: [
+                    _tableCell(s['label']!, isLabel: true),
+                    _tableCell(s['p1']!),
+                    _tableCell(s['p2']!),
+                  ],
+                ),
+              ),
             ],
           ),
         ],
@@ -322,7 +346,11 @@ class _CompareBottomSheetState extends ConsumerState<CompareBottomSheet> {
       padding: const EdgeInsets.all(8.0),
       child: Text(
         text,
-        style: GoogleFonts.poppins(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.white),
+        style: GoogleFonts.poppins(
+          fontSize: 11,
+          fontWeight: FontWeight.bold,
+          color: Colors.white,
+        ),
         textAlign: TextAlign.center,
       ),
     );

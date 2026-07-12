@@ -12,7 +12,7 @@ class MaasgaMobileApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(appRouterProvider);
     final themeMode = ref.watch(themeControllerProvider);
-    
+
     return MaterialApp.router(
       title: 'MAASGA Mobile',
       debugShowCheckedModeBanner: false,

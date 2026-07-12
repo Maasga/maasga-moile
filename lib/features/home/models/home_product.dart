@@ -11,4 +11,3 @@ class HomeProduct {
   final String priceLabel;
   final String imageAsset;
 }
-

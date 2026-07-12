@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-
 enum CommandeStatus {
   pending,
   paid,
@@ -16,17 +15,28 @@ enum CommandeStatus {
 
   String get label {
     switch (this) {
-      case pending: return 'En attente';
-      case paid: return 'Payée';
-      case validationTerrain: return 'Validation terrain';
-      case devisEnAttente: return 'Devis envoyé';
-      case devisValide: return 'Devis accepté';
-      case devisRefuse: return 'Devis refusé';
-      case livre: return 'Livrée';
-      case installed: return 'Installée';
-      case cancelled: return 'Annulée';
-      case refunded: return 'Remboursée';
-      case unknown: return 'Inconnu';
+      case pending:
+        return 'En attente';
+      case paid:
+        return 'Payée';
+      case validationTerrain:
+        return 'Validation terrain';
+      case devisEnAttente:
+        return 'Devis envoyé';
+      case devisValide:
+        return 'Devis accepté';
+      case devisRefuse:
+        return 'Devis refusé';
+      case livre:
+        return 'Livrée';
+      case installed:
+        return 'Installée';
+      case cancelled:
+        return 'Annulée';
+      case refunded:
+        return 'Remboursée';
+      case unknown:
+        return 'Inconnu';
     }
   }
 
@@ -63,7 +73,6 @@ enum CommandeStatus {
         return CommandeStatus.unknown;
     }
   }
-
 }
 
 class Commande {
@@ -124,7 +133,12 @@ class Commande {
 
   factory Commande.fromJson(Map<String, dynamic> json) {
     // Universal price mapping with all possible keys
-    dynamic rawPrice = json['price'] ?? json['total_price'] ?? json['climatiseur_prix'] ?? json['total_amount'] ?? json['produit_prix'];
+    dynamic rawPrice =
+        json['price'] ??
+        json['total_price'] ??
+        json['climatiseur_prix'] ??
+        json['total_amount'] ??
+        json['produit_prix'];
     String formattedPrice = '0 FCFA';
 
     if (rawPrice != null) {
@@ -133,16 +147,19 @@ class Commande {
       if (s.isNotEmpty) {
         final val = int.tryParse(s) ?? 0;
         final reg = RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))');
-        formattedPrice = '${val.toString().replaceAllMapped(reg, (Match m) => '${m[1]} ')} FCFA';
+        formattedPrice =
+            '${val.toString().replaceAllMapped(reg, (Match m) => '${m[1]} ')} FCFA';
       }
     }
 
     // Accessoires parsing
     List<dynamic>? parsedAccs;
     if (json['accessoires'] != null) {
-      if (json['accessoires'] is String && json['accessoires'].toString().startsWith('[')) {
+      if (json['accessoires'] is String &&
+          json['accessoires'].toString().startsWith('[')) {
         try {
-          parsedAccs = jsonDecode(json['accessoires'] as String) as List<dynamic>;
+          parsedAccs =
+              jsonDecode(json['accessoires'] as String) as List<dynamic>;
         } catch (_) {}
       } else if (json['accessoires'] is List) {
         parsedAccs = json['accessoires'] as List<dynamic>;
@@ -161,7 +178,11 @@ class Commande {
 
     return Commande(
       id: json['id']?.toString() ?? '',
-      productName: json['product_name'] ?? json['climatiseur_nom'] ?? json['produit_nom'] ?? 'Produit MAASGA',
+      productName:
+          json['product_name'] ??
+          json['climatiseur_nom'] ??
+          json['produit_nom'] ??
+          'Produit MAASGA',
       date: json['date'] ?? json['created_at'] ?? '',
       price: formattedPrice,
       status: CommandeStatus.fromString(json['status']),
@@ -169,10 +190,21 @@ class Commande {
       productImage: json['product_image'],
       invoiceUrl: json['invoice_url'],
       devisNumero: json['devis_numero'] ?? json['numero'],
-      produitPrix: safeInt(json['produit_prix'] ?? json['climatiseur_prix'] ?? json['total_price'] ?? json['total_amount']),
+      produitPrix: safeInt(
+        json['produit_prix'] ??
+            json['climatiseur_prix'] ??
+            json['total_price'] ??
+            json['total_amount'],
+      ),
       produitQuantite: safeInt(json['produit_quantite']) ?? 1,
-      installationPrix: safeInt(json['installation_prix'] ?? json['main_oeuvre_prix']),
-      accessoires: parsedAccs ?? (json['fournitures'] is String ? jsonDecode(json['fournitures']) : json['fournitures']),
+      installationPrix: safeInt(
+        json['installation_prix'] ?? json['main_oeuvre_prix'],
+      ),
+      accessoires:
+          parsedAccs ??
+          (json['fournitures'] is String
+              ? jsonDecode(json['fournitures'])
+              : json['fournitures']),
       remise: safeInt(json['remise']),
       totalHt: safeInt(json['devis_total_ht'] ?? json['total_amount']),
       messageClient: json['message_client'],

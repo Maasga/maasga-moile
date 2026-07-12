@@ -31,7 +31,11 @@ class SimulatorRepository {
   }) async {
     // Keep legacy `occupation` for backend compatibility while prioritizing
     // the website-aligned `fenetres` input.
-    final occupation = fenetres >= 3 ? '5+' : fenetres >= 2 ? '3-4' : '1-2';
+    final occupation = fenetres >= 3
+        ? '5+'
+        : fenetres >= 2
+        ? '3-4'
+        : '1-2';
     final response = await _dio.post(
       '/api/simulateur/btu',
       data: {
@@ -58,7 +62,9 @@ class SimulatorRepository {
   }
 }
 
-final simulatorRepositoryProvider = FutureProvider<SimulatorRepository>((ref) async {
+final simulatorRepositoryProvider = FutureProvider<SimulatorRepository>((
+  ref,
+) async {
   final dio = await ref.watch(dioProvider.future);
   return SimulatorRepository(dio);
 });

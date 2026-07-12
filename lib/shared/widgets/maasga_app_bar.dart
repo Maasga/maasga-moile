@@ -25,9 +25,11 @@ class MaasgaAppBar extends ConsumerWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final themeMode = ref.watch(themeControllerProvider);
-    final isDark = themeMode == ThemeMode.dark || 
-                  (themeMode == ThemeMode.system && MediaQuery.of(context).platformBrightness == Brightness.dark);
-    
+    final isDark =
+        themeMode == ThemeMode.dark ||
+        (themeMode == ThemeMode.system &&
+            MediaQuery.of(context).platformBrightness == Brightness.dark);
+
     final colorScheme = Theme.of(context).colorScheme;
 
     return Container(
@@ -58,7 +60,9 @@ class MaasgaAppBar extends ConsumerWidget implements PreferredSizeWidget {
             child: (showBackButton && context.canPop())
                 ? Container(
                     decoration: BoxDecoration(
-                      color: isDark ? colorScheme.surfaceContainerHighest : const Color(0xFFF5F5F5),
+                      color: isDark
+                          ? colorScheme.surfaceContainerHighest
+                          : const Color(0xFFF5F5F5),
                       shape: BoxShape.circle,
                     ),
                     child: IconButton(
@@ -70,7 +74,7 @@ class MaasgaAppBar extends ConsumerWidget implements PreferredSizeWidget {
                   )
                 : const SizedBox.shrink(),
           ),
-          
+
           // Center Title (Image Asset)
           Expanded(
             child: Center(
@@ -91,11 +95,14 @@ class MaasgaAppBar extends ConsumerWidget implements PreferredSizeWidget {
               children: [
                 // Theme Switcher Button
                 IconButton(
-                  onPressed: () => ref.read(themeControllerProvider.notifier).toggleTheme(),
+                  onPressed: () =>
+                      ref.read(themeControllerProvider.notifier).toggleTheme(),
                   icon: Icon(
-                    themeMode == ThemeMode.system 
-                      ? Icons.brightness_auto_outlined 
-                      : (themeMode == ThemeMode.dark ? Icons.dark_mode : Icons.light_mode),
+                    themeMode == ThemeMode.system
+                        ? Icons.brightness_auto_outlined
+                        : (themeMode == ThemeMode.dark
+                              ? Icons.dark_mode
+                              : Icons.light_mode),
                     size: 20,
                   ),
                   color: isDark ? MaasgaTokens.cyan500 : MaasgaTokens.blue700,
@@ -103,7 +110,7 @@ class MaasgaAppBar extends ConsumerWidget implements PreferredSizeWidget {
                 ),
 
                 if (trailingAction != null) trailingAction!,
-                
+
                 Stack(
                   clipBehavior: Clip.none,
                   alignment: Alignment.center,

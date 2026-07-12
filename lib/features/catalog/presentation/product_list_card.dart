@@ -59,14 +59,22 @@ class ProductListCard extends StatelessWidget {
                         product.imageUrl!,
                         fit: BoxFit.contain,
                         errorBuilder: (context, error, stackTrace) {
-                          return const Center(child: Icon(Icons.image_not_supported, color: Color(0xFFBDBDBD), size: 40));
+                          return const Center(
+                            child: Icon(
+                              Icons.image_not_supported,
+                              color: Color(0xFFBDBDBD),
+                              size: 40,
+                            ),
+                          );
                         },
                       )
                     : Image.asset(
                         AssetUtils.getAssetPath(product.image),
                         fit: BoxFit.contain,
                         errorBuilder: (context, error, stackTrace) {
-                          return Image.asset('assets/products/product_placeholder.png');
+                          return Image.asset(
+                            'assets/products/product_placeholder.png',
+                          );
                         },
                       ),
               ),
@@ -142,7 +150,9 @@ class ProductListCard extends StatelessWidget {
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF1B3A8D),
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 12, vertical: 6),
+                              horizontal: 12,
+                              vertical: 6,
+                            ),
                             minimumSize: Size.zero,
                             tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                             shape: RoundedRectangleBorder(

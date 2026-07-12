@@ -10,13 +10,13 @@ class RdvRepository {
 
   Future<void> submitRdv(RdvRequest request) async {
     try {
-      await _dio.post(
-        '/api/mobile/rdv',
-        data: request.toJson(),
-      );
+      await _dio.post('/api/mobile/rdv', data: request.toJson());
     } catch (e) {
       if (e is DioException) {
-        throw Exception(e.response?.data?['message'] ?? 'Erreur lors de la soumission de la demande');
+        throw Exception(
+          e.response?.data?['message'] ??
+              'Erreur lors de la soumission de la demande',
+        );
       }
       rethrow;
     }

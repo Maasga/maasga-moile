@@ -3,11 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../domain/contrat_maintenance.dart';
 
 class ContratCard extends StatelessWidget {
-  const ContratCard({
-    required this.contrat,
-    this.onViewInvoice,
-    super.key,
-  });
+  const ContratCard({required this.contrat, this.onViewInvoice, super.key});
 
   final ContratMaintenance contrat;
   final VoidCallback? onViewInvoice;
@@ -42,11 +38,17 @@ class ContratCard extends StatelessWidget {
                     ),
                     Text(
                       contrat.period,
-                      style: GoogleFonts.poppins(fontSize: 12, color: const Color(0xFF757575)),
+                      style: GoogleFonts.poppins(
+                        fontSize: 12,
+                        color: const Color(0xFF757575),
+                      ),
                     ),
                     Text(
                       contrat.quartier,
-                      style: GoogleFonts.poppins(fontSize: 12, color: const Color(0xFF757575)),
+                      style: GoogleFonts.poppins(
+                        fontSize: 12,
+                        color: const Color(0xFF757575),
+                      ),
                     ),
                     const SizedBox(height: 4),
                     Text(
@@ -83,7 +85,10 @@ class ContratCard extends StatelessWidget {
             children: [
               Text(
                 'Visites : ${contrat.visitesEffectuees}/${contrat.visitesTotales}',
-                style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w500),
+                style: GoogleFonts.poppins(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ],
           ),
@@ -91,9 +96,13 @@ class ContratCard extends StatelessWidget {
           ClipRRect(
             borderRadius: BorderRadius.circular(4),
             child: LinearProgressIndicator(
-              value: contrat.visitesTotales > 0 ? contrat.visitesEffectuees / contrat.visitesTotales : 0,
+              value: contrat.visitesTotales > 0
+                  ? contrat.visitesEffectuees / contrat.visitesTotales
+                  : 0,
               backgroundColor: const Color(0xFFF0F0F0),
-              valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF1B3A8D)),
+              valueColor: const AlwaysStoppedAnimation<Color>(
+                Color(0xFF1B3A8D),
+              ),
               minHeight: 6,
             ),
           ),
@@ -101,18 +110,25 @@ class ContratCard extends StatelessWidget {
           OutlinedButton.icon(
             onPressed: onViewInvoice,
             icon: const Icon(Icons.picture_as_pdf, size: 16),
-            label: Text('Facture PDF', style: GoogleFonts.poppins(fontSize: 11)),
+            label: Text(
+              'Facture PDF',
+              style: GoogleFonts.poppins(fontSize: 11),
+            ),
             style: OutlinedButton.styleFrom(
               foregroundColor: const Color(0xFF1B3A8D),
               side: const BorderSide(color: Color(0xFF1B3A8D)),
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
             ),
           ),
           if (contrat.visites.isNotEmpty) ...[
             const Divider(height: 24, color: Color(0xFFF0F0F0)),
             Theme(
-              data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+              data: Theme.of(
+                context,
+              ).copyWith(dividerColor: Colors.transparent),
               child: ExpansionTile(
                 tilePadding: EdgeInsets.zero,
                 dense: true,
@@ -124,7 +140,9 @@ class ContratCard extends StatelessWidget {
                     color: const Color(0xFF1B3A8D),
                   ),
                 ),
-                children: contrat.visites.map((v) => _VisiteItem(visite: v)).toList(),
+                children: contrat.visites
+                    .map((v) => _VisiteItem(visite: v))
+                    .toList(),
               ),
             ),
           ],
@@ -147,17 +165,25 @@ class _VisiteItem extends StatelessWidget {
           Icon(
             visite.isCompleted ? Icons.check_circle : Icons.pending_outlined,
             size: 16,
-            color: visite.isCompleted ? const Color(0xFF43A047) : const Color(0xFFFB8C00),
+            color: visite.isCompleted
+                ? const Color(0xFF43A047)
+                : const Color(0xFFFB8C00),
           ),
           const SizedBox(width: 8),
           Text(
             visite.date,
-            style: GoogleFonts.poppins(fontSize: 12, color: const Color(0xFF1A1A1A)),
+            style: GoogleFonts.poppins(
+              fontSize: 12,
+              color: const Color(0xFF1A1A1A),
+            ),
           ),
           const Spacer(),
           Text(
             'Tech: ${visite.technicianName}',
-            style: GoogleFonts.poppins(fontSize: 11, color: const Color(0xFF757575)),
+            style: GoogleFonts.poppins(
+              fontSize: 11,
+              color: const Color(0xFF757575),
+            ),
           ),
           const SizedBox(width: 8),
           if (visite.isCompleted)
@@ -169,7 +195,11 @@ class _VisiteItem extends StatelessWidget {
               ),
               child: Text(
                 'Effectuée',
-                style: GoogleFonts.poppins(fontSize: 9, color: const Color(0xFF43A047), fontWeight: FontWeight.w600),
+                style: GoogleFonts.poppins(
+                  fontSize: 9,
+                  color: const Color(0xFF43A047),
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
         ],

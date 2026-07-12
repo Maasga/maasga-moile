@@ -36,8 +36,12 @@ class FormulaCard extends StatelessWidget {
     final primaryColor = const Color(0xFF1B3A8D);
     final backgroundColor = isPremium ? primaryColor : Colors.white;
     final textColor = isPremium ? Colors.white : const Color(0xFF1A1A1A);
-    final secondaryTextColor = isPremium ? Colors.white.withValues(alpha: 0.7) : const Color(0xFF757575);
-    final borderColor = isRecommended ? primaryColor : (isPremium ? Colors.transparent : const Color(0xFFE0E0E0));
+    final secondaryTextColor = isPremium
+        ? Colors.white.withValues(alpha: 0.7)
+        : const Color(0xFF757575);
+    final borderColor = isRecommended
+        ? primaryColor
+        : (isPremium ? Colors.transparent : const Color(0xFFE0E0E0));
 
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
@@ -47,7 +51,9 @@ class FormulaCard extends StatelessWidget {
         border: Border.all(color: borderColor, width: isRecommended ? 2 : 1),
         boxShadow: [
           BoxShadow(
-            color: isRecommended ? primaryColor.withValues(alpha: 0.15) : Colors.black.withValues(alpha: 0.05),
+            color: isRecommended
+                ? primaryColor.withValues(alpha: 0.15)
+                : Colors.black.withValues(alpha: 0.05),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -60,9 +66,14 @@ class FormulaCard extends StatelessWidget {
               top: 0,
               right: 0,
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
-                  color: isPremium ? Colors.white.withValues(alpha: 0.2) : primaryColor,
+                  color: isPremium
+                      ? Colors.white.withValues(alpha: 0.2)
+                      : primaryColor,
                   borderRadius: const BorderRadius.only(
                     topRight: Radius.circular(20),
                     bottomLeft: Radius.circular(12),
@@ -94,7 +105,11 @@ class FormulaCard extends StatelessWidget {
                           Text(
                             title,
                             style: GoogleFonts.poppins(
-                              color: isPremium ? Colors.white.withValues(alpha: 0.8) : (isRecommended ? primaryColor : const Color(0xFF757575)),
+                              color: isPremium
+                                  ? Colors.white.withValues(alpha: 0.8)
+                                  : (isRecommended
+                                        ? primaryColor
+                                        : const Color(0xFF757575)),
                               fontSize: 13,
                               fontWeight: FontWeight.bold,
                               letterSpacing: 1.2,
@@ -127,22 +142,31 @@ class FormulaCard extends StatelessWidget {
                           Text(
                             subtitle,
                             style: GoogleFonts.poppins(
-                              color: isPremium ? Colors.white.withValues(alpha: 0.6) : const Color(0xFF9E9E9E),
+                              color: isPremium
+                                  ? Colors.white.withValues(alpha: 0.6)
+                                  : const Color(0xFF9E9E9E),
                               fontSize: 11,
                             ),
                           ),
                           if (economy.isNotEmpty) ...[
                             const SizedBox(height: 6),
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 4,
+                              ),
                               decoration: BoxDecoration(
-                                color: isPremium ? Colors.white.withValues(alpha: 0.15) : const Color(0xFFE8F5E9),
+                                color: isPremium
+                                    ? Colors.white.withValues(alpha: 0.15)
+                                    : const Color(0xFFE8F5E9),
                                 borderRadius: BorderRadius.circular(6),
                               ),
                               child: Text(
                                 economy,
                                 style: GoogleFonts.poppins(
-                                  color: isPremium ? Colors.white : const Color(0xFF43A047),
+                                  color: isPremium
+                                      ? Colors.white
+                                      : const Color(0xFF43A047),
                                   fontSize: 11,
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -156,19 +180,35 @@ class FormulaCard extends StatelessWidget {
                       width: 44,
                       height: 44,
                       decoration: BoxDecoration(
-                        color: isPremium ? Colors.white.withValues(alpha: 0.15) : (isRecommended ? const Color(0xFFE8EEFF) : const Color(0xFFF5F5F5)),
+                        color: isPremium
+                            ? Colors.white.withValues(alpha: 0.15)
+                            : (isRecommended
+                                  ? const Color(0xFFE8EEFF)
+                                  : const Color(0xFFF5F5F5)),
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
-                        isPremium ? Icons.workspace_premium_outlined : (isRecommended ? Icons.calendar_month_outlined : Icons.calendar_view_week_outlined),
-                        color: isPremium ? Colors.white : (isRecommended ? primaryColor : const Color(0xFF757575)),
+                        isPremium
+                            ? Icons.workspace_premium_outlined
+                            : (isRecommended
+                                  ? Icons.calendar_month_outlined
+                                  : Icons.calendar_view_week_outlined),
+                        color: isPremium
+                            ? Colors.white
+                            : (isRecommended
+                                  ? primaryColor
+                                  : const Color(0xFF757575)),
                         size: 22,
                       ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 16),
-                Divider(color: isPremium ? Colors.white.withValues(alpha: 0.2) : const Color(0xFFF0F0F0)),
+                Divider(
+                  color: isPremium
+                      ? Colors.white.withValues(alpha: 0.2)
+                      : const Color(0xFFF0F0F0),
+                ),
                 const SizedBox(height: 12),
                 Text(
                   'Ce qui est inclus :',
@@ -179,13 +219,17 @@ class FormulaCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 12),
-                ...inclusions.map((item) => _BulletItem(text: item, isPremium: isPremium)),
+                ...inclusions.map(
+                  (item) => _BulletItem(text: item, isPremium: isPremium),
+                ),
                 const SizedBox(height: 12),
                 if (bonusTitle != null && bonusDesc != null) ...[
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: isPremium ? Colors.white.withValues(alpha: 0.12) : const Color(0xFFFFF8E1),
+                      color: isPremium
+                          ? Colors.white.withValues(alpha: 0.12)
+                          : const Color(0xFFFFF8E1),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Column(
@@ -194,7 +238,9 @@ class FormulaCard extends StatelessWidget {
                         Text(
                           bonusTitle!,
                           style: GoogleFonts.poppins(
-                            color: isPremium ? const Color(0xFFFFD700) : const Color(0xFFFB8C00),
+                            color: isPremium
+                                ? const Color(0xFFFFD700)
+                                : const Color(0xFFFB8C00),
                             fontSize: 12,
                             fontWeight: FontWeight.bold,
                           ),
@@ -203,7 +249,9 @@ class FormulaCard extends StatelessWidget {
                         Text(
                           bonusDesc!,
                           style: GoogleFonts.poppins(
-                            color: isPremium ? Colors.white.withValues(alpha: 0.9) : const Color(0xFF757575),
+                            color: isPremium
+                                ? Colors.white.withValues(alpha: 0.9)
+                                : const Color(0xFF757575),
                             fontSize: 12,
                           ),
                         ),
@@ -216,7 +264,9 @@ class FormulaCard extends StatelessWidget {
                   Text(
                     target,
                     style: GoogleFonts.poppins(
-                      color: isPremium ? Colors.white.withValues(alpha: 0.6) : const Color(0xFF9E9E9E),
+                      color: isPremium
+                          ? Colors.white.withValues(alpha: 0.6)
+                          : const Color(0xFF9E9E9E),
                       fontSize: 12,
                       fontStyle: FontStyle.italic,
                     ),
@@ -228,9 +278,19 @@ class FormulaCard extends StatelessWidget {
                   child: ElevatedButton(
                     onPressed: onSelect,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: isPremium ? Colors.white : (isRecommended ? primaryColor : const Color(0xFFF5F5F5)),
-                      foregroundColor: isPremium ? primaryColor : (isRecommended ? Colors.white : const Color(0xFF1A1A1A)),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      backgroundColor: isPremium
+                          ? Colors.white
+                          : (isRecommended
+                                ? primaryColor
+                                : const Color(0xFFF5F5F5)),
+                      foregroundColor: isPremium
+                          ? primaryColor
+                          : (isRecommended
+                                ? Colors.white
+                                : const Color(0xFF1A1A1A)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                       elevation: 0,
                     ),
                     child: Text(
@@ -266,7 +326,9 @@ class _BulletItem extends StatelessWidget {
         children: [
           Icon(
             Icons.check_circle_outline,
-            color: isPremium ? const Color(0xFFFFD700) : const Color(0xFF43A047),
+            color: isPremium
+                ? const Color(0xFFFFD700)
+                : const Color(0xFF43A047),
             size: 16,
           ),
           const SizedBox(width: 8),

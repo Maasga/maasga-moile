@@ -7,7 +7,11 @@ import '../../../core/config/env.dart';
 class GoogleSignInBtn extends StatefulWidget {
   final Future<void> Function(String token) onTokenReceived;
   final Function(String error) onError;
-  const GoogleSignInBtn({super.key, required this.onTokenReceived, required this.onError});
+  const GoogleSignInBtn({
+    super.key,
+    required this.onTokenReceived,
+    required this.onError,
+  });
 
   @override
   State<GoogleSignInBtn> createState() => _GoogleSignInBtnState();
@@ -22,27 +26,29 @@ class _GoogleSignInBtnState extends State<GoogleSignInBtn> {
     super.initState();
     _initGoogleSignIn();
     _sub = GoogleSignIn.instance.authenticationEvents.listen((event) async {
-       if (event is GoogleSignInAuthenticationEventSignIn) {
-          final account = event.user;
+      if (event is GoogleSignInAuthenticationEventSignIn) {
+        final account = event.user;
+        try {
+          final auth = account.authentication;
+          GoogleSignInClientAuthorization? authz;
           try {
-             final auth = account.authentication;
-             GoogleSignInClientAuthorization? authz;
-             try {
-                 authz = await account.authorizationClient.authorizationForScopes([]);
-             } catch (_) {}
+            authz = await account.authorizationClient.authorizationForScopes(
+              [],
+            );
+          } catch (_) {}
 
-             if (authz != null && authz.accessToken.isNotEmpty) {
-                await widget.onTokenReceived(authz.accessToken);
-             } else if (auth.idToken != null) {
-                // Parfois le web renvoie idToken au lieu de accessToken selon le flow
-                await widget.onTokenReceived(auth.idToken!);
-             } else {
-                widget.onError("Access token manquant.");
-             }
-          } catch (e) {
-             widget.onError(e.toString());
+          if (authz != null && authz.accessToken.isNotEmpty) {
+            await widget.onTokenReceived(authz.accessToken);
+          } else if (auth.idToken != null) {
+            // Parfois le web renvoie idToken au lieu de accessToken selon le flow
+            await widget.onTokenReceived(auth.idToken!);
+          } else {
+            widget.onError("Access token manquant.");
           }
-       }
+        } catch (e) {
+          widget.onError(e.toString());
+        }
+      }
     });
   }
 

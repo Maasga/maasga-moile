@@ -23,7 +23,6 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
-
   final int _notificationsCount = 3;
 
   final List<String> _brandAssets = const <String>[
@@ -34,9 +33,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     'assets/brands/aero.png',
   ];
 
-
   String _formatPrice(int price) {
-    final f = NumberFormat.currency(locale: 'fr_FR', symbol: 'FCFA', decimalDigits: 0);
+    final f = NumberFormat.currency(
+      locale: 'fr_FR',
+      symbol: 'FCFA',
+      decimalDigits: 0,
+    );
     return f.format(price);
   }
 
@@ -51,10 +53,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _SearchBar().animate().fadeIn(duration: 400.ms).slideY(begin: -0.2, end: 0),
+            _SearchBar()
+                .animate()
+                .fadeIn(duration: 400.ms)
+                .slideY(begin: -0.2, end: 0),
             _LocationRow().animate().fadeIn(delay: 100.ms),
-            BrandScroll(brandAssetPaths: _brandAssets).animate().fadeIn(delay: 200.ms),
-            const PromoBanner().animate().fadeIn(delay: 300.ms).scale(begin: const Offset(0.95, 0.95)),
+            BrandScroll(
+              brandAssetPaths: _brandAssets,
+            ).animate().fadeIn(delay: 200.ms),
+            const PromoBanner()
+                .animate()
+                .fadeIn(delay: 300.ms)
+                .scale(begin: const Offset(0.95, 0.95)),
             _InnovationsSection(
               productsAsync: productsAsync,
               formatPrice: _formatPrice,
@@ -193,7 +203,15 @@ class _InnovationsSection extends StatelessWidget {
                   childAspectRatio: 0.78,
                 ),
                 itemBuilder: (context, index) => _ProductCard(
-                  product: Product(id: 0, name: 'Chargement...', brand: 'MAASGA', price: 150000, category: 'Split', image: '', stock: 0),
+                  product: Product(
+                    id: 0,
+                    name: 'Chargement...',
+                    brand: 'MAASGA',
+                    price: 150000,
+                    category: 'Split',
+                    image: '',
+                    stock: 0,
+                  ),
                   priceLabel: '150 000 F',
                 ),
               ),
@@ -213,7 +231,10 @@ class _InnovationsSection extends StatelessWidget {
                   return Center(
                     child: Padding(
                       padding: const EdgeInsets.all(24),
-                      child: Text('Aucun produit disponible.', style: GoogleFonts.poppins(color: Colors.grey)),
+                      child: Text(
+                        'Aucun produit disponible.',
+                        style: GoogleFonts.poppins(color: Colors.grey),
+                      ),
                     ),
                   );
                 }
@@ -230,9 +251,12 @@ class _InnovationsSection extends StatelessWidget {
                   itemBuilder: (context, index) {
                     final p = displayed[index];
                     return _ProductCard(
-                      product: p,
-                      priceLabel: formatPrice(p.price),
-                    ).animate().fadeIn(delay: (index * 100).ms).slideY(begin: 0.1, end: 0);
+                          product: p,
+                          priceLabel: formatPrice(p.price),
+                        )
+                        .animate()
+                        .fadeIn(delay: (index * 100).ms)
+                        .slideY(begin: 0.1, end: 0);
                   },
                 );
               },
@@ -247,10 +271,7 @@ class _InnovationsSection extends StatelessWidget {
 
 // ─── Product Card (uses real Product model) ────────────────────────────────────
 class _ProductCard extends StatelessWidget {
-  const _ProductCard({
-    required this.product,
-    required this.priceLabel,
-  });
+  const _ProductCard({required this.product, required this.priceLabel});
 
   final Product product;
   final String priceLabel;
@@ -277,22 +298,33 @@ class _ProductCard extends StatelessWidget {
             Stack(
               children: [
                 ClipRRect(
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(16),
+                  ),
                   child: Container(
                     width: double.infinity,
                     height: 130,
                     color: const Color(0xFFF5F5F5),
                     alignment: Alignment.center,
-                    child: product.imageUrl != null && 
-                           product.imageUrl!.isNotEmpty && 
-                           !AssetUtils.getAssetPath(product.imageUrl!).contains('logo_maasga')
+                    child:
+                        product.imageUrl != null &&
+                            product.imageUrl!.isNotEmpty &&
+                            !AssetUtils.getAssetPath(
+                              product.imageUrl!,
+                            ).contains('logo_maasga')
                         ? CachedNetworkImage(
                             imageUrl: product.imageUrl!,
                             width: 110,
                             height: 110,
                             fit: BoxFit.contain,
                             placeholder: (context, url) => const Center(
-                              child: SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2)),
+                              child: SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
+                              ),
                             ),
                             errorWidget: (context, url, error) => Image.asset(
                               'assets/products/product_placeholder.png',
@@ -301,9 +333,12 @@ class _ProductCard extends StatelessWidget {
                             ),
                           )
                         : Image.asset(
-                            AssetUtils.getAssetPath(product.image.isNotEmpty
-                                ? product.image
-                                : (product.imageUrl ?? 'assets/products/product_placeholder.png')),
+                            AssetUtils.getAssetPath(
+                              product.image.isNotEmpty
+                                  ? product.image
+                                  : (product.imageUrl ??
+                                        'assets/products/product_placeholder.png'),
+                            ),
                             width: 110,
                             height: 110,
                             fit: BoxFit.contain,

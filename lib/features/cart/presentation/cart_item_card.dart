@@ -49,7 +49,8 @@ class CartItemCard extends StatelessWidget {
               child: Image.asset(
                 AssetUtils.getAssetPath(line.product.image),
                 fit: BoxFit.contain,
-                errorBuilder: (_, __, ___) => Image.asset('assets/products/product_placeholder.png'),
+                errorBuilder: (_, __, ___) =>
+                    Image.asset('assets/products/product_placeholder.png'),
               ),
             ),
           ),
@@ -95,10 +96,15 @@ class CartItemCard extends StatelessWidget {
                                 color: const Color(0xFFF5F5F5),
                                 shape: BoxShape.circle,
                                 border: Border.all(
-                                    color: const Color(0xFFE0E0E0), width: 1),
+                                  color: const Color(0xFFE0E0E0),
+                                  width: 1,
+                                ),
                               ),
-                              child: const Icon(Icons.remove,
-                                  size: 14, color: Color(0xFF1A1A1A)),
+                              child: const Icon(
+                                Icons.remove,
+                                size: 14,
+                                color: Color(0xFF1A1A1A),
+                              ),
                             ),
                           ),
                           const SizedBox(width: 12),
@@ -121,8 +127,11 @@ class CartItemCard extends StatelessWidget {
                                 color: Color(0xFF1B3A8D),
                                 shape: BoxShape.circle,
                               ),
-                              child: const Icon(Icons.add,
-                                  size: 14, color: Colors.white),
+                              child: const Icon(
+                                Icons.add,
+                                size: 14,
+                                color: Colors.white,
+                              ),
                             ),
                           ),
                         ],

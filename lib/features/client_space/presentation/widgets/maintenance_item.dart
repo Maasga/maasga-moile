@@ -22,7 +22,9 @@ class MaintenanceItem extends StatelessWidget {
           Icon(
             isCompleted ? Icons.check_circle : Icons.pending_outlined,
             size: 20,
-            color: isCompleted ? const Color(0xFF43A047) : const Color(0xFFFB8C00),
+            color: isCompleted
+                ? const Color(0xFF43A047)
+                : const Color(0xFFFB8C00),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -50,7 +52,9 @@ class MaintenanceItem extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
-              color: isCompleted ? const Color(0xFFE8F5E9) : const Color(0xFFFFF3E0),
+              color: isCompleted
+                  ? const Color(0xFFE8F5E9)
+                  : const Color(0xFFFFF3E0),
               borderRadius: BorderRadius.circular(6),
             ),
             child: Text(
@@ -58,7 +62,9 @@ class MaintenanceItem extends StatelessWidget {
               style: GoogleFonts.poppins(
                 fontSize: 10,
                 fontWeight: FontWeight.w600,
-                color: isCompleted ? const Color(0xFF43A047) : const Color(0xFFFB8C00),
+                color: isCompleted
+                    ? const Color(0xFF43A047)
+                    : const Color(0xFFFB8C00),
               ),
             ),
           ),

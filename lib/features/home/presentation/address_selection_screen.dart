@@ -21,4 +21,3 @@ class AddressSelectionScreen extends StatelessWidget {
     );
   }
 }
-

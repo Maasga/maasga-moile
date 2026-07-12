@@ -21,4 +21,3 @@ class SearchScreen extends StatelessWidget {
     );
   }
 }
-

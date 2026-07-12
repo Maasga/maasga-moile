@@ -22,11 +22,7 @@ class CatalogScreen extends ConsumerStatefulWidget {
 }
 
 class _CatalogScreenState extends ConsumerState<CatalogScreen> {
-  final List<String> _categories = [
-    'Mural/Split',
-    'Armoire',
-    'Mobile'
-  ];
+  final List<String> _categories = ['Mural/Split', 'Armoire', 'Mobile'];
   String _selectedCategory = 'Mural/Split';
 
   void _openFilterBottomSheet() {
@@ -46,7 +42,9 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
     ref.read(cartProvider.notifier).add(product);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('${product.name} ajouté au panier').animate().slideX(begin: 1, end: 0),
+        content: Text(
+          '${product.name} ajouté au panier',
+        ).animate().slideX(begin: 1, end: 0),
         behavior: SnackBarBehavior.floating,
         duration: const Duration(seconds: 3),
         backgroundColor: const Color(0xFF1B3A8D),
@@ -82,9 +80,11 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
         if (powers.isNotEmpty && !powers.contains(product.power)) return false;
         if (brands.isNotEmpty && !brands.contains(product.brand)) return false;
         if (product.price < minPrice || product.price > maxPrice) return false;
-        
+
         if (sheetCategory != null) {
-          final mappedCat = sheetCategory == 'Split / Mural' ? 'Mural/Split' : sheetCategory;
+          final mappedCat = sheetCategory == 'Split / Mural'
+              ? 'Mural/Split'
+              : sheetCategory;
           if (product.category != mappedCat) return false;
         }
       }
@@ -109,7 +109,10 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
                 physics: const BouncingScrollPhysics(),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
                 itemCount: _categories.length,
                 itemBuilder: (context, index) {
                   final category = _categories[index];
@@ -133,10 +136,21 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
                 enabled: productsAsync.isLoading,
                 child: productsAsync.when(
                   loading: () => ListView.builder(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
                     itemCount: 5,
                     itemBuilder: (context, index) => ProductListCard(
-                      product: Product(id: 0, name: 'Chargement...', brand: 'MAASGA', price: 150000, category: 'Split', image: '', stock: 0),
+                      product: Product(
+                        id: 0,
+                        name: 'Chargement...',
+                        brand: 'MAASGA',
+                        price: 150000,
+                        category: 'Split',
+                        image: '',
+                        stock: 0,
+                      ),
                       onTap: () {},
                       onAddToCart: () {},
                     ),
@@ -148,17 +162,26 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
                     }
                     return ListView.builder(
                       physics: const BouncingScrollPhysics(),
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
                       itemCount: filteredProducts.length,
                       itemBuilder: (context, index) {
                         final product = filteredProducts[index];
                         return ProductListCard(
-                          product: product,
-                          onTap: () {
-                            context.push('/catalog/product', extra: product);
-                          },
-                          onAddToCart: () => _addToCart(product),
-                        ).animate().fadeIn(delay: (index * 50).ms).slideX(begin: 0.1, end: 0);
+                              product: product,
+                              onTap: () {
+                                context.push(
+                                  '/catalog/product',
+                                  extra: product,
+                                );
+                              },
+                              onAddToCart: () => _addToCart(product),
+                            )
+                            .animate()
+                            .fadeIn(delay: (index * 50).ms)
+                            .slideX(begin: 0.1, end: 0);
                       },
                     );
                   },

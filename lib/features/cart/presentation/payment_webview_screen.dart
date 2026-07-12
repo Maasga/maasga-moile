@@ -19,7 +19,8 @@ class PaymentWebViewScreen extends ConsumerStatefulWidget {
   final int orderId;
 
   @override
-  ConsumerState<PaymentWebViewScreen> createState() => _PaymentWebViewScreenState();
+  ConsumerState<PaymentWebViewScreen> createState() =>
+      _PaymentWebViewScreenState();
 }
 
 class _PaymentWebViewScreenState extends ConsumerState<PaymentWebViewScreen> {
@@ -48,7 +49,10 @@ class _PaymentWebViewScreenState extends ConsumerState<PaymentWebViewScreen> {
         ),
       )
       ..loadRequest(Uri.parse(widget.paymentUrl));
-    _pollTimer = Timer.periodic(const Duration(seconds: 4), (_) => _checkAndFinish());
+    _pollTimer = Timer.periodic(
+      const Duration(seconds: 4),
+      (_) => _checkAndFinish(),
+    );
   }
 
   @override

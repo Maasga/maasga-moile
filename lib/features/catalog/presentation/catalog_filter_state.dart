@@ -9,4 +9,7 @@ class CatalogFilterNotifier extends Notifier<Map<String, dynamic>> {
   }
 }
 
-final catalogFilterProvider = NotifierProvider<CatalogFilterNotifier, Map<String, dynamic>>(CatalogFilterNotifier.new);
+final catalogFilterProvider =
+    NotifierProvider<CatalogFilterNotifier, Map<String, dynamic>>(
+      CatalogFilterNotifier.new,
+    );

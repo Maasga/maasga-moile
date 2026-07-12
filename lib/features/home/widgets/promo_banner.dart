@@ -52,18 +52,23 @@ class _PromoBannerState extends ConsumerState<PromoBanner> {
       _Promo(
         title: 'Soldes de fin d\u2019\u00e9t\u00e9',
         subtitle: '- \u00c9conomisez jusqu\u2019\u00e0 30%',
-        imageUrl: 'https://images.unsplash.com/photo-1542013976693-85499f1c7964?q=80&w=600&auto=format&fit=crop',
+        imageUrl:
+            'https://images.unsplash.com/photo-1542013976693-85499f1c7964?q=80&w=600&auto=format&fit=crop',
       ),
     ];
     return _buildCarousel(
-      items: staticPromos.map((p) => _renderPromoItem(p.title, p.subtitle, p.imageUrl)).toList(),
+      items: staticPromos
+          .map((p) => _renderPromoItem(p.title, p.subtitle, p.imageUrl))
+          .toList(),
       count: staticPromos.length,
     );
   }
 
   Widget _buildDynamicCarousel(List<Promo> banners) {
     return _buildCarousel(
-      items: banners.map((p) => _renderPromoItem(p.title, p.subtitle ?? '', p.imageUrl)).toList(),
+      items: banners
+          .map((p) => _renderPromoItem(p.title, p.subtitle ?? '', p.imageUrl))
+          .toList(),
       count: banners.length,
     );
   }

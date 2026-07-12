@@ -32,11 +32,7 @@ class SpecCard extends StatelessWidget {
               color: const Color(0xFFE8EEFF),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: Icon(
-              icon,
-              color: const Color(0xFF1B3A8D),
-              size: 20,
-            ),
+            child: Icon(icon, color: const Color(0xFF1B3A8D), size: 20),
           ),
           const SizedBox(width: 10),
           Expanded(

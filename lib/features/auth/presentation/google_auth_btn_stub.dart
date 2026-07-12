@@ -10,8 +10,8 @@ Widget buildGoogleSignInButton({
       try {
         final token = await GoogleMobileAuth.requestAccessToken();
         if (token.isEmpty) {
-           onError('Google Sign-In annulé ou token indisponible.');
-           return;
+          onError('Google Sign-In annulé ou token indisponible.');
+          return;
         }
         await onTokenReceived(token);
       } catch (e) {

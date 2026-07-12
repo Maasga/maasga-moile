@@ -48,13 +48,19 @@ class _MaintenanceScreenState extends ConsumerState<MaintenanceScreen> {
             const SizedBox(height: 8),
             Text(
               'Demande envoyée !',
-              style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.bold),
+              style: GoogleFonts.poppins(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             const SizedBox(height: 8),
             Text(
               'Nous vous confirmons votre souscription sous 2h. Notre équipe vous contactera sur WhatsApp.',
               textAlign: TextAlign.center,
-              style: GoogleFonts.poppins(fontSize: 13, color: const Color(0xFF757575)),
+              style: GoogleFonts.poppins(
+                fontSize: 13,
+                color: const Color(0xFF757575),
+              ),
             ),
             const SizedBox(height: 24),
             SizedBox(
@@ -66,9 +72,17 @@ class _MaintenanceScreenState extends ConsumerState<MaintenanceScreen> {
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF1B3A8D),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
-                child: Text('Parfait', style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.w600)),
+                child: Text(
+                  'Parfait',
+                  style: GoogleFonts.poppins(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
               ),
             ),
           ],
@@ -111,17 +125,28 @@ class _MaintenanceScreenState extends ConsumerState<MaintenanceScreen> {
                       children: [
                         Text(
                           'Maintenance préventive · MAASGA',
-                          style: GoogleFonts.poppins(color: Colors.white.withValues(alpha: 0.8), fontSize: 11, letterSpacing: 1.0),
+                          style: GoogleFonts.poppins(
+                            color: Colors.white.withValues(alpha: 0.8),
+                            fontSize: 11,
+                            letterSpacing: 1.0,
+                          ),
                         ),
                         const SizedBox(height: 6),
                         Text(
                           'Contrats de Maintenance',
-                          style: GoogleFonts.poppins(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
+                          style: GoogleFonts.poppins(
+                            color: Colors.white,
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                         const SizedBox(height: 8),
                         Text(
                           'Protégez votre investissement. Un entretien régulier prolonge la durée de vie de vos climatiseurs et réduit votre consommation.',
-                          style: GoogleFonts.poppins(color: Colors.white.withValues(alpha: 0.85), fontSize: 13),
+                          style: GoogleFonts.poppins(
+                            color: Colors.white.withValues(alpha: 0.85),
+                            fontSize: 13,
+                          ),
                         ),
                         const SizedBox(height: 16),
                         Container(
@@ -132,12 +157,19 @@ class _MaintenanceScreenState extends ConsumerState<MaintenanceScreen> {
                           ),
                           child: Row(
                             children: [
-                              const Icon(Icons.bolt, color: Color(0xFFFFD700), size: 16),
+                              const Icon(
+                                Icons.bolt,
+                                color: Color(0xFFFFD700),
+                                size: 16,
+                              ),
                               const SizedBox(width: 8),
                               Expanded(
                                 child: Text(
                                   'Un climatiseur bien entretenu consomme jusqu\'à 30% d\'énergie en moins et dure 2× plus longtemps.',
-                                  style: GoogleFonts.poppins(color: Colors.white, fontSize: 12),
+                                  style: GoogleFonts.poppins(
+                                    color: Colors.white,
+                                    fontSize: 12,
+                                  ),
                                 ),
                               ),
                             ],
@@ -152,7 +184,11 @@ class _MaintenanceScreenState extends ConsumerState<MaintenanceScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: Text(
                       'Pourquoi un contrat de maintenance ?',
-                      style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600, color: const Color(0xFF1A1A1A)),
+                      style: GoogleFonts.poppins(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: const Color(0xFF1A1A1A),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -165,10 +201,26 @@ class _MaintenanceScreenState extends ConsumerState<MaintenanceScreen> {
                     mainAxisSpacing: 10,
                     childAspectRatio: 1.5,
                     children: const [
-                      BenefitCard(icon: Icons.electric_bolt_outlined, title: '-30% énergie', subtitle: 'Économies sur votre facture'),
-                      BenefitCard(icon: Icons.timelapse_outlined, title: '2× durée de vie', subtitle: 'Votre clim dure plus longtemps'),
-                      BenefitCard(icon: Icons.air_outlined, title: 'Air pur', subtitle: 'Filtres propres, air sain garanti'),
-                      BenefitCard(icon: Icons.shield_outlined, title: 'Zéro panne', subtitle: 'Diagnostic précoce des problèmes'),
+                      BenefitCard(
+                        icon: Icons.electric_bolt_outlined,
+                        title: '-30% énergie',
+                        subtitle: 'Économies sur votre facture',
+                      ),
+                      BenefitCard(
+                        icon: Icons.timelapse_outlined,
+                        title: '2× durée de vie',
+                        subtitle: 'Votre clim dure plus longtemps',
+                      ),
+                      BenefitCard(
+                        icon: Icons.air_outlined,
+                        title: 'Air pur',
+                        subtitle: 'Filtres propres, air sain garanti',
+                      ),
+                      BenefitCard(
+                        icon: Icons.shield_outlined,
+                        title: 'Zéro panne',
+                        subtitle: 'Diagnostic précoce des problèmes',
+                      ),
                     ],
                   ),
                   const SizedBox(height: 24),
@@ -177,7 +229,11 @@ class _MaintenanceScreenState extends ConsumerState<MaintenanceScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: Text(
                       'Choisissez votre formule',
-                      style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600, color: const Color(0xFF1A1A1A)),
+                      style: GoogleFonts.poppins(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: const Color(0xFF1A1A1A),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -229,7 +285,8 @@ class _MaintenanceScreenState extends ConsumerState<MaintenanceScreen> {
                           economy: '💰 Économie : 20 000 F',
                           isPremium: true,
                           bonusTitle: 'Avantages exclusifs :',
-                          bonusDesc: '• 1 recharge gaz gratuite\n• 10% de réduction réparations\n• Support prioritaire',
+                          bonusDesc:
+                              '• 1 recharge gaz gratuite\n• 10% de réduction réparations\n• Support prioritaire',
                           inclusions: const [
                             '12 maintenances préventives',
                             'Nettoyage complet pro',
@@ -239,8 +296,10 @@ class _MaintenanceScreenState extends ConsumerState<MaintenanceScreen> {
                             'Conseils sur mesure',
                             'Suivi personnalisé',
                           ],
-                          onSelect: () => _showSubscriptionForm('ANNUEL PREMIUM'),
-                          target: 'Idéal pour : restaurants, hôtels et serveurs',
+                          onSelect: () =>
+                              _showSubscriptionForm('ANNUEL PREMIUM'),
+                          target:
+                              'Idéal pour : restaurants, hôtels et serveurs',
                         ),
                       ],
                     ),
@@ -300,10 +359,12 @@ class _SubscriptionFormModal extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<_SubscriptionFormModal> createState() => _SubscriptionFormModalState();
+  ConsumerState<_SubscriptionFormModal> createState() =>
+      _SubscriptionFormModalState();
 }
 
-class _SubscriptionFormModalState extends ConsumerState<_SubscriptionFormModal> {
+class _SubscriptionFormModalState
+    extends ConsumerState<_SubscriptionFormModal> {
   final _formKey = GlobalKey<FormState>();
   final _nameCtrl = TextEditingController();
   final _phoneCtrl = TextEditingController();
@@ -353,7 +414,14 @@ class _SubscriptionFormModalState extends ConsumerState<_SubscriptionFormModal> 
         mainAxisSize: MainAxisSize.min,
         children: [
           const SizedBox(height: 12),
-          Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2))),
+          Container(
+            width: 40,
+            height: 4,
+            decoration: BoxDecoration(
+              color: Colors.grey[300],
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
           const SizedBox(height: 20),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -363,15 +431,30 @@ class _SubscriptionFormModalState extends ConsumerState<_SubscriptionFormModal> 
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Ma Souscription', style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.bold)),
-                    Text('Formule : $_selectedFormule', style: GoogleFonts.poppins(fontSize: 13, color: primaryColor, fontWeight: FontWeight.w600)),
+                    Text(
+                      'Ma Souscription',
+                      style: GoogleFonts.poppins(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      'Formule : $_selectedFormule',
+                      style: GoogleFonts.poppins(
+                        fontSize: 13,
+                        color: primaryColor,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                   ],
                 ),
                 IconButton(
                   onPressed: () => Navigator.pop(context),
                   icon: const Icon(Icons.close),
-                  style: IconButton.styleFrom(backgroundColor: const Color(0xFFF5F5F5)),
-                )
+                  style: IconButton.styleFrom(
+                    backgroundColor: const Color(0xFFF5F5F5),
+                  ),
+                ),
               ],
             ),
           ),
@@ -388,7 +471,13 @@ class _SubscriptionFormModalState extends ConsumerState<_SubscriptionFormModal> 
                     TextFormField(
                       controller: _nameCtrl,
                       style: MaasgaTokens.inputTextStyle,
-                      decoration: InputDecoration(hintText: 'Votre nom', prefixIcon: Icon(Icons.person_outline, color: MaasgaTokens.blue700)),
+                      decoration: InputDecoration(
+                        hintText: 'Votre nom',
+                        prefixIcon: Icon(
+                          Icons.person_outline,
+                          color: MaasgaTokens.blue700,
+                        ),
+                      ),
                       validator: (v) => v!.isEmpty ? 'Requis' : null,
                     ),
                     const SizedBox(height: 16),
@@ -396,7 +485,13 @@ class _SubscriptionFormModalState extends ConsumerState<_SubscriptionFormModal> 
                     TextFormField(
                       controller: _phoneCtrl,
                       style: MaasgaTokens.inputTextStyle,
-                      decoration: InputDecoration(hintText: 'XX XX XX XX', prefixIcon: Icon(Icons.phone_outlined, color: MaasgaTokens.blue700)),
+                      decoration: InputDecoration(
+                        hintText: 'XX XX XX XX',
+                        prefixIcon: Icon(
+                          Icons.phone_outlined,
+                          color: MaasgaTokens.blue700,
+                        ),
+                      ),
                       validator: (v) => v!.isEmpty ? 'Requis' : null,
                     ),
                     const SizedBox(height: 32),
@@ -415,9 +510,18 @@ class _SubscriptionFormModalState extends ConsumerState<_SubscriptionFormModal> 
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: primaryColor,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
                         ),
-                        child: Text('Confirmer ma souscription', style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+                        child: Text(
+                          'Confirmer ma souscription',
+                          style: GoogleFonts.poppins(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
                       ),
                     ),
                   ],
@@ -433,7 +537,14 @@ class _SubscriptionFormModalState extends ConsumerState<_SubscriptionFormModal> 
   Widget _buildFieldLabel(String label) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
-      child: Text(label, style: GoogleFonts.poppins(fontSize: 13, fontWeight: FontWeight.w500, color: const Color(0xFF1A1A1A))),
+      child: Text(
+        label,
+        style: GoogleFonts.poppins(
+          fontSize: 13,
+          fontWeight: FontWeight.w500,
+          color: const Color(0xFF1A1A1A),
+        ),
+      ),
     );
   }
 }
@@ -455,12 +566,20 @@ class _WhatsAppCTA extends StatelessWidget {
           const Icon(Icons.chat_outlined, color: Color(0xFF43A047)),
           const SizedBox(width: 12),
           Expanded(
-            child: Text('Besoin d\'aide ? Contactez-nous sur WhatsApp', style: GoogleFonts.poppins(fontSize: 12)),
+            child: Text(
+              'Besoin d\'aide ? Contactez-nous sur WhatsApp',
+              style: GoogleFonts.poppins(fontSize: 12),
+            ),
           ),
           ElevatedButton(
             onPressed: () => launchUrl(Uri.parse('https://wa.me/22655996418')),
-            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF43A047)),
-            child: Text('Ouvrir', style: GoogleFonts.poppins(color: Colors.white)),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF43A047),
+            ),
+            child: Text(
+              'Ouvrir',
+              style: GoogleFonts.poppins(color: Colors.white),
+            ),
           ),
         ],
       ),

@@ -11,7 +11,9 @@ class GoogleMobileAuth {
 
   static Future<String> requestAccessToken() async {
     if (kIsWeb) {
-      throw Exception("La connexion Google n'est pas encore disponible sur la version Web.");
+      throw Exception(
+        "La connexion Google n'est pas encore disponible sur la version Web.",
+      );
     }
     final google = GoogleSignIn.instance;
     if (!_initialized) {
@@ -26,7 +28,7 @@ class GoogleMobileAuth {
     final account = await google.authenticate(scopeHint: _scopes);
     final authz =
         await account.authorizationClient.authorizationForScopes(_scopes) ??
-            await account.authorizationClient.authorizeScopes(_scopes);
+        await account.authorizationClient.authorizeScopes(_scopes);
     return authz.accessToken;
   }
 }

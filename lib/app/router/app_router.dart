@@ -31,11 +31,13 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     routes: [
       GoRoute(
         path: '/splash',
-        pageBuilder: (context, state) => _buildPage(state, const SplashScreen()),
+        pageBuilder: (context, state) =>
+            _buildPage(state, const SplashScreen()),
       ),
       GoRoute(
         path: '/onboarding',
-        pageBuilder: (context, state) => _buildPage(state, const OnboardingScreen()),
+        pageBuilder: (context, state) =>
+            _buildPage(state, const OnboardingScreen()),
       ),
       GoRoute(
         path: '/auth/login',
@@ -43,7 +45,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/auth/register',
-        pageBuilder: (context, state) => _buildPage(state, const RegisterScreen()),
+        pageBuilder: (context, state) =>
+            _buildPage(state, const RegisterScreen()),
       ),
       GoRoute(
         path: '/home',
@@ -51,7 +54,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/catalogue',
-        pageBuilder: (context, state) => _buildPage(state, const CatalogScreen()),
+        pageBuilder: (context, state) =>
+            _buildPage(state, const CatalogScreen()),
       ),
       GoRoute(
         path: '/rendez-vous',
@@ -59,11 +63,13 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/espace-client',
-        pageBuilder: (context, state) => _buildPage(state, const ClientSpaceScreen()),
+        pageBuilder: (context, state) =>
+            _buildPage(state, const ClientSpaceScreen()),
       ),
       GoRoute(
         path: '/catalog',
-        pageBuilder: (context, state) => _buildPage(state, const CatalogScreen()),
+        pageBuilder: (context, state) =>
+            _buildPage(state, const CatalogScreen()),
       ),
       GoRoute(
         path: '/catalog/product',
@@ -74,7 +80,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/simulator',
-        pageBuilder: (context, state) => _buildPage(state, const SimulatorScreen()),
+        pageBuilder: (context, state) =>
+            _buildPage(state, const SimulatorScreen()),
       ),
       GoRoute(
         path: '/cart',
@@ -82,7 +89,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/checkout',
-        pageBuilder: (context, state) => _buildPage(state, const CheckoutScreen()),
+        pageBuilder: (context, state) =>
+            _buildPage(state, const CheckoutScreen()),
       ),
       GoRoute(
         path: '/payment',
@@ -110,31 +118,38 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/client-space',
-        pageBuilder: (context, state) => _buildPage(state, const ClientSpaceScreen()),
+        pageBuilder: (context, state) =>
+            _buildPage(state, const ClientSpaceScreen()),
       ),
       GoRoute(
         path: '/notifications',
-        pageBuilder: (context, state) => _buildPage(state, const NotificationsScreen()),
+        pageBuilder: (context, state) =>
+            _buildPage(state, const NotificationsScreen()),
       ),
       GoRoute(
         path: '/support',
-        pageBuilder: (context, state) => _buildPage(state, const SupportScreen()),
+        pageBuilder: (context, state) =>
+            _buildPage(state, const SupportScreen()),
       ),
       GoRoute(
         path: '/settings',
-        pageBuilder: (context, state) => _buildPage(state, const SettingsScreen()),
+        pageBuilder: (context, state) =>
+            _buildPage(state, const SettingsScreen()),
       ),
       GoRoute(
         path: '/search',
-        pageBuilder: (context, state) => _buildPage(state, const SearchScreen()),
+        pageBuilder: (context, state) =>
+            _buildPage(state, const SearchScreen()),
       ),
       GoRoute(
         path: '/maintenance',
-        pageBuilder: (context, state) => _buildPage(state, const MaintenanceScreen()),
+        pageBuilder: (context, state) =>
+            _buildPage(state, const MaintenanceScreen()),
       ),
       GoRoute(
         path: '/address',
-        pageBuilder: (context, state) => _buildPage(state, const AddressSelectionScreen()),
+        pageBuilder: (context, state) =>
+            _buildPage(state, const AddressSelectionScreen()),
       ),
     ],
   );
