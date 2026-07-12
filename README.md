@@ -54,8 +54,14 @@ flutter analyze
 flutter test
 ```
 
+## CI
+
+GitHub Actions (`.github/workflows/ci.yml`) sur chaque push/PR vers `main` :
+`dart format` (gate) · `flutter analyze` · `flutter test` · build APK debug (artefact).
+
 ## Backlog / améliorations
 
-Voir `IMPLEMENTATION_BACKLOG.md`. Pistes ouvertes : mise à jour groupée des
-dépendances, CI (analyze + test + build APK), tests d'intégration auth/catalogue,
-minification R8/ProGuard (à valider), config release iOS si multiplateforme.
+Voir `IMPLEMENTATION_BACKLOG.md`. Fait : dépendances à jour (majeures), CI,
+règles ProGuard prêtes. Pistes ouvertes : tests d'intégration auth/catalogue,
+activation R8/ProGuard (après QA d'un build release signé), config release iOS
+si multiplateforme.

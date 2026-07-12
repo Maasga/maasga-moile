@@ -61,6 +61,16 @@ android {
             } else {
                 signingConfigs.getByName("debug")
             }
+
+            // Minification/obfuscation R8 : règles prêtes dans proguard-rules.pro.
+            // NON activée par défaut — tester un build release signé sur appareil
+            // avant d'activer (réflexion Firebase/webview/pdf). Pour activer :
+            // isMinifyEnabled = true
+            // isShrinkResources = true
+            // proguardFiles(
+            //     getDefaultProguardFile("proguard-android-optimize.txt"),
+            //     "proguard-rules.pro",
+            // )
         }
     }
 }
