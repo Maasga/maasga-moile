@@ -1,6 +1,7 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
@@ -18,6 +19,36 @@ class _PromoBannerState extends ConsumerState<PromoBanner> {
   final int _dotColor = 0xFFD0D0D0;
   final int _primaryBlue = 0xFF1B3A8D;
   int _activeIndex = 0;
+
+  /// Destinations autorisées pour le `target_page` d'une bannière.
+  ///
+  /// La valeur vient de `/api/mobile/banners`, donc du serveur : on ne
+  /// l'injecte pas telle quelle dans le router. Même liste d'exclusions que
+  /// pour les pushs (cf. `PushService._allowedRoutes`) — `/catalog/product`
+  /// attend un `Product` en `extra` et crasherait sans argument.
+  static const Set<String> _allowedTargets = {
+    '/home',
+    '/catalogue',
+    '/catalog',
+    '/rendez-vous',
+    '/rdv',
+    '/espace-client',
+    '/client-space',
+    '/simulator',
+    '/cart',
+    '/support',
+    '/search',
+    '/maintenance',
+  };
+
+  /// Une bannière sans destination exploitable renvoie au catalogue : c'est le
+  /// sens attendu d'un « Découvrir » sur une promo produit.
+  String _resolveTarget(String? rawTarget) {
+    final value = rawTarget?.trim();
+    if (value == null || value.isEmpty) return '/catalog';
+    final path = value.startsWith('/') ? value : '/$value';
+    return _allowedTargets.contains(path) ? path : '/catalog';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -58,7 +89,7 @@ class _PromoBannerState extends ConsumerState<PromoBanner> {
     ];
     return _buildCarousel(
       items: staticPromos
-          .map((p) => _renderPromoItem(p.title, p.subtitle, p.imageUrl))
+          .map((p) => _renderPromoItem(p.title, p.subtitle, p.imageUrl, null))
           .toList(),
       count: staticPromos.length,
     );
@@ -67,7 +98,14 @@ class _PromoBannerState extends ConsumerState<PromoBanner> {
   Widget _buildDynamicCarousel(List<Promo> banners) {
     return _buildCarousel(
       items: banners
-          .map((p) => _renderPromoItem(p.title, p.subtitle ?? '', p.imageUrl))
+          .map(
+            (p) => _renderPromoItem(
+              p.title,
+              p.subtitle ?? '',
+              p.imageUrl,
+              p.targetPage,
+            ),
+          )
           .toList(),
       count: banners.length,
     );
@@ -111,7 +149,12 @@ class _PromoBannerState extends ConsumerState<PromoBanner> {
     );
   }
 
-  Widget _renderPromoItem(String title, String subtitle, String imageUrl) {
+  Widget _renderPromoItem(
+    String title,
+    String subtitle,
+    String imageUrl,
+    String? targetPage,
+  ) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(16),
       child: Stack(
@@ -172,7 +215,7 @@ class _PromoBannerState extends ConsumerState<PromoBanner> {
                 SizedBox(
                   height: 34,
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () => context.push(_resolveTarget(targetPage)),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF1B3A8D),
                       foregroundColor: Colors.white,

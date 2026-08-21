@@ -99,7 +99,9 @@ class _SearchBar extends StatelessWidget {
       ),
       child: InkWell(
         borderRadius: BorderRadius.circular(25),
-        onTap: () => context.go('/catalog'),
+        // `push` et non `go` : la recherche est un détour depuis l'accueil, le
+        // retour système doit ramener ici et non quitter l'app.
+        onTap: () => context.push('/search'),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
           child: Row(
@@ -220,7 +222,7 @@ class _InnovationsSection extends StatelessWidget {
                   padding: const EdgeInsets.all(24),
                   child: Text(
                     'Impossible de charger les produits.',
-                    style: GoogleFonts.poppins(color: Colors.grey),
+                    style: GoogleFonts.poppins(color: const Color(0xFF475467)),
                     textAlign: TextAlign.center,
                   ),
                 ),
@@ -233,7 +235,9 @@ class _InnovationsSection extends StatelessWidget {
                       padding: const EdgeInsets.all(24),
                       child: Text(
                         'Aucun produit disponible.',
-                        style: GoogleFonts.poppins(color: Colors.grey),
+                        style: GoogleFonts.poppins(
+                          color: const Color(0xFF475467),
+                        ),
                       ),
                     ),
                   );
