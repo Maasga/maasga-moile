@@ -8,7 +8,7 @@ paiement, alignée sur le backend web MAASGA existant.
 
 - **Flutter** (Dart, SDK `^3.9.2`) — cible principale **Android**
 - **Riverpod** (état), **go_router** (navigation), **Dio** + cookie jar (réseau)
-- **flutter_secure_storage** (token), **Firebase Messaging** (push)
+- **Firebase Auth** (session, token ID en `Bearer`), **Firebase Messaging** (push)
 - **Google Maps / Geolocator**, **Google Sign-In**, génération **PDF**
 
 ## Démarrage
@@ -27,7 +27,7 @@ Les valeurs sensibles/environnement passent par `--dart-define` (voir
 flutter run \
   --dart-define=API_BASE_URL=https://maasga-website.pages.dev \
   --dart-define=GOOGLE_WEB_CLIENT_ID=... \
-  --dart-define=GOOGLE_ANDROID_CLIENT_ID=...
+  --dart-define=APP_VERSION=1.0.0
 ```
 
 ## Build release signé
@@ -61,7 +61,7 @@ GitHub Actions (`.github/workflows/ci.yml`) sur chaque push/PR vers `main` :
 
 ## Backlog / améliorations
 
-Voir `IMPLEMENTATION_BACKLOG.md`. Fait : dépendances à jour (majeures), CI,
-règles ProGuard prêtes. Pistes ouvertes : tests d'intégration auth/catalogue,
-activation R8/ProGuard (après QA d'un build release signé), config release iOS
-si multiplateforme.
+`IMPLEMENTATION_BACKLOG.md` tient la liste à jour. En résumé : dépendances à
+jour, CI en place, R8/ProGuard déjà actif en release. Restent notamment la QA
+d'un APK release signé, la restriction de la clé Google Maps, le recalcul du
+total de commande côté worker, et l'élargissement de la couverture de tests.
