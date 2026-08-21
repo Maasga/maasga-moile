@@ -5,14 +5,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 
 import '../../features/cart/presentation/cart_state.dart';
+import '../design_tokens/maasga_tokens.dart';
 
 class MainBottomNav extends ConsumerWidget {
   const MainBottomNav({super.key, required this.currentPath});
 
   final String currentPath;
-
-  static const _primaryBlue = Color(0xFF1B3A8D);
-  static const _unselected = Color(0xFF9E9E9E);
 
   int _indexFromPath() {
     if (currentPath.startsWith('/catalog') ||
@@ -43,26 +41,44 @@ class MainBottomNav extends ConsumerWidget {
     final lines = ref.watch(cartProvider);
     final cartCount = lines.fold<int>(0, (sum, line) => sum + line.quantity);
 
+    final palette = context.maasga;
+    // Le bleu marine de la charte n'a presque aucun contraste sur la barre
+    // sombre : en mode sombre, c'est le cyan qui porte l'état actif.
+    final active = palette.accent;
+    final inactive = palette.textMuted;
+
+    final labelStyle = TextStyle(
+      fontSize: 11,
+      fontWeight: FontWeight.w600,
+      color: active,
+    );
+
     return Container(
       decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
+        color: palette.card,
+        border: Border(top: BorderSide(color: palette.divider)),
         boxShadow: [
-          BoxShadow(blurRadius: 20, color: Colors.black.withValues(alpha: .1)),
+          BoxShadow(
+            blurRadius: 20,
+            color: palette.shadow.withValues(
+              alpha: context.isDarkMode ? .35 : .1,
+            ),
+          ),
         ],
       ),
       child: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 6),
           child: GNav(
-            rippleColor: _primaryBlue.withValues(alpha: 0.2),
-            hoverColor: _primaryBlue.withValues(alpha: 0.1),
+            rippleColor: active.withValues(alpha: 0.2),
+            hoverColor: active.withValues(alpha: 0.1),
             gap: 4,
-            activeColor: _primaryBlue,
+            activeColor: active,
             iconSize: 20,
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
             duration: const Duration(milliseconds: 400),
-            tabBackgroundColor: _primaryBlue.withValues(alpha: 0.1),
-            color: _unselected,
+            tabBackgroundColor: active.withValues(alpha: 0.14),
+            color: inactive,
             selectedIndex: _indexFromPath(),
             onTabChange: (index) {
               const routes = <String>[
@@ -77,50 +93,30 @@ class MainBottomNav extends ConsumerWidget {
               context.go(routes[index]);
             },
             tabs: [
-              const GButton(
+              GButton(
                 icon: Icons.home_outlined,
                 text: 'Accueil',
-                textStyle: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600,
-                  color: _primaryBlue,
-                ),
+                textStyle: labelStyle,
               ),
-              const GButton(
+              GButton(
                 icon: Icons.grid_view_outlined,
                 text: 'Catalogue',
-                textStyle: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600,
-                  color: _primaryBlue,
-                ),
+                textStyle: labelStyle,
               ),
-              const GButton(
+              GButton(
                 icon: Icons.calculate_outlined,
                 text: 'Simul.',
-                textStyle: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600,
-                  color: _primaryBlue,
-                ),
+                textStyle: labelStyle,
               ),
-              const GButton(
+              GButton(
                 icon: Icons.build_outlined,
                 text: 'Services',
-                textStyle: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600,
-                  color: _primaryBlue,
-                ),
+                textStyle: labelStyle,
               ),
-              const GButton(
+              GButton(
                 icon: Icons.verified_user_outlined,
                 text: 'Contrat',
-                textStyle: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600,
-                  color: _primaryBlue,
-                ),
+                textStyle: labelStyle,
               ),
               GButton(
                 icon: Icons.shopping_cart_outlined,
@@ -129,20 +125,12 @@ class MainBottomNav extends ConsumerWidget {
                   cartCount: cartCount,
                   isSelected: _indexFromPath() == 5,
                 ),
-                textStyle: const TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600,
-                  color: _primaryBlue,
-                ),
+                textStyle: labelStyle,
               ),
-              const GButton(
+              GButton(
                 icon: Icons.person_outline,
                 text: 'Profil',
-                textStyle: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600,
-                  color: _primaryBlue,
-                ),
+                textStyle: labelStyle,
               ),
             ],
           ),
@@ -160,10 +148,8 @@ class _CartIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const badgeColor = Color(0xFFE53935);
-    final iconColor = isSelected
-        ? const Color(0xFF1B3A8D)
-        : const Color(0xFF9E9E9E);
+    final palette = context.maasga;
+    final iconColor = isSelected ? palette.accent : palette.textMuted;
 
     return Stack(
       clipBehavior: Clip.none,
@@ -181,8 +167,10 @@ class _CartIcon extends StatelessWidget {
               padding: const EdgeInsets.all(2),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: badgeColor,
-                border: Border.all(color: Colors.white, width: 1),
+                color: palette.danger,
+                // Le liseré reprend le fond de la barre : c'est lui qui détache
+                // la pastille de l'icône, quel que soit le mode.
+                border: Border.all(color: palette.card, width: 1),
               ),
               constraints: const BoxConstraints(minWidth: 14, minHeight: 14),
               alignment: Alignment.center,

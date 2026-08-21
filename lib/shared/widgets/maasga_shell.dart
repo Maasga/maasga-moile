@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../design_tokens/maasga_tokens.dart';
 import 'main_bottom_nav.dart';
 import 'maasga_app_bar.dart';
+import '../../features/notifications/data/activity_repository.dart';
 
-class MaasgaShell extends StatelessWidget {
+class MaasgaShell extends ConsumerWidget {
   const MaasgaShell({
     super.key,
     required this.title,
@@ -21,12 +23,14 @@ class MaasgaShell extends StatelessWidget {
   final bool showDrawer;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final unreadNotificationCount = ref.watch(unreadNotificationCountProvider);
+
     return Scaffold(
       drawer: null,
-      appBar: const MaasgaAppBar(),
+      appBar: MaasgaAppBar(notificationsCount: unreadNotificationCount),
       body: Container(
-        decoration: const BoxDecoration(gradient: MaasgaTokens.pageGradient),
+        decoration: BoxDecoration(gradient: context.maasga.pageGradient),
         child: SafeArea(child: child),
       ),
       bottomNavigationBar:

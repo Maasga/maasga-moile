@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/network/api_client.dart';
+import '../../../core/session/session_providers.dart';
 import '../domain/commande.dart';
 import '../domain/contrat_maintenance.dart';
 import '../domain/rendez_vous.dart';
@@ -75,9 +76,16 @@ final clientDashboardRepositoryProvider =
       return ClientDashboardRepository(dio);
     });
 
+/// Tableau de bord du client connecté (profil, commandes, RDV, contrats).
+///
+/// `watch(currentUserIdProvider)` lie ce cache au compte courant. Sans lui, le
+/// provider n'étant pas `autoDispose`, la réponse du premier utilisateur reste
+/// en mémoire et s'affiche telle quelle après une reconnexion sur un autre
+/// compte.
 final clientDashboardProvider = FutureProvider<ClientDashboardData>((
   ref,
 ) async {
+  ref.watch(currentUserIdProvider);
   final repo = await ref.watch(clientDashboardRepositoryProvider.future);
   return repo.fetchDashboard();
 });

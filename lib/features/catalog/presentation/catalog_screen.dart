@@ -13,6 +13,7 @@ import 'catalog_filter_state.dart';
 import 'category_chip.dart';
 import 'filter_bottom_sheet.dart';
 import 'product_list_card.dart';
+import '../../../features/notifications/data/activity_repository.dart';
 
 class CatalogScreen extends ConsumerStatefulWidget {
   const CatalogScreen({super.key});
@@ -94,6 +95,7 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
       appBar: MaasgaAppBar(
+        notificationsCount: ref.watch(unreadNotificationCountProvider),
         trailingAction: IconButton(
           onPressed: _openFilterBottomSheet,
           icon: const Icon(Icons.tune, color: Color(0xFF1A1A1A)),

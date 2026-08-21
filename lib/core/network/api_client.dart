@@ -17,6 +17,20 @@ final cookieJarProvider = FutureProvider<CookieJar>((ref) async {
   );
 });
 
+/// Vide le cookie jar persistant.
+///
+/// À appeler à **chaque déconnexion**. Le worker Cloudflare pose un cookie de
+/// session et [PersistCookieJar] l'écrit sur disque : `FirebaseAuth.signOut()`
+/// ne l'efface pas. Le compte suivant repartirait donc avec le cookie du
+/// précédent, et comme ce cookie identifie une session côté serveur,
+/// `/api/mobile/*` peut répondre avec les données de l'ancien utilisateur — d'où
+/// un profil, des commandes et des rendez-vous qui ne sont pas ceux du compte
+/// qui vient de se connecter.
+Future<void> clearSessionCookies(Ref ref) async {
+  final jar = await ref.read(cookieJarProvider.future);
+  await jar.deleteAll();
+}
+
 final dioProvider = FutureProvider<Dio>((ref) async {
   final jar = await ref.watch(cookieJarProvider.future);
   final dio = Dio(

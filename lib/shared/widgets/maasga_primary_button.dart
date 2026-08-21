@@ -38,13 +38,19 @@ class MaasgaPrimaryButton extends StatelessWidget {
     final isDanger = variant == MaasgaButtonVariant.danger;
     final isOutline = variant == MaasgaButtonVariant.outline;
 
+    final palette = context.maasga;
+
     final gradient = isPrimary
-        ? MaasgaTokens.brandGradient
+        ? palette.buttonGradient
         : isDanger
-        ? const LinearGradient(colors: [Color(0xFFE53935), Color(0xFFB71C1C)])
+        ? LinearGradient(
+            colors: [palette.danger, Color.lerp(palette.danger, Colors.black, 0.35)!],
+          )
         : null;
 
-    final fg = isOutline ? MaasgaTokens.blue700 : Colors.white;
+    // Le contenu d'un bouton dégradé est toujours clair ; seul l'« outline »,
+    // qui n'a pas de fond, doit suivre la couleur interactive du thème.
+    final fg = isOutline ? palette.accent : Colors.white;
 
     return Opacity(
       opacity: enabled ? 1 : 0.6,
@@ -53,11 +59,11 @@ class MaasgaPrimaryButton extends StatelessWidget {
           gradient: gradient,
           color: gradient == null
               ? (variant == MaasgaButtonVariant.secondary
-                    ? MaasgaTokens.bgMuted
-                    : Colors.white)
+                    ? palette.cardAlt
+                    : palette.card)
               : null,
           border: isOutline
-              ? Border.all(color: MaasgaTokens.blue700, width: 1.4)
+              ? Border.all(color: palette.accent, width: 1.4)
               : null,
           borderRadius: BorderRadius.circular(MaasgaTokens.radiusPill),
         ),

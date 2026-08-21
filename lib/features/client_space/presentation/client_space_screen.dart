@@ -12,6 +12,7 @@ import '../../../shared/services/pdf_service.dart';
 import '../data/client_dashboard_repository.dart';
 import '../domain/commande.dart';
 import '../domain/rendez_vous.dart';
+import '../../../features/notifications/data/activity_repository.dart';
 import 'widgets/commande_card.dart';
 import 'widgets/contrat_card.dart';
 import 'widgets/maintenance_item.dart';
@@ -28,7 +29,7 @@ class ClientSpaceScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
-      appBar: const MaasgaAppBar(),
+      appBar: MaasgaAppBar(notificationsCount: ref.watch(unreadNotificationCountProvider)),
       body: auth.when(
         data: (loggedIn) {
           if (!loggedIn) {

@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/network/api_client.dart';
+import '../../../core/session/session_providers.dart';
 
 class UserActivity {
   UserActivity({
@@ -54,7 +55,27 @@ final activityRepositoryProvider = FutureProvider<ActivityRepository>((
   return ActivityRepository(dio);
 });
 
+/// Activité (commandes + rendez-vous) du compte connecté.
+///
+/// Voir `clientDashboardProvider` : le `watch` de l'UID est ce qui empêche
+/// l'activité d'un compte de rester affichée après un changement d'utilisateur.
 final userActivityProvider = FutureProvider<List<UserActivity>>((ref) async {
+  ref.watch(currentUserIdProvider);
   final repo = await ref.watch(activityRepositoryProvider.future);
   return repo.fetchActivity();
+});
+
+/// Nombre d'activités non lues (notifications).
+///
+/// NOTE: Pour l'instant, nous considérons toutes les activités comme non lues.
+/// Une amélioration future pourrait filtrer par un statut "lu" si l'API le fournit.
+final unreadNotificationCountProvider = Provider<int>((ref) {
+  final asyncActivities = ref.watch(userActivityProvider);
+
+  // Retourne 0 tant que les données ne sont pas chargées
+  return asyncActivities.when(
+    data: (activities) => activities.length,
+    loading: () => 0,
+    error: (_, __) => 0,
+  );
 });

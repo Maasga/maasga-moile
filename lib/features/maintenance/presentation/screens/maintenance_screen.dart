@@ -13,6 +13,7 @@ import 'package:app/features/auth/data/auth_repository.dart';
 import '../../../../shared/widgets/maasga_app_bar.dart';
 import '../../../../shared/design_tokens/maasga_tokens.dart';
 import '../../data/repositories/maintenance_repository.dart';
+import '../../../../features/notifications/data/activity_repository.dart';
 
 class MaintenanceScreen extends ConsumerStatefulWidget {
   const MaintenanceScreen({super.key});
@@ -100,7 +101,7 @@ class _MaintenanceScreenState extends ConsumerState<MaintenanceScreen> {
       backgroundColor: const Color(0xFFF5F5F5),
       body: Column(
         children: [
-          MaasgaAppBar(notificationsCount: 3),
+          MaasgaAppBar(notificationsCount: ref.watch(unreadNotificationCountProvider)),
           if (_isLoading)
             const LinearProgressIndicator(
               backgroundColor: Colors.transparent,

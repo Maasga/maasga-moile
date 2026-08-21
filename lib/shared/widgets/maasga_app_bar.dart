@@ -8,7 +8,7 @@ import '../../app/theme/theme_controller.dart';
 class MaasgaAppBar extends ConsumerWidget implements PreferredSizeWidget {
   const MaasgaAppBar({
     super.key,
-    this.notificationsCount = 3,
+    required this.notificationsCount,
     this.trailingAction,
     this.showBackButton = false,
   });
@@ -25,11 +25,10 @@ class MaasgaAppBar extends ConsumerWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final themeMode = ref.watch(themeControllerProvider);
-    final isDark =
-        themeMode == ThemeMode.dark ||
-        (themeMode == ThemeMode.system &&
-            MediaQuery.of(context).platformBrightness == Brightness.dark);
-
+    // La luminosité effective vient du thème, pas du mode choisi : `system` est
+    // la valeur la plus courante et ne dit rien de ce qui est réellement rendu.
+    final isDark = context.isDarkMode;
+    final palette = context.maasga;
     final colorScheme = Theme.of(context).colorScheme;
 
     return Container(
@@ -41,10 +40,11 @@ class MaasgaAppBar extends ConsumerWidget implements PreferredSizeWidget {
         right: 16,
       ),
       decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
+        color: palette.card,
+        border: Border(bottom: BorderSide(color: palette.divider)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.05),
+            color: palette.shadow.withValues(alpha: isDark ? 0.35 : 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -60,9 +60,7 @@ class MaasgaAppBar extends ConsumerWidget implements PreferredSizeWidget {
             child: (showBackButton && context.canPop())
                 ? Container(
                     decoration: BoxDecoration(
-                      color: isDark
-                          ? colorScheme.surfaceContainerHighest
-                          : const Color(0xFFF5F5F5),
+                      color: palette.cardAlt,
                       shape: BoxShape.circle,
                     ),
                     child: IconButton(
@@ -104,7 +102,7 @@ class MaasgaAppBar extends ConsumerWidget implements PreferredSizeWidget {
                               : Icons.light_mode),
                     size: 20,
                   ),
-                  color: isDark ? MaasgaTokens.cyan500 : MaasgaTokens.blue700,
+                  color: palette.accent,
                   tooltip: 'Changer le thème',
                 ),
 
@@ -129,9 +127,9 @@ class MaasgaAppBar extends ConsumerWidget implements PreferredSizeWidget {
                       child: Container(
                         width: 14,
                         height: 14,
-                        decoration: const BoxDecoration(
+                        decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: Color(0xFFE53935),
+                          color: palette.danger,
                         ),
                         alignment: Alignment.center,
                         child: Text(

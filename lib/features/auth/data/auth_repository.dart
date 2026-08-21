@@ -6,6 +6,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 
 import '../../../core/config/env.dart';
 import '../../../core/config/maasga_contact.dart';
+import '../../../core/session/session_providers.dart';
 
 /// Dépôt d'authentification — délègue tout à Firebase Auth.
 ///
@@ -142,10 +143,34 @@ class AuthRepository {
 
   // ─── Connexion Google ─────────────────────────────────────────────────────
 
+  /// `initialize()` ne doit être appelé qu'une fois par cycle de vie : chaque
+  /// appel réabonne le plugin au flux d'événements de la plateforme, ce qui
+  /// dupliquerait les événements de connexion. Le bouton Web applique la même
+  /// garde de son côté.
+  static bool _googleInitialized = false;
+
+  Future<GoogleSignIn> _initializedGoogle() async {
+    final google = GoogleSignIn.instance;
+    if (!_googleInitialized) {
+      await google.initialize(serverClientId: Env.googleWebClientId);
+      _googleInitialized = true;
+    }
+    return google;
+  }
+
   Future<void> loginWithGoogle() async {
     try {
-      final google = GoogleSignIn.instance;
-      await google.initialize(serverClientId: Env.googleWebClientId);
+      final google = await _initializedGoogle();
+
+      // Révoque l'autorisation encore accordée au compte précédent avant
+      // d'ouvrir le sélecteur. Sans cela, Credential Manager (Android) peut
+      // resservir ce compte sans afficher de choix : impossible de basculer sur
+      // un autre compte Google depuis l'app, on est reconnecté sur l'ancien.
+      // Échec sans conséquence : aucun compte n'était autorisé.
+      try {
+        await google.disconnect();
+      } catch (_) {}
+
       final account = await google.authenticate();
 
       final idToken = account.authentication.idToken;
@@ -256,7 +281,22 @@ class AuthRepository {
 
   // ─── Déconnexion ─────────────────────────────────────────────────────────
 
+  /// Ferme la session Firebase **et** révoque le compte Google associé.
+  ///
+  /// `disconnect()` s'ajoute à `signOut()` : `signOut()` seul se contente
+  /// d'oublier la session côté plugin, l'autorisation reste accordée et le
+  /// prochain `authenticate()` peut resélectionner le même compte sans afficher
+  /// le sélecteur — l'utilisateur ne peut alors plus changer de compte Google.
+  ///
+  /// Ne purge délibérément que Firebase et Google : le cookie de session
+  /// backend, le panier et les caches Riverpod sont l'affaire de
+  /// `AuthController.logout`, qui a accès au `Ref`.
   Future<void> logout() async {
+    try {
+      await GoogleSignIn.instance.disconnect();
+    } catch (_) {
+      // Aucun compte Google connecté, ou révocation refusée par la plateforme.
+    }
     try {
       await GoogleSignIn.instance.signOut();
     } catch (_) {}
@@ -349,11 +389,13 @@ final authRepositoryProvider = Provider<AuthRepository>((ref) {
   return AuthRepository(FirebaseAuth.instance);
 });
 
-final firebaseUserProvider = StreamProvider<User?>((ref) {
-  return FirebaseAuth.instance.authStateChanges();
-});
-
+/// Profil issu de Firebase Auth (nom, e-mail, photo du compte courant).
+///
+/// `watch(currentUserIdProvider)` est indispensable : sans lui ce provider est
+/// calculé une seule fois et continue de servir le profil du compte précédent
+/// après un changement d'utilisateur.
 final userProfileProvider = FutureProvider<Map<String, dynamic>?>((ref) async {
+  ref.watch(currentUserIdProvider);
   final repo = ref.watch(authRepositoryProvider);
   return repo.getProfile();
 });

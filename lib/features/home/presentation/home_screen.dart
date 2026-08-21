@@ -14,6 +14,7 @@ import '../../../shared/widgets/main_bottom_nav.dart';
 import '../../../shared/widgets/maasga_app_bar.dart';
 import '../../../shared/utils/asset_utils.dart';
 import '../widgets/promo_banner.dart';
+import '../../../features/notifications/data/activity_repository.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -23,7 +24,6 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
-  final int _notificationsCount = 3;
 
   final List<String> _brandAssets = const <String>[
     'assets/brands/daikin.png',
@@ -45,10 +45,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final productsAsync = ref.watch(productsProvider);
+    final unreadNotificationCount = ref.watch(unreadNotificationCountProvider);
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
-      appBar: MaasgaAppBar(notificationsCount: _notificationsCount),
+      appBar: MaasgaAppBar(notificationsCount: unreadNotificationCount),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
