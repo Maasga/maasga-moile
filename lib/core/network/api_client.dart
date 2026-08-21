@@ -1,26 +1,20 @@
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../config/env.dart';
 
 final cookieJarProvider = FutureProvider<CookieJar>((ref) async {
-  if (kIsWeb) {
-    return CookieJar();
-  }
+  if (kIsWeb) return CookieJar();
   final dir = await getApplicationDocumentsDirectory();
   return PersistCookieJar(
     storage: FileStorage('${dir.path}/.cookies/'),
     ignoreExpires: false,
   );
-});
-
-final secureStorageProvider = Provider<FlutterSecureStorage>((ref) {
-  return const FlutterSecureStorage();
 });
 
 final dioProvider = FutureProvider<Dio>((ref) async {
@@ -31,8 +25,10 @@ final dioProvider = FutureProvider<Dio>((ref) async {
       connectTimeout: const Duration(seconds: 15),
       receiveTimeout: const Duration(seconds: 20),
       sendTimeout: kIsWeb ? null : const Duration(seconds: 20),
-      headers: {'Accept': 'application/json'},
-      extra: {'withCredentials': true},
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
     ),
   );
   if (!kIsWeb) {
@@ -41,27 +37,28 @@ final dioProvider = FutureProvider<Dio>((ref) async {
   dio.interceptors.add(
     InterceptorsWrapper(
       onRequest: (options, handler) async {
-        final storage = ref.read(secureStorageProvider);
-        final token = await storage.read(key: 'maasga_token');
-        if (token != null) {
-          options.headers['Authorization'] = 'Bearer $token';
+        // Utilise le token Firebase ID comme Bearer token
+        final user = FirebaseAuth.instance.currentUser;
+        if (user != null) {
+          try {
+            final token = await user.getIdToken();
+            if (token != null) {
+              options.headers['Authorization'] = 'Bearer $token';
+            }
+          } catch (_) {}
         }
         return handler.next(options);
       },
       onError: (e, handler) async {
         if (e.response?.statusCode == 401) {
-          final storage = ref.read(secureStorageProvider);
-          await storage.delete(key: 'maasga_token');
+          // Token expiré — Firebase le renouvelle automatiquement au prochain appel
+          if (kDebugMode) {
+            debugPrint('API 401 — token Firebase peut-être expiré');
+          }
         }
         return handler.next(e);
       },
     ),
   );
   return dio;
-});
-
-final plainHttpProvider = Provider<Dio>((ref) {
-  return Dio(
-    BaseOptions(baseUrl: Env.apiBaseUrl, extra: {'withCredentials': true}),
-  );
 });

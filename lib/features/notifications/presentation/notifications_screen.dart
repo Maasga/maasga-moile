@@ -41,12 +41,12 @@ class NotificationsScreen extends ConsumerWidget {
                   const Icon(
                     Icons.notifications_off_outlined,
                     size: 64,
-                    color: Colors.grey,
+                    color: Color(0xFF9E9E9E),
                   ),
                   const SizedBox(height: 16),
                   Text(
                     'Aucune activité pour le moment',
-                    style: GoogleFonts.poppins(color: Colors.grey),
+                    style: GoogleFonts.poppins(color: const Color(0xFF475467)),
                   ),
                 ],
               ),
@@ -106,7 +106,7 @@ class NotificationsScreen extends ConsumerWidget {
                           _formatDate(activity.createdAt),
                           style: GoogleFonts.poppins(
                             fontSize: 10,
-                            color: Colors.grey,
+                            color: const Color(0xFF6B7280),
                           ),
                         ),
                       ],
@@ -153,7 +153,7 @@ class NotificationsScreen extends ConsumerWidget {
       case 'failed':
         return Colors.red;
       default:
-        return Colors.grey;
+        return const Color(0xFF6B7280);
     }
   }
 }

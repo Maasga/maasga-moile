@@ -80,9 +80,8 @@ class MaasgaAppBar extends ConsumerWidget implements PreferredSizeWidget {
             child: Center(
               child: Image.asset(
                 'assets/logo_maasga.png',
-                height: 44, // Adjusted for the high res logo
+                height: 44,
                 fit: BoxFit.contain,
-                color: isDark ? Colors.white : null,
               ),
             ),
           ),

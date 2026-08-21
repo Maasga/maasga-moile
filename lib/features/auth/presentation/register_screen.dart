@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../shared/design_tokens/maasga_tokens.dart';
 import '../../../shared/widgets/maasga_primary_button.dart';
+import '../data/auth_repository.dart';
 import 'auth_controller.dart';
 import 'google_auth_btn.dart';
 
@@ -20,32 +21,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final _emailCtrl = TextEditingController();
   final _quartierCtrl = TextEditingController();
   final _passwordCtrl = TextEditingController();
+  bool _obscurePassword = true;
   String? _error;
-
-  String _friendlyAuthError(Object? error) {
-    final message = '$error'.toLowerCase();
-    if (message.contains('status code of 400')) {
-      return 'Informations manquantes ou mot de passe trop court.';
-    }
-    if (message.contains('status code of 401')) {
-      return 'Autorisation refusée. Vérifie ton compte.';
-    }
-    if (message.contains('status code of 409')) {
-      return 'Ce compte existe déjà. Essaie plutôt de te connecter.';
-    }
-    if (message.contains('status code of 422')) {
-      return 'Informations invalides. Vérifie les champs.';
-    }
-    if (message.contains('status code of 429')) {
-      return 'Trop de tentatives. Réessaie plus tard.';
-    }
-    if (message.contains('socketexception') ||
-        message.contains('failed host lookup') ||
-        message.contains('connection error')) {
-      return 'Connexion internet indisponible.';
-    }
-    return 'Inscription impossible pour le moment.';
-  }
 
   @override
   void dispose() {
@@ -57,12 +34,40 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     super.dispose();
   }
 
+  String _friendlyError(Object? error) {
+    final msg = '$error'.toLowerCase();
+    if (msg.contains('existe déjà') || msg.contains('email-already-in-use')) {
+      return 'Ce compte existe déjà. Connecte-toi plutôt.';
+    }
+    if (msg.contains('weak-password') ||
+        msg.contains('trop faible') ||
+        msg.contains('trop court')) {
+      return 'Mot de passe trop court '
+          '(${AuthRepository.minPasswordLength} caractères minimum).';
+    }
+    // Erreurs de validation du dépôt : le message est déjà destiné à
+    // l'utilisateur et plus précis que n'importe quel repli générique.
+    if (msg.contains('invalide')) {
+      return '$error'.replaceFirst(RegExp(r'^Exception:\s*'), '');
+    }
+    if (msg.contains('connexion internet') ||
+        msg.contains('network-request-failed')) {
+      return 'Connexion internet indisponible.';
+    }
+    if (msg.contains('too-many-requests') ||
+        msg.contains('trop de tentatives')) {
+      return 'Trop de tentatives. Réessaie plus tard.';
+    }
+    return 'Inscription impossible pour le moment. Réessaie.';
+  }
+
   @override
   Widget build(BuildContext context) {
     final auth = ref.watch(authControllerProvider);
+
     ref.listen(authControllerProvider, (_, next) {
       if (next.hasError) {
-        setState(() => _error = _friendlyAuthError(next.error));
+        setState(() => _error = _friendlyError(next.error));
       } else if (next.value == true) {
         context.go('/home');
       }
@@ -78,25 +83,48 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 430),
                 child: Card(
+                  elevation: 0,
+                  color: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(MaasgaTokens.radiusLg),
+                    side: const BorderSide(color: Color(0xFFE1F1FF)),
+                  ),
                   child: Padding(
                     padding: const EdgeInsets.all(20),
                     child: Column(
                       children: [
+                        // Logo
+                        Image.asset(
+                          'assets/logo_maasga.png',
+                          height: 72,
+                          fit: BoxFit.contain,
+                        ),
+                        const SizedBox(height: 12),
                         const Text(
                           'Créer un compte',
                           style: TextStyle(
                             fontSize: 28,
                             fontWeight: FontWeight.w800,
+                            color: Color(0xFF1A1A1A),
                           ),
                         ),
                         const SizedBox(height: 6),
-                        const Text('Renseignez vos informations pour démarrer'),
+                        const Text(
+                          'Renseignez vos informations pour démarrer',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Color(0xFF475467),
+                          ),
+                        ),
                         const SizedBox(height: 16),
+
+                        // Nom
                         TextField(
                           controller: _nameCtrl,
                           style: MaasgaTokens.inputTextStyle,
+                          textCapitalization: TextCapitalization.words,
                           decoration: const InputDecoration(
-                            labelText: 'Nom complet',
+                            labelText: 'Nom complet *',
                             labelStyle: TextStyle(
                               color: MaasgaTokens.textSecondary,
                             ),
@@ -109,11 +137,15 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                           ),
                         ),
                         const SizedBox(height: 10),
+
+                        // Téléphone
                         TextField(
                           controller: _phoneCtrl,
+                          keyboardType: TextInputType.phone,
                           style: MaasgaTokens.inputTextStyle,
                           decoration: const InputDecoration(
-                            labelText: 'Téléphone WhatsApp',
+                            labelText: 'Téléphone WhatsApp *',
+                            hintText: '70 00 00 00',
                             labelStyle: TextStyle(
                               color: MaasgaTokens.textSecondary,
                             ),
@@ -121,16 +153,20 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                               Icons.phone_outlined,
                               color: MaasgaTokens.blue700,
                             ),
+                            prefixText: '+226 ',
                             filled: true,
                             fillColor: Colors.white,
                           ),
                         ),
                         const SizedBox(height: 10),
+
+                        // Email
                         TextField(
                           controller: _emailCtrl,
+                          keyboardType: TextInputType.emailAddress,
                           style: MaasgaTokens.inputTextStyle,
                           decoration: const InputDecoration(
-                            labelText: 'Email',
+                            labelText: 'Email (optionnel)',
                             labelStyle: TextStyle(
                               color: MaasgaTokens.textSecondary,
                             ),
@@ -143,11 +179,14 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                           ),
                         ),
                         const SizedBox(height: 10),
+
+                        // Quartier
                         TextField(
                           controller: _quartierCtrl,
                           style: MaasgaTokens.inputTextStyle,
                           decoration: const InputDecoration(
-                            labelText: 'Quartier',
+                            labelText: 'Quartier *',
+                            hintText: 'Ex: Ouaga 2000, Pissy...',
                             labelStyle: TextStyle(
                               color: MaasgaTokens.textSecondary,
                             ),
@@ -160,30 +199,69 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                           ),
                         ),
                         const SizedBox(height: 10),
+
+                        // Mot de passe
                         TextField(
                           controller: _passwordCtrl,
-                          obscureText: true,
+                          obscureText: _obscurePassword,
                           style: MaasgaTokens.inputTextStyle,
-                          decoration: const InputDecoration(
-                            labelText: 'Mot de passe',
-                            labelStyle: TextStyle(
+                          decoration: InputDecoration(
+                            labelText: 'Mot de passe *',
+                            labelStyle: const TextStyle(
                               color: MaasgaTokens.textSecondary,
                             ),
-                            prefixIcon: Icon(
+                            prefixIcon: const Icon(
                               Icons.lock_outline,
                               color: MaasgaTokens.blue700,
+                            ),
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                _obscurePassword
+                                    ? Icons.visibility_off_outlined
+                                    : Icons.visibility_outlined,
+                                color: MaasgaTokens.textSecondary,
+                                size: 20,
+                              ),
+                              onPressed: () => setState(
+                                () => _obscurePassword = !_obscurePassword,
+                              ),
                             ),
                             filled: true,
                             fillColor: Colors.white,
                           ),
                         ),
+
                         if (_error != null) ...[
                           const SizedBox(height: 10),
-                          Text(
-                            _error!,
-                            style: const TextStyle(color: Colors.red),
+                          Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: Colors.red.shade50,
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(color: Colors.red.shade200),
+                            ),
+                            child: Row(
+                              children: [
+                                const Icon(
+                                  Icons.error_outline,
+                                  color: Colors.red,
+                                  size: 18,
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    _error!,
+                                    style: const TextStyle(
+                                      color: Colors.red,
+                                      fontSize: 13,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ],
+
                         const SizedBox(height: 16),
                         MaasgaPrimaryButton(
                           label: auth.isLoading
@@ -191,20 +269,55 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                               : 'Créer le compte',
                           enabled: !auth.isLoading,
                           onPressed: () {
+                            setState(() => _error = null);
                             final name = _nameCtrl.text.trim();
                             final phone = _phoneCtrl.text.trim();
-                            final password = _passwordCtrl.text.trim();
+                            final password = _passwordCtrl.text;
+                            final quartier = _quartierCtrl.text.trim();
 
-                            if (name.isEmpty || phone.isEmpty) {
+                            if (name.isEmpty) {
                               setState(
-                                () => _error = 'Nom et téléphone obligatoires.',
+                                () => _error = 'Le nom est obligatoire.',
                               );
                               return;
                             }
-                            if (password.length < 6) {
+                            if (phone.isEmpty) {
+                              setState(
+                                () => _error = 'Le téléphone est obligatoire.',
+                              );
+                              return;
+                            }
+                            if (!AuthRepository.isValidPhone(phone)) {
                               setState(
                                 () => _error =
-                                    'Le mot de passe doit faire au moins 6 caractères.',
+                                    'Numéro invalide : 8 chiffres attendus '
+                                    '(ex. 70 12 34 56).',
+                              );
+                              return;
+                            }
+                            final email = _emailCtrl.text.trim();
+                            if (email.isNotEmpty &&
+                                !AuthRepository.isValidEmail(email)) {
+                              setState(
+                                () => _error =
+                                    'Adresse e-mail invalide '
+                                    '(ex. nom@exemple.com).',
+                              );
+                              return;
+                            }
+                            if (quartier.isEmpty) {
+                              setState(
+                                () => _error = 'Le quartier est obligatoire.',
+                              );
+                              return;
+                            }
+                            if (password.length <
+                                AuthRepository.minPasswordLength) {
+                              setState(
+                                () => _error =
+                                    'Mot de passe trop court '
+                                    '(${AuthRepository.minPasswordLength} '
+                                    'caractères min).',
                               );
                               return;
                             }
@@ -214,8 +327,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                 .register(
                                   name: name,
                                   phone: phone,
-                                  email: _emailCtrl.text.trim(),
-                                  quartier: _quartierCtrl.text.trim(),
+                                  email: email,
+                                  quartier: quartier,
                                   password: password,
                                 );
                           },
@@ -226,14 +339,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                           child: const Text('Retour connexion'),
                         ),
                         buildGoogleSignInButton(
-                          onTokenReceived: (token) async {
-                            await ref
-                                .read(authControllerProvider.notifier)
-                                .loginWithGoogle(accessToken: token);
-                          },
-                          onError: (e) {
-                            setState(() => _error = e);
-                          },
+                          onError: (e) => setState(() => _error = e),
                         ),
                       ],
                     ),

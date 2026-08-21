@@ -31,30 +31,37 @@ class BenefitCard extends StatelessWidget {
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            width: 36,
-            height: 36,
+            width: 32,
+            height: 32,
             decoration: const BoxDecoration(
               color: Color(0xFFE8EEFF),
               shape: BoxShape.circle,
             ),
-            child: Icon(icon, color: const Color(0xFF1B3A8D), size: 20),
+            child: Icon(icon, color: const Color(0xFF1B3A8D), size: 18),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 6),
           Text(
             title,
             style: GoogleFonts.poppins(
-              fontSize: 18,
+              fontSize: 13,
               fontWeight: FontWeight.bold,
               color: const Color(0xFF1B3A8D),
             ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
-          Text(
-            subtitle,
-            style: GoogleFonts.poppins(
-              fontSize: 11,
-              color: const Color(0xFF757575),
+          Flexible(
+            child: Text(
+              subtitle,
+              style: GoogleFonts.poppins(
+                fontSize: 10,
+                color: const Color(0xFF757575),
+              ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
             ),
           ),
         ],

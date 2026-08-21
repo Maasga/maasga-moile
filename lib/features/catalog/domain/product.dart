@@ -44,17 +44,17 @@ class Product {
       stock: (json['stock'] as num?)?.toInt() ?? 0,
       category: json['category'] as String? ?? 'Mural/Split',
       power: json['power'] as String? ?? '1cv',
+      // Aucune valeur de repli inventée : afficher « Classe A+++ » ou
+      // « 12000 BTU » sur un produit dont le serveur ne dit rien est un
+      // argument commercial faux. Une liste vide laisse l'UI masquer la
+      // section.
       specs:
           (json['features'] as List<dynamic>? ??
                   json['specs'] as List<dynamic>?)
               ?.map((e) => '$e')
               .where((e) => e.trim().isNotEmpty)
               .toList() ??
-          const <String>[
-            'Classe A+++',
-            'Silencieux 20dB',
-            'Puissance 12000 BTU',
-          ],
+          const <String>[],
       image: json['image'] as String? ?? '',
       imageUrl: json['imageUrl'] as String? ?? json['image_url'] as String?,
       btu: (json['btu'] as num?)?.toInt(),

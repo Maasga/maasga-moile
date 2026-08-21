@@ -6,6 +6,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../../../shared/widgets/main_bottom_nav.dart';
 import '../../../shared/widgets/maasga_app_bar.dart';
+import '../../../shared/services/user_prefs_service.dart';
 import '../../auth/data/auth_repository.dart';
 import '../../client_space/data/client_dashboard_repository.dart';
 import '../../notifications/data/activity_repository.dart';
@@ -58,21 +59,57 @@ class _RdvScreenState extends ConsumerState<RdvScreen> {
   }
 
   Future<void> _loadUserProfile() async {
+    // 1. Depuis le dashboard client si disponible
     try {
-      final repo = await ref.read(authRepositoryProvider.future);
-      final profile = await repo.getProfile();
-      if (profile != null && mounted) {
+      final dashboard = ref.read(clientDashboardProvider);
+      if (dashboard.hasValue) {
+        final profile = dashboard.value!.profile;
+        if (mounted) {
+          setState(() {
+            if (_nameCtrl.text.isEmpty && profile.fullName.isNotEmpty) {
+              _nameCtrl.text = profile.fullName;
+            }
+            if (_phoneCtrl.text.isEmpty && profile.phone.isNotEmpty) {
+              _phoneCtrl.text = profile.phone;
+            }
+            if (_emailCtrl.text.isEmpty && profile.email.isNotEmpty) {
+              _emailCtrl.text = profile.email;
+            }
+            _selectedQuartier ??= profile.quartier.isNotEmpty
+                ? profile.quartier
+                : null;
+          });
+          return;
+        }
+      }
+    } catch (_) {}
+
+    // 2. Depuis Firebase Auth + SharedPreferences
+    try {
+      final prefs = ref.read(userPrefsProvider);
+      final repo = ref.read(authRepositoryProvider);
+      final firebaseProfile = await repo.getProfile();
+      if (mounted) {
         setState(() {
           if (_nameCtrl.text.isEmpty) {
-            _nameCtrl.text = profile['name']?.toString() ?? '';
-          }
-          if (_emailCtrl.text.isEmpty) {
-            _emailCtrl.text = profile['email']?.toString() ?? '';
+            _nameCtrl.text =
+                prefs?.savedName ?? firebaseProfile?['name']?.toString() ?? '';
           }
           if (_phoneCtrl.text.isEmpty) {
-            _phoneCtrl.text = profile['phone']?.toString() ?? '';
+            _phoneCtrl.text =
+                prefs?.savedPhone ??
+                firebaseProfile?['phone']?.toString() ??
+                '';
           }
-          _selectedQuartier ??= profile['quartier']?.toString();
+          if (_emailCtrl.text.isEmpty) {
+            _emailCtrl.text =
+                prefs?.savedEmail ??
+                firebaseProfile?['email']?.toString() ??
+                '';
+          }
+          _selectedQuartier ??= prefs?.savedQuartier.isNotEmpty == true
+              ? prefs!.savedQuartier
+              : null;
         });
       }
     } catch (_) {}
@@ -142,6 +179,15 @@ class _RdvScreenState extends ConsumerState<RdvScreen> {
     try {
       final repo = await ref.read(rdvRepositoryProvider.future);
       await repo.submitRdv(request);
+
+      // Sauvegarder pour auto-remplissage futur
+      final prefs = ref.read(userPrefsProvider);
+      await prefs?.save(
+        name: request.fullName,
+        phone: request.phone,
+        email: request.email,
+        quartier: request.quartier,
+      );
 
       // Invalider les fournisseurs pour rafraîchir les données dans l'espace client
       ref.invalidate(clientDashboardProvider);

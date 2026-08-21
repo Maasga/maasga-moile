@@ -1,16 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../../core/config/maasga_contact.dart';
 import '../../../shared/widgets/main_bottom_nav.dart';
 import '../../../shared/widgets/maasga_primary_button.dart';
 import '../../../shared/widgets/maasga_shell.dart';
 
 class SupportScreen extends StatelessWidget {
   const SupportScreen({super.key});
-
-  static final Uri _whatsAppUri = Uri.parse(
-    'https://wa.me/22655996418?text=Bonjour%20MAASGA,%20j%27ai%20besoin%20d%27assistance.',
-  );
 
   @override
   Widget build(BuildContext context) {
@@ -24,21 +21,26 @@ class SupportScreen extends StatelessWidget {
           children: [
             const Text(
               'Support client',
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700),
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.w700,
+                color: Color(0xFF1A1A1A),
+              ),
             ),
             const SizedBox(height: 8),
             const Text(
               'V1: support via WhatsApp. Le chat in-app arrive en V2.',
+              style: TextStyle(fontSize: 14, color: Color(0xFF475467)),
             ),
             const SizedBox(height: 20),
             MaasgaPrimaryButton(
               label: 'Contacter sur WhatsApp',
               icon: Icons.chat_bubble_outline,
               onPressed: () async {
-                await launchUrl(
-                  _whatsAppUri,
-                  mode: LaunchMode.externalApplication,
+                final uri = Uri.parse(
+                  MaasgaContact.whatsAppUrl(MaasgaContact.whatsAppMsgSupport),
                 );
+                await launchUrl(uri, mode: LaunchMode.externalApplication);
               },
             ),
           ],

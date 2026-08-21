@@ -29,9 +29,8 @@ class MaasgaTokens {
     end: Alignment.bottomCenter,
   );
 
-  // Styles de saisie pour garantir la lisibilité (fix contrastes)
   static const TextStyle inputTextStyle = TextStyle(
-    color: textPrimary,
+    color: Color(0xFF1A1A1A), // toujours sombre — lisible sur fond blanc
     fontSize: 15,
     fontWeight: FontWeight.w500,
   );

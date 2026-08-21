@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../auth/data/auth_repository.dart';
+import '../../auth/presentation/auth_controller.dart';
 
 class SplashScreen extends ConsumerWidget {
   const SplashScreen({super.key});
@@ -14,16 +14,17 @@ class SplashScreen extends ConsumerWidget {
       duration: const Duration(milliseconds: 3000),
       backgroundColor: Colors.white,
       onAnimationEnd: () async {
-        // Handle redidirection logic based on auth
-        final authRepoAsync = await ref.read(authRepositoryProvider.future);
-        final isLoggedIn = await authRepoAsync.hasActiveSession();
+        // Passe par le contrôleur (et non le dépôt directement) : il absorbe
+        // déjà les erreurs de session et reste surchargeable en test.
+        bool isLoggedIn = false;
+        try {
+          isLoggedIn = await ref.read(authControllerProvider.future);
+        } catch (_) {
+          isLoggedIn = false;
+        }
 
         if (context.mounted) {
-          if (isLoggedIn) {
-            context.go('/home');
-          } else {
-            context.go('/onboarding');
-          }
+          context.go(isLoggedIn ? '/home' : '/onboarding');
         }
       },
       childWidget: Center(

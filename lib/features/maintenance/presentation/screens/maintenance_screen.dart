@@ -5,6 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:lottie/lottie.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
+import '../../../../core/config/maasga_contact.dart';
 import '../../../../shared/widgets/main_bottom_nav.dart';
 import '../widgets/formula_card.dart';
 import '../widgets/maintenance_widgets.dart';
@@ -199,7 +200,7 @@ class _MaintenanceScreenState extends ConsumerState<MaintenanceScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     crossAxisSpacing: 10,
                     mainAxisSpacing: 10,
-                    childAspectRatio: 1.5,
+                    childAspectRatio: 1.65,
                     children: const [
                       BenefitCard(
                         icon: Icons.electric_bolt_outlined,
@@ -334,9 +335,7 @@ class _MaintenanceScreenState extends ConsumerState<MaintenanceScreen> {
     try {
       final repo = await ref.read(maintenanceRepositoryProvider.future);
       await repo.submitRequest(data);
-      if (mounted) {
-        _showSuccessDialog();
-      }
+      if (mounted) _showSuccessDialog();
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -473,9 +472,28 @@ class _SubscriptionFormModalState
                       style: MaasgaTokens.inputTextStyle,
                       decoration: InputDecoration(
                         hintText: 'Votre nom',
-                        prefixIcon: Icon(
+                        hintStyle: GoogleFonts.poppins(
+                          fontSize: 14,
+                          color: const Color(0xFF6B7280),
+                        ),
+                        prefixIcon: const Icon(
                           Icons.person_outline,
-                          color: MaasgaTokens.blue700,
+                          color: Color(0xFF1B3A8D),
+                        ),
+                        filled: true,
+                        fillColor: Colors.white,
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(
+                            color: Color(0xFFD8EAFB),
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(
+                            color: Color(0xFF1B3A8D),
+                            width: 1.5,
+                          ),
                         ),
                       ),
                       validator: (v) => v!.isEmpty ? 'Requis' : null,
@@ -484,16 +502,105 @@ class _SubscriptionFormModalState
                     _buildFieldLabel('Téléphone (WhatsApp) *'),
                     TextFormField(
                       controller: _phoneCtrl,
+                      keyboardType: TextInputType.phone,
                       style: MaasgaTokens.inputTextStyle,
                       decoration: InputDecoration(
                         hintText: 'XX XX XX XX',
-                        prefixIcon: Icon(
+                        hintStyle: GoogleFonts.poppins(
+                          fontSize: 14,
+                          color: const Color(0xFF6B7280),
+                        ),
+                        prefixIcon: const Icon(
                           Icons.phone_outlined,
-                          color: MaasgaTokens.blue700,
+                          color: Color(0xFF1B3A8D),
+                        ),
+                        filled: true,
+                        fillColor: Colors.white,
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(
+                            color: Color(0xFFD8EAFB),
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(
+                            color: Color(0xFF1B3A8D),
+                            width: 1.5,
+                          ),
                         ),
                       ),
                       validator: (v) => v!.isEmpty ? 'Requis' : null,
                     ),
+                    const SizedBox(height: 20),
+
+                    // ── Message paiement à l'installation ────────────────
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF0FDF4),
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: const Color(0xFFBBF7D0)),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              const Icon(
+                                Icons.info_outline,
+                                color: Color(0xFF15803D),
+                                size: 18,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                'Comment se passe le paiement ?',
+                                style: GoogleFonts.poppins(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w700,
+                                  color: const Color(0xFF15803D),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+                          _buildPaymentStep(
+                            '1',
+                            'Vous confirmez votre souscription ci-dessous.',
+                          ),
+                          _buildPaymentStep(
+                            '2',
+                            'L\'équipe MAASGA vous contacte par WhatsApp ou par appel sous 2h.',
+                          ),
+                          _buildPaymentStep(
+                            '3',
+                            'Le paiement se règle à la première intervention — aucun paiement en ligne requis.',
+                          ),
+                          const SizedBox(height: 12),
+                          Row(
+                            children: [
+                              const Icon(
+                                Icons.shield_outlined,
+                                color: Color(0xFF15803D),
+                                size: 16,
+                              ),
+                              const SizedBox(width: 6),
+                              Expanded(
+                                child: Text(
+                                  '100% sécurisé · Paiement à domicile uniquement',
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w600,
+                                    color: const Color(0xFF15803D),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+
                     const SizedBox(height: 32),
                     SizedBox(
                       width: double.infinity,
@@ -502,14 +609,19 @@ class _SubscriptionFormModalState
                         onPressed: () {
                           if (!_formKey.currentState!.validate()) return;
                           Navigator.pop(context);
+                          final planKey = _selectedFormule
+                              .toLowerCase()
+                              .replaceAll(' premium', '')
+                              .replaceAll(' ', '_');
                           widget.onSubmit({
                             'name': _nameCtrl.text.trim(),
                             'phone': _phoneCtrl.text.trim(),
-                            'plan_type': _selectedFormule.toLowerCase(),
+                            'plan_type': planKey,
+                            'payment_method': 'a_confirmer',
                           });
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: primaryColor,
+                          backgroundColor: const Color(0xFF1B3A8D),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
                           ),
@@ -547,6 +659,45 @@ class _SubscriptionFormModalState
       ),
     );
   }
+
+  Widget _buildPaymentStep(String number, String text) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 8),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 20,
+            height: 20,
+            decoration: BoxDecoration(
+              color: const Color(0xFF15803D),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Center(
+              child: Text(
+                number,
+                style: GoogleFonts.poppins(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              text,
+              style: GoogleFonts.poppins(
+                fontSize: 12,
+                color: const Color(0xFF166534),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class _WhatsAppCTA extends StatelessWidget {
@@ -572,7 +723,10 @@ class _WhatsAppCTA extends StatelessWidget {
             ),
           ),
           ElevatedButton(
-            onPressed: () => launchUrl(Uri.parse('https://wa.me/22655996418')),
+            onPressed: () => launchUrl(
+              Uri.parse(MaasgaContact.whatsAppDirectLink),
+              mode: LaunchMode.externalApplication,
+            ),
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF43A047),
             ),

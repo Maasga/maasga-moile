@@ -43,19 +43,20 @@ class CatalogRepository {
       displayImages.add('assets/products/product_placeholder.png');
     }
 
-    // Dummy technical specs for demo fallback
+    // Fiche technique : uniquement des données réellement renvoyées par le
+    // serveur. L'ancien bloc de repli affirmait « Gaz R32 », « WiFi intégré »,
+    // « A+++ », « 21 dB(A) », « Garantie 2 ans » sur TOUS les produits sans
+    // rien en savoir — des allégations commerciales fausses, et un risque
+    // juridique sur un devis. Les champs dérivés du BTU n'apparaissent que si
+    // le BTU est connu.
     final techSpecs = p.technicalSpecs.isNotEmpty
         ? p.technicalSpecs
-        : {
-            'Marque': p.brand,
-            'Modèle': p.name,
-            'Puissance BTU': '${p.btu ?? 12000}',
-            'Puissance CV': power.toUpperCase(),
-            'Gaz Frigorigène': 'R32',
-            'WiFi': 'Intégré',
-            'Classe Énergétique': 'A+++ / A++',
-            'Niveau Sonore': '21 dB(A)',
-            'Garantie': '2 ans',
+        : <String, String>{
+            if (p.brand.trim().isNotEmpty) 'Marque': p.brand,
+            if (p.name.trim().isNotEmpty) 'Modèle': p.name,
+            if (p.btu != null) 'Puissance BTU': '${p.btu}',
+            if (p.btu != null) 'Puissance CV': power.toUpperCase(),
+            if (category.trim().isNotEmpty) 'Type': category,
           };
 
     return Product(
@@ -71,10 +72,15 @@ class CatalogRepository {
       imageUrl: p.imageUrl,
       btu: p.btu,
       images: displayImages,
-      oldPrice: p.oldPrice ?? (p.price * 1.2).toInt(),
+      // Pas de prix barré inventé : `(price * 1.2)` faisait afficher une
+      // remise de -17 % sur chaque produit, y compris ceux qui n'ont jamais
+      // été soldés. Publicité mensongère côté client.
+      oldPrice: p.oldPrice,
       description: p.description.isNotEmpty
           ? p.description
-          : 'Découvrez le confort ultime avec le ${p.name}. Ce climatiseur de haute performance allie puissance, silence et efficacité énergétique pour votre intérieur.',
+          : '${p.name}${p.brand.isNotEmpty ? ' — ${p.brand}' : ''}. '
+                'Contactez MAASGA pour la fiche technique détaillée et les '
+                'conditions d\'installation.',
       technicalSpecs: techSpecs,
     );
   }
@@ -101,13 +107,16 @@ class CatalogRepository {
     }
   }
 
+  /// Trois arguments produit maximum, tirés des données serveur uniquement.
+  ///
+  /// Renvoie une liste vide quand le serveur n'en fournit aucun : mieux vaut
+  /// une section absente qu'une caractéristique inventée.
   List<String> _buildSpecs(Product p) {
     final source = p.specs.where((e) => e.trim().isNotEmpty).toList();
     if (source.isNotEmpty) return source.take(3).toList();
     return <String>[
-      'Classe énergétique A+++',
-      'Silencieux 20dB',
-      'Puissance ${(p.btu ?? 12000).toString()} BTU',
+      if (p.btu != null) '${p.btu} BTU',
+      if (p.category.trim().isNotEmpty) p.category.trim(),
     ];
   }
 }

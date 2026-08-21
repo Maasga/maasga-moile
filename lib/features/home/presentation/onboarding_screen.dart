@@ -9,8 +9,16 @@ class OnboardingScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const pageDecoration = PageDecoration(
-      titleTextStyle: TextStyle(fontSize: 26.0, fontWeight: FontWeight.w800),
-      bodyTextStyle: TextStyle(fontSize: 16.0, color: Color(0xFF757575)),
+      titleTextStyle: TextStyle(
+        fontSize: 26.0,
+        fontWeight: FontWeight.w800,
+        color: Color(0xFF1A1A1A),
+      ),
+      bodyTextStyle: TextStyle(
+        fontSize: 15.0,
+        color: Color(0xFF475467),
+        height: 1.5,
+      ),
       bodyPadding: EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 16.0),
       pageColor: Colors.white,
       imagePadding: EdgeInsets.zero,

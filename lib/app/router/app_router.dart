@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:animations/animations.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -7,8 +10,7 @@ import '../../features/auth/presentation/login_screen.dart';
 import '../../features/auth/presentation/register_screen.dart';
 import '../../features/cart/presentation/cart_screen.dart';
 import '../../features/cart/presentation/checkout_screen.dart';
-import '../../features/cart/presentation/payment_redirect_screen.dart';
-import '../../features/cart/presentation/payment_webview_screen.dart';
+import '../../features/cart/presentation/order_confirmation_screen.dart';
 import '../../features/catalog/presentation/catalog_screen.dart';
 import '../../features/catalog/presentation/product_detail_screen.dart';
 import '../../features/catalog/domain/product.dart';
@@ -25,9 +27,35 @@ import '../../features/support/presentation/support_screen.dart';
 import '../../features/settings/presentation/settings_screen.dart';
 import '../../features/maintenance/presentation/screens/maintenance_screen.dart';
 
+/// Routes qui exigent une session Firebase valide.
+///
+/// `/espace-client` et `/client-space` sont volontairement absents : l'écran
+/// affiche déjà lui-même un état « connectez-vous » avec un bouton, ce qui est
+/// une meilleure expérience qu'une redirection sèche.
+const Set<String> _protectedRoutes = {
+  '/checkout',
+  '/order-confirmation',
+  '/notifications',
+  '/settings',
+};
+
 final appRouterProvider = Provider<GoRouter>((ref) {
+  final refresh = _AuthRefreshNotifier(_authStateChanges());
+  ref.onDispose(refresh.dispose);
+
   return GoRouter(
     initialLocation: '/splash',
+    refreshListenable: refresh,
+    redirect: (context, state) {
+      final location = state.matchedLocation;
+      if (!_protectedRoutes.contains(location)) return null;
+      if (_currentUser() != null) return null;
+      // Mémorise la destination pour y revenir juste après la connexion.
+      return Uri(
+        path: '/auth/login',
+        queryParameters: {'from': location},
+      ).toString();
+    },
     routes: [
       GoRoute(
         path: '/splash',
@@ -93,21 +121,16 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             _buildPage(state, const CheckoutScreen()),
       ),
       GoRoute(
-        path: '/payment',
-        pageBuilder: (context, state) => _buildPage(
-          state,
-          PaymentRedirectScreen(url: state.extra as String? ?? ''),
-        ),
-      ),
-      GoRoute(
-        path: '/payment-webview',
+        path: '/order-confirmation',
         pageBuilder: (context, state) {
           final args = (state.extra as Map<String, dynamic>?) ?? const {};
           return _buildPage(
             state,
-            PaymentWebViewScreen(
-              paymentUrl: args['url'] as String? ?? '',
-              orderId: (args['orderId'] as num?)?.toInt() ?? 0,
+            OrderConfirmationScreen(
+              orderId: args['orderId'] as String? ?? '',
+              clientName: args['clientName'] as String? ?? '',
+              clientPhone: args['clientPhone'] as String? ?? '',
+              total: (args['total'] as num?)?.toInt() ?? 0,
             ),
           );
         },
@@ -154,6 +177,44 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     ],
   );
 });
+
+/// Accès défensif à Firebase Auth.
+///
+/// En production, `Firebase.initializeApp()` a toujours été appelé avant
+/// `runApp`. En test widget (aucun binding Firebase), l'accès lèverait et
+/// empêcherait toute construction du router : on retombe alors sur « pas de
+/// session », ce qui est le comportement voulu.
+User? _currentUser() {
+  try {
+    return FirebaseAuth.instance.currentUser;
+  } catch (_) {
+    return null;
+  }
+}
+
+Stream<User?> _authStateChanges() {
+  try {
+    return FirebaseAuth.instance.authStateChanges();
+  } catch (_) {
+    return Stream<User?>.empty();
+  }
+}
+
+/// Fait réévaluer `redirect` par GoRouter à chaque changement d'état Firebase
+/// (connexion, déconnexion, révocation du token).
+class _AuthRefreshNotifier extends ChangeNotifier {
+  _AuthRefreshNotifier(Stream<User?> stream) {
+    _sub = stream.listen((_) => notifyListeners());
+  }
+
+  late final StreamSubscription<User?> _sub;
+
+  @override
+  void dispose() {
+    _sub.cancel();
+    super.dispose();
+  }
+}
 
 CustomTransitionPage _buildPage(GoRouterState state, Widget child) {
   return CustomTransitionPage(

@@ -2,30 +2,35 @@
 //
 // Le splash utilise un Timer (fadeIn 3 s) et un CircularProgressIndicator.
 // Pour éviter les "pending timer" et les dépendances plateforme indisponibles
-// en test (path_provider via le cookie jar, secure storage), on:
+// en test (path_provider via le cookie jar, Firebase non initialisé), on :
 //  - override cookieJarProvider avec un CookieJar en mémoire,
-//  - mocke flutter_secure_storage (aucun token -> pas de session),
+//  - override authControllerProvider pour renvoyer « pas de session » sans
+//    jamais toucher à FirebaseAuth,
 //  - laisse le Timer du splash se déclencher puis on stabilise.
 
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:app/app/app.dart';
 import 'package:app/core/network/api_client.dart';
+import 'package:app/features/auth/presentation/auth_controller.dart';
+
+/// Contrôleur d'auth de test : aucune session, aucun appel Firebase.
+class _LoggedOutAuthController extends AuthController {
+  @override
+  Future<bool> build() async => false;
+}
 
 void main() {
-  setUp(() {
-    // Aucun token stocké -> hasActiveSession() renvoie false.
-    FlutterSecureStorage.setMockInitialValues({});
-  });
-
   testWidgets('L\'app démarre sur le splash puis redirige', (tester) async {
     await tester.pumpWidget(
       ProviderScope(
-        overrides: [cookieJarProvider.overrideWith((ref) async => CookieJar())],
+        overrides: [
+          cookieJarProvider.overrideWith((ref) async => CookieJar()),
+          authControllerProvider.overrideWith(_LoggedOutAuthController.new),
+        ],
         child: const MaasgaMobileApp(),
       ),
     );

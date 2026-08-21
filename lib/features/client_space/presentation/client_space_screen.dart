@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../../core/config/maasga_contact.dart';
 import '../../../core/network/api_client.dart';
 import '../../auth/presentation/auth_controller.dart';
 import '../../../shared/widgets/main_bottom_nav.dart';
@@ -137,10 +138,14 @@ class _LoggedInView extends ConsumerWidget {
   final ClientDashboardData data;
 
   Future<void> _launchWhatsApp() async {
-    const url = 'https://wa.me/22655996418';
-    if (!await launchUrl(Uri.parse(url))) {
-      debugPrint('Could not launch $url');
-    }
+    final url = MaasgaContact.whatsAppDirectLink;
+    // externalApplication : ouvre l'app WhatsApp installée plutôt que la vue
+    // web intégrée, qui affiche une page de redirection vide.
+    final ok = await launchUrl(
+      Uri.parse(url),
+      mode: LaunchMode.externalApplication,
+    );
+    if (!ok) debugPrint('Could not launch $url');
   }
 
   void _showLogoutDialog(BuildContext context, WidgetRef ref) {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../../../core/config/maasga_contact.dart';
 import '../../domain/rdv_request.dart';
 import 'package:intl/intl.dart';
 
@@ -15,12 +16,9 @@ class RdvConfirmationStep extends StatelessWidget {
   });
 
   Future<void> _launchWhatsApp() async {
-    final phone = '22655996418';
     final message =
         'Bonjour MAASGA, je viens d\'envoyer une demande de rendez-vous pour : ${request.serviceType}.';
-    final url = Uri.parse(
-      'https://wa.me/$phone?text=${Uri.encodeComponent(message)}',
-    );
+    final url = Uri.parse(MaasgaContact.whatsAppUrl(message));
     if (await canLaunchUrl(url)) {
       await launchUrl(url, mode: LaunchMode.externalApplication);
     }

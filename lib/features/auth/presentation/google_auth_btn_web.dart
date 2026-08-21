@@ -1,24 +1,31 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:google_sign_in_web/web_only.dart' as web_only;
-import '../../../core/config/env.dart';
 
-class GoogleSignInBtn extends StatefulWidget {
-  final Future<void> Function(String token) onTokenReceived;
-  final Function(String error) onError;
-  const GoogleSignInBtn({
-    super.key,
-    required this.onTokenReceived,
-    required this.onError,
-  });
+import '../../../core/config/env.dart';
+import 'auth_controller.dart';
+
+/// Bouton Google Sign-In pour le Web.
+///
+/// Contrairement au mobile, le flux web est piloté par un évènement : le
+/// widget natif rendu par `google_sign_in_web` déclenche
+/// `authenticationEvents`. Le widget récupère alors les jetons et ouvre
+/// lui-même la session Firebase via [AuthController.loginWithGoogleTokens] —
+/// exactement comme le fait le bouton mobile.
+class GoogleSignInBtn extends ConsumerStatefulWidget {
+  const GoogleSignInBtn({super.key, required this.onError});
+
+  final void Function(String error) onError;
 
   @override
-  State<GoogleSignInBtn> createState() => _GoogleSignInBtnState();
+  ConsumerState<GoogleSignInBtn> createState() => _GoogleSignInBtnState();
 }
 
-class _GoogleSignInBtnState extends State<GoogleSignInBtn> {
-  StreamSubscription? _sub;
+class _GoogleSignInBtnState extends ConsumerState<GoogleSignInBtn> {
+  StreamSubscription<GoogleSignInAuthenticationEvent>? _sub;
   static bool _initialized = false;
 
   @override
@@ -26,28 +33,28 @@ class _GoogleSignInBtnState extends State<GoogleSignInBtn> {
     super.initState();
     _initGoogleSignIn();
     _sub = GoogleSignIn.instance.authenticationEvents.listen((event) async {
-      if (event is GoogleSignInAuthenticationEventSignIn) {
-        final account = event.user;
-        try {
-          final auth = account.authentication;
-          GoogleSignInClientAuthorization? authz;
-          try {
-            authz = await account.authorizationClient.authorizationForScopes(
-              [],
-            );
-          } catch (_) {}
+      if (event is! GoogleSignInAuthenticationEventSignIn) return;
+      final account = event.user;
+      try {
+        final idToken = account.authentication.idToken;
 
-          if (authz != null && authz.accessToken.isNotEmpty) {
-            await widget.onTokenReceived(authz.accessToken);
-          } else if (auth.idToken != null) {
-            // Parfois le web renvoie idToken au lieu de accessToken selon le flow
-            await widget.onTokenReceived(auth.idToken!);
-          } else {
-            widget.onError("Access token manquant.");
-          }
-        } catch (e) {
-          widget.onError(e.toString());
+        String? accessToken;
+        try {
+          final authz = await account.authorizationClient
+              .authorizationForScopes(const ['email', 'profile']);
+          accessToken = authz?.accessToken;
+        } catch (_) {}
+
+        if (idToken == null && accessToken == null) {
+          widget.onError('Jetons Google manquants. Réessaie.');
+          return;
         }
+
+        await ref
+            .read(authControllerProvider.notifier)
+            .loginWithGoogleTokens(idToken: idToken, accessToken: accessToken);
+      } catch (e) {
+        widget.onError('Connexion Google impossible : $e');
       }
     });
   }
@@ -79,9 +86,6 @@ class _GoogleSignInBtnState extends State<GoogleSignInBtn> {
   }
 }
 
-Widget buildGoogleSignInButton({
-  required Future<void> Function(String token) onTokenReceived,
-  required Function(String error) onError,
-}) {
-  return GoogleSignInBtn(onTokenReceived: onTokenReceived, onError: onError);
+Widget buildGoogleSignInButton({required void Function(String error) onError}) {
+  return GoogleSignInBtn(onError: onError);
 }

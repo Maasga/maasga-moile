@@ -52,14 +52,14 @@ class MainBottomNav extends ConsumerWidget {
       ),
       child: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 6),
           child: GNav(
             rippleColor: _primaryBlue.withValues(alpha: 0.2),
             hoverColor: _primaryBlue.withValues(alpha: 0.1),
-            gap: 6,
+            gap: 4,
             activeColor: _primaryBlue,
-            iconSize: 22,
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            iconSize: 20,
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
             duration: const Duration(milliseconds: 400),
             tabBackgroundColor: _primaryBlue.withValues(alpha: 0.1),
             color: _unselected,
@@ -81,7 +81,7 @@ class MainBottomNav extends ConsumerWidget {
                 icon: Icons.home_outlined,
                 text: 'Accueil',
                 textStyle: TextStyle(
-                  fontSize: 12,
+                  fontSize: 11,
                   fontWeight: FontWeight.w600,
                   color: _primaryBlue,
                 ),
@@ -90,7 +90,7 @@ class MainBottomNav extends ConsumerWidget {
                 icon: Icons.grid_view_outlined,
                 text: 'Catalogue',
                 textStyle: TextStyle(
-                  fontSize: 12,
+                  fontSize: 11,
                   fontWeight: FontWeight.w600,
                   color: _primaryBlue,
                 ),
@@ -99,7 +99,7 @@ class MainBottomNav extends ConsumerWidget {
                 icon: Icons.calculate_outlined,
                 text: 'Simul.',
                 textStyle: TextStyle(
-                  fontSize: 12,
+                  fontSize: 11,
                   fontWeight: FontWeight.w600,
                   color: _primaryBlue,
                 ),
@@ -108,7 +108,7 @@ class MainBottomNav extends ConsumerWidget {
                 icon: Icons.build_outlined,
                 text: 'Services',
                 textStyle: TextStyle(
-                  fontSize: 12,
+                  fontSize: 11,
                   fontWeight: FontWeight.w600,
                   color: _primaryBlue,
                 ),
@@ -117,7 +117,7 @@ class MainBottomNav extends ConsumerWidget {
                 icon: Icons.verified_user_outlined,
                 text: 'Contrat',
                 textStyle: TextStyle(
-                  fontSize: 12,
+                  fontSize: 11,
                   fontWeight: FontWeight.w600,
                   color: _primaryBlue,
                 ),
@@ -130,7 +130,7 @@ class MainBottomNav extends ConsumerWidget {
                   isSelected: _indexFromPath() == 5,
                 ),
                 textStyle: const TextStyle(
-                  fontSize: 12,
+                  fontSize: 11,
                   fontWeight: FontWeight.w600,
                   color: _primaryBlue,
                 ),
@@ -139,7 +139,7 @@ class MainBottomNav extends ConsumerWidget {
                 icon: Icons.person_outline,
                 text: 'Profil',
                 textStyle: TextStyle(
-                  fontSize: 12,
+                  fontSize: 11,
                   fontWeight: FontWeight.w600,
                   color: _primaryBlue,
                 ),
@@ -187,7 +187,9 @@ class _CartIcon extends StatelessWidget {
               constraints: const BoxConstraints(minWidth: 14, minHeight: 14),
               alignment: Alignment.center,
               child: Text(
-                cartCount > 9 ? '9' : '$cartCount',
+                // '9+' et non '9' : afficher « 9 » pour 12 articles annonce un
+                // panier plus petit qu'il ne l'est.
+                cartCount > 9 ? '9+' : '$cartCount',
                 style: GoogleFonts.poppins(
                   fontSize: 8,
                   color: Colors.white,

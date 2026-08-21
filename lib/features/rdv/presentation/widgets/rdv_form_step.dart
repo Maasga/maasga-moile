@@ -61,6 +61,11 @@ class _RdvFormStepState extends State<RdvFormStep> {
   final LatLng _initialPos = const LatLng(12.3647, -1.5335); // Ouagadougou
   Set<Marker> _markers = {};
 
+  static const _inputTextStyle = TextStyle(
+    fontSize: 14,
+    color: Color(0xFF1A1A1A),
+  );
+
   @override
   void initState() {
     super.initState();
@@ -90,7 +95,6 @@ class _RdvFormStepState extends State<RdvFormStep> {
 
     String? address;
     try {
-      // geocoding >= 5 : l'API est désormais une méthode d'instance de Geocoding.
       List<Placemark> placemarks = await Geocoding().placemarkFromCoordinates(
         pos.latitude,
         pos.longitude,
@@ -148,7 +152,6 @@ class _RdvFormStepState extends State<RdvFormStep> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 16),
-            // Recap header
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
@@ -188,13 +191,13 @@ class _RdvFormStepState extends State<RdvFormStep> {
             _buildLabel('Nom complet *'),
             TextFormField(
               controller: widget.nameCtrl,
+              style: _inputTextStyle,
               decoration: _buildInputDecoration(
                 'Votre nom et prénom',
                 Icons.person_outline,
               ),
               validator: (v) =>
                   v == null || v.isEmpty ? 'Champ obligatoire' : null,
-              style: GoogleFonts.poppins(fontSize: 14),
             ),
             const SizedBox(height: 16),
 
@@ -219,6 +222,7 @@ class _RdvFormStepState extends State<RdvFormStep> {
                     style: GoogleFonts.poppins(
                       fontWeight: FontWeight.w600,
                       fontSize: 13,
+                      color: const Color(0xFF1A1A1A),
                     ),
                   ),
                 ),
@@ -226,6 +230,7 @@ class _RdvFormStepState extends State<RdvFormStep> {
                   child: TextFormField(
                     controller: widget.phoneCtrl,
                     keyboardType: TextInputType.phone,
+                    style: _inputTextStyle,
                     decoration: _buildInputDecoration(
                       'XX XX XX XX',
                       Icons.phone,
@@ -236,7 +241,6 @@ class _RdvFormStepState extends State<RdvFormStep> {
                     ),
                     validator: (v) =>
                         v == null || v.length < 8 ? '8 chiffres minimum' : null,
-                    style: GoogleFonts.poppins(fontSize: 14),
                   ),
                 ),
               ],
@@ -247,11 +251,11 @@ class _RdvFormStepState extends State<RdvFormStep> {
             TextFormField(
               controller: widget.emailCtrl,
               keyboardType: TextInputType.emailAddress,
+              style: _inputTextStyle,
               decoration: _buildInputDecoration(
                 'votre@email.com',
                 Icons.email_outlined,
               ),
-              style: GoogleFonts.poppins(fontSize: 14),
             ),
             const SizedBox(height: 16),
 
@@ -263,6 +267,7 @@ class _RdvFormStepState extends State<RdvFormStep> {
                   controller: TextEditingController(
                     text: widget.selectedQuartier,
                   ),
+                  style: _inputTextStyle,
                   decoration: _buildInputDecoration(
                     'Sélectionner votre quartier',
                     Icons.location_city_outlined,
@@ -270,7 +275,6 @@ class _RdvFormStepState extends State<RdvFormStep> {
                   validator: (v) => v == null || v.isEmpty
                       ? 'Veuillez choisir un quartier'
                       : null,
-                  style: GoogleFonts.poppins(fontSize: 14),
                 ),
               ),
             ),
@@ -289,11 +293,11 @@ class _RdvFormStepState extends State<RdvFormStep> {
                       child: Padding(
                         padding: const EdgeInsets.all(16.0),
                         child: Text(
-                          'La carte interactive n\'est pas disponible en version Web. Veuillez indiquer votre adresse précise ci-dessous.',
+                          "La carte interactive n'est pas disponible en version Web. Veuillez indiquer votre adresse précise ci-dessous.",
                           textAlign: TextAlign.center,
                           style: GoogleFonts.poppins(
                             fontSize: 12,
-                            color: Colors.grey,
+                            color: const Color(0xFF475467),
                           ),
                         ),
                       ),
@@ -374,7 +378,9 @@ class _RdvFormStepState extends State<RdvFormStep> {
                       fontWeight: FontWeight.bold,
                     ),
                     dayTextStyle: GoogleFonts.poppins(color: Colors.black),
-                    disabledDayTextStyle: const TextStyle(color: Colors.grey),
+                    disabledDayTextStyle: const TextStyle(
+                      color: Color(0xFFBDBDBD),
+                    ),
                     firstDate: first,
                     lastDate: first.add(const Duration(days: 90)),
                     currentDate: today,
@@ -467,13 +473,12 @@ class _RdvFormStepState extends State<RdvFormStep> {
               controller: widget.notesCtrl,
               maxLines: 4,
               maxLength: 500,
+              style: _inputTextStyle,
               decoration: _buildInputDecoration(
                 'Décrivez votre projet ou problème...',
                 null,
               ),
-              style: GoogleFonts.poppins(fontSize: 14),
             ),
-
             const SizedBox(height: 8),
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -652,6 +657,7 @@ class _QuartierSearchDialogState extends State<_QuartierSearchDialog> {
           const SizedBox(height: 16),
           TextField(
             onChanged: (v) => setState(() => _search = v),
+            style: const TextStyle(fontSize: 14, color: Color(0xFF1A1A1A)),
             decoration: InputDecoration(
               hintText: 'Rechercher un quartier...',
               prefixIcon: const Icon(Icons.search),

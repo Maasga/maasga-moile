@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
+import '../../core/config/maasga_contact.dart';
 import '../../features/client_space/domain/commande.dart';
 import '../../features/client_space/domain/user_profile.dart';
 import '../../features/cart/presentation/cart_state.dart';
@@ -43,11 +44,33 @@ class PdfService {
   ) async {
     final pdf = pw.Document();
 
-    final contract = data['contract'] as Map<String, dynamic>;
-    final client = data['client'] as Map<String, dynamic>;
-    final visits = (data['visits'] as List? ?? []);
-    final payment = data['payment'] as Map<String, dynamic>?;
-    final company = data['company'] as Map<String, dynamic>;
+    // Casts défensifs : la réponse serveur est une source externe. Un `as
+    // Map<String, dynamic>` sur un champ absent lançait une TypeError et
+    // faisait échouer toute la génération de la facture, avec un message
+    // incompréhensible pour le client.
+    Map<String, dynamic> asMap(Object? value) => value is Map
+        ? value.cast<String, dynamic>()
+        : const <String, dynamic>{};
+
+    final contract = asMap(data['contract']);
+    final client = asMap(data['client']);
+    final visits = (data['visits'] as List? ?? const []);
+    final payment = data['payment'] is Map ? asMap(data['payment']) : null;
+    final company = asMap(data['company']);
+
+    // Repli sur les coordonnées locales si le serveur ne les fournit pas.
+    final companyName = (company['name'] as String?)?.trim().isNotEmpty == true
+        ? company['name'] as String
+        : MaasgaContact.companyName;
+    final companyAddress =
+        (company['address'] as String?)?.trim().isNotEmpty == true
+        ? company['address'] as String
+        : MaasgaContact.city;
+    final companyPhone =
+        (company['phone'] as String?)?.trim().isNotEmpty == true
+        ? company['phone'] as String
+        : MaasgaContact.phoneInternational;
+    final companyIfu = '${company['ifu'] ?? MaasgaContact.ifu}'.trim();
 
     final logoData = await rootBundle.load('assets/logo_maasga.png');
     final logoImage = pw.MemoryImage(logoData.buffer.asUint8List());
@@ -74,7 +97,8 @@ class PdfService {
       'cash': 'Espèces',
     };
 
-    final invoiceNum = 'MAASGA-MC-${contract['id'].toString().padLeft(5, '0')}';
+    final invoiceNum =
+        'MAASGA-MC-${(contract['id']?.toString() ?? '0').padLeft(5, '0')}';
     final invoiceDate = DateFormat(
       'dd MMMM yyyy',
       'fr_FR',
@@ -96,7 +120,7 @@ class PdfService {
                     pw.Image(logoImage, width: 80),
                     pw.SizedBox(height: 10),
                     pw.Text(
-                      company['name'],
+                      companyName,
                       style: pw.TextStyle(
                         fontSize: 14,
                         fontWeight: pw.FontWeight.bold,
@@ -104,17 +128,18 @@ class PdfService {
                       ),
                     ),
                     pw.Text(
-                      company['address'],
+                      companyAddress,
                       style: const pw.TextStyle(fontSize: 9),
                     ),
                     pw.Text(
-                      'Tél: ${company['phone']}',
+                      'Tél: $companyPhone',
                       style: const pw.TextStyle(fontSize: 9),
                     ),
-                    pw.Text(
-                      'IFU: ${company['ifu']}',
-                      style: const pw.TextStyle(fontSize: 9),
-                    ),
+                    if (companyIfu.isNotEmpty)
+                      pw.Text(
+                        'IFU: $companyIfu',
+                        style: const pw.TextStyle(fontSize: 9),
+                      ),
                   ],
                 ),
                 pw.Column(
@@ -619,7 +644,7 @@ class PdfService {
                 ),
                 pw.SizedBox(height: 4),
                 pw.Text(
-                  'Ouagadougou, Burkina Faso · +226 55 99 64 18',
+                  '${MaasgaContact.city} · ${MaasgaContact.phoneInternational}',
                   style: pw.TextStyle(fontSize: 7, color: PdfColors.grey600),
                 ),
               ],
@@ -678,11 +703,16 @@ class PdfService {
             pw.SizedBox(width: 15),
             pw.Expanded(
               child: _buildInfoCard('ÉMETTEUR', [
-                'MAASGA SARL',
-                'Activité : Froid & Climatisation',
-                'Tel : +226 55 99 64 18',
-                'Email : maasgabf@gmail.com',
-                'RCCM : BF OUA 2023 B 1234',
+                MaasgaContact.companyName,
+                'Activité : ${MaasgaContact.activity}',
+                'Tel : ${MaasgaContact.phoneInternational}',
+                'Email : ${MaasgaContact.email}',
+                // Uniquement si renseignés au build (--dart-define) : un
+                // document commercial ne doit jamais porter un numéro légal
+                // inventé.
+                if (MaasgaContact.rccm.isNotEmpty)
+                  'RCCM : ${MaasgaContact.rccm}',
+                if (MaasgaContact.ifu.isNotEmpty) 'IFU : ${MaasgaContact.ifu}',
               ]),
             ),
           ],

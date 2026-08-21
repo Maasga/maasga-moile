@@ -7,19 +7,27 @@ import '../data/auth_repository.dart';
 class AuthController extends AsyncNotifier<bool> {
   @override
   Future<bool> build() async {
-    final repo = await ref.watch(authRepositoryProvider.future);
+    final repo = ref.watch(authRepositoryProvider);
     try {
       final loggedIn = await repo.hasActiveSession();
-      if (loggedIn) {
-        try {
-          final dio = await ref.read(dioProvider.future);
-          await ref.read(pushServiceProvider).initialize(dio: dio);
-        } catch (_) {}
-      }
+      if (loggedIn) await _registerForPush();
       return loggedIn;
     } catch (_) {
       return false;
     }
+  }
+
+  /// Enregistre l'appareil pour les notifications push.
+  ///
+  /// [PushService.initialize] est idempotent : on peut l'appeler à chaque
+  /// connexion sans empiler les listeners `onMessage` / `onTokenRefresh`.
+  /// Les échecs sont volontairement avalés — pas de push ne doit jamais
+  /// empêcher une connexion réussie.
+  Future<void> _registerForPush() async {
+    try {
+      final dio = await ref.read(dioProvider.future);
+      await ref.read(pushServiceProvider).initialize(dio: dio);
+    } catch (_) {}
   }
 
   Future<void> login({
@@ -28,12 +36,9 @@ class AuthController extends AsyncNotifier<bool> {
   }) async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
-      final repo = await ref.read(authRepositoryProvider.future);
+      final repo = ref.read(authRepositoryProvider);
       await repo.login(identifier: identifier, password: password);
-      try {
-        final dio = await ref.read(dioProvider.future);
-        await ref.read(pushServiceProvider).initialize(dio: dio);
-      } catch (_) {}
+      await _registerForPush();
       return true;
     });
   }
@@ -47,7 +52,7 @@ class AuthController extends AsyncNotifier<bool> {
   }) async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
-      final repo = await ref.read(authRepositoryProvider.future);
+      final repo = ref.read(authRepositoryProvider);
       await repo.register(
         name: name,
         phone: phone,
@@ -55,31 +60,63 @@ class AuthController extends AsyncNotifier<bool> {
         quartier: quartier,
         password: password,
       );
+      // Pousse téléphone + quartier vers D1. Non bloquant : le compte Firebase
+      // existe déjà, échouer ici ne doit pas casser l'inscription.
       try {
         final dio = await ref.read(dioProvider.future);
-        await ref.read(pushServiceProvider).initialize(dio: dio);
+        await repo.syncProfile(
+          dio: dio,
+          name: name,
+          phone: phone,
+          quartier: quartier,
+        );
       } catch (_) {}
+      await _registerForPush();
       return true;
     });
+  }
+
+  Future<void> loginWithGoogle() async {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() async {
+      final repo = ref.read(authRepositoryProvider);
+      await repo.loginWithGoogle();
+      await _registerForPush();
+      return true;
+    });
+  }
+
+  /// Finalise une connexion Google amorcée côté Web (jetons déjà obtenus).
+  Future<void> loginWithGoogleTokens({
+    String? idToken,
+    String? accessToken,
+  }) async {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() async {
+      final repo = ref.read(authRepositoryProvider);
+      await repo.signInWithGoogleTokens(
+        idToken: idToken,
+        accessToken: accessToken,
+      );
+      await _registerForPush();
+      return true;
+    });
+  }
+
+  /// Envoie un e-mail de réinitialisation. Ne touche pas à [state] : l'écran
+  /// gère son propre indicateur de chargement et affiche l'erreur telle quelle.
+  Future<void> sendPasswordReset(String identifier) {
+    return ref.read(authRepositoryProvider).sendPasswordReset(identifier);
   }
 
   Future<void> logout() async {
-    final repo = await ref.read(authRepositoryProvider.future);
+    try {
+      final dio = await ref.read(dioProvider.future);
+      await ref.read(pushServiceProvider).unregisterToken(dio: dio);
+    } catch (_) {}
+    final repo = ref.read(authRepositoryProvider);
     await repo.logout();
     state = const AsyncData(false);
-  }
-
-  Future<void> loginWithGoogle({required String accessToken}) async {
-    state = const AsyncLoading();
-    state = await AsyncValue.guard(() async {
-      final repo = await ref.read(authRepositoryProvider.future);
-      await repo.loginWithGoogle(accessToken: accessToken);
-      try {
-        final dio = await ref.read(dioProvider.future);
-        await ref.read(pushServiceProvider).initialize(dio: dio);
-      } catch (_) {}
-      return true;
-    });
   }
 }
 
