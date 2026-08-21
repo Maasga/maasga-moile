@@ -1,9 +1,10 @@
-# Règles ProGuard/R8 — PRÊTES mais NON activées par défaut.
+# Règles ProGuard/R8 — ACTIVES.
 #
-# Pour activer la minification/obfuscation en release, décommenter le bloc
-# `isMinifyEnabled` dans android/app/build.gradle.kts, PUIS tester un vrai
-# build release sur appareil (la réflexion de Firebase/webview/pdf peut casser
-# sans ces règles). Ne pas activer sans QA d'un build release signé.
+# `isMinifyEnabled = true` et `isShrinkResources = true` sont posés dans
+# android/app/build.gradle.kts (buildTypes.release). Ce fichier est donc
+# appliqué à chaque build release : toute règle retirée ici peut casser la
+# réflexion de Firebase / PDF / Riverpod à l'exécution — et uniquement en
+# release. Tester sur appareil après toute modification.
 
 # --- Flutter ---
 -keep class io.flutter.** { *; }
@@ -16,7 +17,8 @@
 -dontwarn com.google.firebase.**
 -dontwarn com.google.android.gms.**
 
-# --- WebView (webview_flutter) : garder les interfaces JS ---
+# --- Interfaces JS d'une éventuelle WebView (flutter_inappwebview, plugins
+#     tiers). webview_flutter n'est plus une dépendance directe. ---
 -keepclassmembers class * {
     @android.webkit.JavascriptInterface <methods>;
 }
