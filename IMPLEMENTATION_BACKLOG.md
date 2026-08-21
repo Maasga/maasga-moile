@@ -26,11 +26,14 @@ la liste de ce qui reste.
 
 ## Bloquant — compilation depuis un clone neuf
 
-- [ ] Versionner `android/app/google-services.json` et
-      `lib/core/config/firebase_options.dart`. Ils ne sont aujourd'hui pas
-      suivis par git, alors que `lib/main.dart` importe le second et que
-      `android/app/build.gradle.kts` applique `com.google.gms.google-services`
-      : sans eux, ni un clone neuf ni le job `build-apk` de la CI ne compile.
+- [x] Versionner `android/app/google-services.json` et
+      `lib/core/config/firebase_options.dart`. Fait : `lib/main.dart` importe
+      le second et `android/app/build.gradle.kts` applique
+      `com.google.gms.google-services`, donc sans eux ni un clone neuf ni le
+      job `build-apk` de la CI ne compilait. Ces fichiers ne contiennent que
+      des identifiants client, déjà présents en clair dans chaque APK
+      distribué — la protection réelle est la restriction de la clé côté
+      Google Cloud Console (voir la section Sécurité).
 
 ## Backend (worker MAASGA — hors de ce dépôt)
 
@@ -102,5 +105,3 @@ la liste de ce qui reste.
       un `getIdToken(true)` puis rejouer la requête une seule fois.
 - [ ] Décider du sort de `web/` et `windows/`, et créer le projet iOS
       (+ config Firebase / Maps / Sign-In) si le multiplateforme est visé.
-- [ ] `.vscode/` n'est ni suivi ni ignoré (la ligne `#.vscode/` du
-      `.gitignore` est commentée).
