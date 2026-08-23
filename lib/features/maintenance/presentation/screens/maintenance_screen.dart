@@ -470,7 +470,7 @@ class _SubscriptionFormModalState
                     _buildFieldLabel('Nom complet *'),
                     TextFormField(
                       controller: _nameCtrl,
-                      style: MaasgaTokens.inputTextStyle,
+                      style: context.maasga.inputTextStyle,
                       decoration: InputDecoration(
                         hintText: 'Votre nom',
                         hintStyle: GoogleFonts.poppins(
@@ -504,7 +504,7 @@ class _SubscriptionFormModalState
                     TextFormField(
                       controller: _phoneCtrl,
                       keyboardType: TextInputType.phone,
-                      style: MaasgaTokens.inputTextStyle,
+                      style: context.maasga.inputTextStyle,
                       decoration: InputDecoration(
                         hintText: 'XX XX XX XX',
                         hintStyle: GoogleFonts.poppins(

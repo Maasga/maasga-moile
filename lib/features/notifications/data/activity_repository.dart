@@ -76,6 +76,6 @@ final unreadNotificationCountProvider = Provider<int>((ref) {
   return asyncActivities.when(
     data: (activities) => activities.length,
     loading: () => 0,
-    error: (_, __) => 0,
+    error: (_, _) => 0,
   );
 });

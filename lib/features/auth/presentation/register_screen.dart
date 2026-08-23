@@ -75,7 +75,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(gradient: MaasgaTokens.pageGradient),
+        decoration: BoxDecoration(gradient: context.maasga.pageGradient),
         child: SafeArea(
           child: Center(
             child: SingleChildScrollView(
@@ -121,16 +121,16 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         // Nom
                         TextField(
                           controller: _nameCtrl,
-                          style: MaasgaTokens.inputTextStyle,
+                          style: context.maasga.inputTextStyle,
                           textCapitalization: TextCapitalization.words,
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
                             labelText: 'Nom complet *',
                             labelStyle: TextStyle(
-                              color: MaasgaTokens.textSecondary,
+                              color: context.maasga.textSecondary,
                             ),
                             prefixIcon: Icon(
                               Icons.person_outline,
-                              color: MaasgaTokens.blue700,
+                              color: context.maasga.accent,
                             ),
                             filled: true,
                             fillColor: Colors.white,
@@ -142,16 +142,16 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         TextField(
                           controller: _phoneCtrl,
                           keyboardType: TextInputType.phone,
-                          style: MaasgaTokens.inputTextStyle,
-                          decoration: const InputDecoration(
+                          style: context.maasga.inputTextStyle,
+                          decoration: InputDecoration(
                             labelText: 'Téléphone WhatsApp *',
                             hintText: '70 00 00 00',
                             labelStyle: TextStyle(
-                              color: MaasgaTokens.textSecondary,
+                              color: context.maasga.textSecondary,
                             ),
                             prefixIcon: Icon(
                               Icons.phone_outlined,
-                              color: MaasgaTokens.blue700,
+                              color: context.maasga.accent,
                             ),
                             prefixText: '+226 ',
                             filled: true,
@@ -164,15 +164,15 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         TextField(
                           controller: _emailCtrl,
                           keyboardType: TextInputType.emailAddress,
-                          style: MaasgaTokens.inputTextStyle,
-                          decoration: const InputDecoration(
+                          style: context.maasga.inputTextStyle,
+                          decoration: InputDecoration(
                             labelText: 'Email (optionnel)',
                             labelStyle: TextStyle(
-                              color: MaasgaTokens.textSecondary,
+                              color: context.maasga.textSecondary,
                             ),
                             prefixIcon: Icon(
                               Icons.email_outlined,
-                              color: MaasgaTokens.blue700,
+                              color: context.maasga.accent,
                             ),
                             filled: true,
                             fillColor: Colors.white,
@@ -183,16 +183,16 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         // Quartier
                         TextField(
                           controller: _quartierCtrl,
-                          style: MaasgaTokens.inputTextStyle,
-                          decoration: const InputDecoration(
+                          style: context.maasga.inputTextStyle,
+                          decoration: InputDecoration(
                             labelText: 'Quartier *',
                             hintText: 'Ex: Ouaga 2000, Pissy...',
                             labelStyle: TextStyle(
-                              color: MaasgaTokens.textSecondary,
+                              color: context.maasga.textSecondary,
                             ),
                             prefixIcon: Icon(
                               Icons.location_on_outlined,
-                              color: MaasgaTokens.blue700,
+                              color: context.maasga.accent,
                             ),
                             filled: true,
                             fillColor: Colors.white,
@@ -204,22 +204,22 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         TextField(
                           controller: _passwordCtrl,
                           obscureText: _obscurePassword,
-                          style: MaasgaTokens.inputTextStyle,
+                          style: context.maasga.inputTextStyle,
                           decoration: InputDecoration(
                             labelText: 'Mot de passe *',
-                            labelStyle: const TextStyle(
-                              color: MaasgaTokens.textSecondary,
+                            labelStyle: TextStyle(
+                              color: context.maasga.textSecondary,
                             ),
-                            prefixIcon: const Icon(
+                            prefixIcon: Icon(
                               Icons.lock_outline,
-                              color: MaasgaTokens.blue700,
+                              color: context.maasga.accent,
                             ),
                             suffixIcon: IconButton(
                               icon: Icon(
                                 _obscurePassword
                                     ? Icons.visibility_off_outlined
                                     : Icons.visibility_outlined,
-                                color: MaasgaTokens.textSecondary,
+                                color: context.maasga.textSecondary,
                                 size: 20,
                               ),
                               onPressed: () => setState(

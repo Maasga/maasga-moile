@@ -97,7 +97,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(gradient: MaasgaTokens.pageGradient),
+        decoration: BoxDecoration(gradient: context.maasga.pageGradient),
         child: SafeArea(
           child: Center(
             child: SingleChildScrollView(
@@ -144,15 +144,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         TextField(
                           controller: _identifierCtrl,
                           keyboardType: TextInputType.emailAddress,
-                          style: MaasgaTokens.inputTextStyle,
-                          decoration: const InputDecoration(
+                          style: context.maasga.inputTextStyle,
+                          decoration: InputDecoration(
                             labelText: 'Email ou téléphone',
                             labelStyle: TextStyle(
-                              color: MaasgaTokens.textSecondary,
+                              color: context.maasga.textSecondary,
                             ),
                             prefixIcon: Icon(
                               Icons.person_outline,
-                              color: MaasgaTokens.blue700,
+                              color: context.maasga.accent,
                             ),
                             filled: true,
                             fillColor: Colors.white,
@@ -164,22 +164,22 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         TextField(
                           controller: _passwordCtrl,
                           obscureText: _obscurePassword,
-                          style: MaasgaTokens.inputTextStyle,
+                          style: context.maasga.inputTextStyle,
                           decoration: InputDecoration(
                             labelText: 'Mot de passe',
-                            labelStyle: const TextStyle(
-                              color: MaasgaTokens.textSecondary,
+                            labelStyle: TextStyle(
+                              color: context.maasga.textSecondary,
                             ),
-                            prefixIcon: const Icon(
+                            prefixIcon: Icon(
                               Icons.lock_outline,
-                              color: MaasgaTokens.blue700,
+                              color: context.maasga.accent,
                             ),
                             suffixIcon: IconButton(
                               icon: Icon(
                                 _obscurePassword
                                     ? Icons.visibility_off_outlined
                                     : Icons.visibility_outlined,
-                                color: MaasgaTokens.textSecondary,
+                                color: context.maasga.textSecondary,
                                 size: 20,
                               ),
                               onPressed: () => setState(
