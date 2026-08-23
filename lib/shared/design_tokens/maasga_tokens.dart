@@ -106,11 +106,8 @@ class MaasgaPalette extends ThemeExtension<MaasgaPalette> {
   final Color infoSurface;
 
   /// Style du texte saisi dans les champs de formulaire.
-  TextStyle get inputTextStyle => TextStyle(
-    color: textPrimary,
-    fontSize: 15,
-    fontWeight: FontWeight.w500,
-  );
+  TextStyle get inputTextStyle =>
+      TextStyle(color: textPrimary, fontSize: 15, fontWeight: FontWeight.w500);
 
   static const MaasgaPalette light = MaasgaPalette(
     pageGradient: LinearGradient(

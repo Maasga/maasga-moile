@@ -213,7 +213,9 @@ class _RdvScreenState extends ConsumerState<RdvScreen> {
     return Scaffold(
       backgroundColor: _bgColor,
       resizeToAvoidBottomInset: false,
-      appBar: MaasgaAppBar(notificationsCount: ref.watch(unreadNotificationCountProvider)),
+      appBar: MaasgaAppBar(
+        notificationsCount: ref.watch(unreadNotificationCountProvider),
+      ),
       body: Column(
         children: [
           StepIndicator(currentStep: _currentStep),

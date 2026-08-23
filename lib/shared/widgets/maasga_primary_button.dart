@@ -44,7 +44,10 @@ class MaasgaPrimaryButton extends StatelessWidget {
         ? palette.buttonGradient
         : isDanger
         ? LinearGradient(
-            colors: [palette.danger, Color.lerp(palette.danger, Colors.black, 0.35)!],
+            colors: [
+              palette.danger,
+              Color.lerp(palette.danger, Colors.black, 0.35)!,
+            ],
           )
         : null;
 

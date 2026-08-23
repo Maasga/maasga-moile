@@ -101,7 +101,9 @@ class _MaintenanceScreenState extends ConsumerState<MaintenanceScreen> {
       backgroundColor: const Color(0xFFF5F5F5),
       body: Column(
         children: [
-          MaasgaAppBar(notificationsCount: ref.watch(unreadNotificationCountProvider)),
+          MaasgaAppBar(
+            notificationsCount: ref.watch(unreadNotificationCountProvider),
+          ),
           if (_isLoading)
             const LinearProgressIndicator(
               backgroundColor: Colors.transparent,

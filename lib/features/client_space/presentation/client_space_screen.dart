@@ -29,7 +29,9 @@ class ClientSpaceScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
-      appBar: MaasgaAppBar(notificationsCount: ref.watch(unreadNotificationCountProvider)),
+      appBar: MaasgaAppBar(
+        notificationsCount: ref.watch(unreadNotificationCountProvider),
+      ),
       body: auth.when(
         data: (loggedIn) {
           if (!loggedIn) {

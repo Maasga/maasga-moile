@@ -24,7 +24,6 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
-
   final List<String> _brandAssets = const <String>[
     'assets/brands/daikin.png',
     'assets/brands/mitsubishi.png',
