@@ -95,9 +95,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       }
     });
 
+    final palette = context.maasga;
+
     return Scaffold(
       body: Container(
-        decoration: BoxDecoration(gradient: context.maasga.pageGradient),
+        decoration: BoxDecoration(gradient: palette.pageGradient),
         child: SafeArea(
           child: Center(
             child: SingleChildScrollView(
@@ -106,10 +108,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 constraints: const BoxConstraints(maxWidth: 430),
                 child: Card(
                   elevation: 0,
-                  color: Colors.white,
+                  color: palette.card,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(MaasgaTokens.radiusLg),
-                    side: const BorderSide(color: Color(0xFFE1F1FF)),
+                    side: BorderSide(color: palette.cardBorder),
                   ),
                   child: Padding(
                     padding: const EdgeInsets.all(22),
@@ -122,20 +124,20 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           fit: BoxFit.contain,
                         ),
                         const SizedBox(height: 14),
-                        const Text(
+                        Text(
                           'Connexion',
                           style: TextStyle(
                             fontSize: 28,
                             fontWeight: FontWeight.w800,
-                            color: Color(0xFF1A1A1A),
+                            color: palette.textPrimary,
                           ),
                         ),
                         const SizedBox(height: 6),
-                        const Text(
+                        Text(
                           'Accédez à votre espace MAASGA',
                           style: TextStyle(
                             fontSize: 14,
-                            color: Color(0xFF475467),
+                            color: palette.textSecondary,
                           ),
                         ),
                         const SizedBox(height: 20),
@@ -144,18 +146,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         TextField(
                           controller: _identifierCtrl,
                           keyboardType: TextInputType.emailAddress,
-                          style: context.maasga.inputTextStyle,
+                          style: palette.inputTextStyle,
                           decoration: InputDecoration(
                             labelText: 'Email ou téléphone',
-                            labelStyle: TextStyle(
-                              color: context.maasga.textSecondary,
-                            ),
+                            labelStyle: TextStyle(color: palette.textSecondary),
                             prefixIcon: Icon(
                               Icons.person_outline,
-                              color: context.maasga.accent,
+                              color: palette.accent,
                             ),
                             filled: true,
-                            fillColor: Colors.white,
+                            fillColor: palette.cardAlt,
                           ),
                         ),
                         const SizedBox(height: 12),
@@ -164,22 +164,20 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         TextField(
                           controller: _passwordCtrl,
                           obscureText: _obscurePassword,
-                          style: context.maasga.inputTextStyle,
+                          style: palette.inputTextStyle,
                           decoration: InputDecoration(
                             labelText: 'Mot de passe',
-                            labelStyle: TextStyle(
-                              color: context.maasga.textSecondary,
-                            ),
+                            labelStyle: TextStyle(color: palette.textSecondary),
                             prefixIcon: Icon(
                               Icons.lock_outline,
-                              color: context.maasga.accent,
+                              color: palette.accent,
                             ),
                             suffixIcon: IconButton(
                               icon: Icon(
                                 _obscurePassword
                                     ? Icons.visibility_off_outlined
                                     : Icons.visibility_outlined,
-                                color: context.maasga.textSecondary,
+                                color: palette.textSecondary,
                                 size: 20,
                               ),
                               onPressed: () => setState(
@@ -187,7 +185,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               ),
                             ),
                             filled: true,
-                            fillColor: Colors.white,
+                            fillColor: palette.cardAlt,
                           ),
                         ),
 
@@ -196,23 +194,25 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           Container(
                             padding: const EdgeInsets.all(10),
                             decoration: BoxDecoration(
-                              color: Colors.red.shade50,
+                              color: palette.dangerSurface,
                               borderRadius: BorderRadius.circular(10),
-                              border: Border.all(color: Colors.red.shade200),
+                              border: Border.all(
+                                color: palette.danger.withValues(alpha: 0.4),
+                              ),
                             ),
                             child: Row(
                               children: [
-                                const Icon(
+                                Icon(
                                   Icons.error_outline,
-                                  color: Colors.red,
+                                  color: palette.danger,
                                   size: 18,
                                 ),
                                 const SizedBox(width: 8),
                                 Expanded(
                                   child: Text(
                                     _error!,
-                                    style: const TextStyle(
-                                      color: Colors.red,
+                                    style: TextStyle(
+                                      color: palette.danger,
                                       fontSize: 13,
                                     ),
                                   ),

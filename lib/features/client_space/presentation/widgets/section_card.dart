@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../../shared/design_tokens/maasga_tokens.dart';
+
 class SectionCard extends StatelessWidget {
   const SectionCard({
     required this.title,
@@ -19,14 +21,18 @@ class SectionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.maasga;
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: palette.card,
         borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: palette.cardBorder),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: palette.shadow.withValues(
+              alpha: context.isDarkMode ? 0.35 : 0.05,
+            ),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -35,7 +41,6 @@ class SectionCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header
           Padding(
             padding: const EdgeInsets.all(16),
             child: Row(
@@ -44,7 +49,7 @@ class SectionCard extends StatelessWidget {
                   width: 4,
                   height: 20,
                   decoration: BoxDecoration(
-                    color: const Color(0xFF1B3A8D),
+                    color: palette.accent,
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -54,7 +59,7 @@ class SectionCard extends StatelessWidget {
                   style: GoogleFonts.poppins(
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
-                    color: const Color(0xFF1A1A1A),
+                    color: palette.textPrimary,
                   ),
                 ),
                 if (count != null) ...[
@@ -65,7 +70,7 @@ class SectionCard extends StatelessWidget {
                       vertical: 2,
                     ),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF1B3A8D),
+                      color: palette.accent,
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
@@ -73,7 +78,7 @@ class SectionCard extends StatelessWidget {
                       style: GoogleFonts.poppins(
                         fontSize: 11,
                         fontWeight: FontWeight.w700,
-                        color: Colors.white,
+                        color: palette.onAccent,
                       ),
                     ),
                   ),
@@ -81,7 +86,6 @@ class SectionCard extends StatelessWidget {
               ],
             ),
           ),
-          // Content
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
             child: child,

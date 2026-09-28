@@ -51,9 +51,11 @@ class MaasgaPrimaryButton extends StatelessWidget {
           )
         : null;
 
-    // Le contenu d'un bouton dégradé est toujours clair ; seul l'« outline »,
-    // qui n'a pas de fond, doit suivre la couleur interactive du thème.
-    final fg = isOutline ? palette.accent : Colors.white;
+    // Dégradé / danger : texte clair. Outline et secondaire : texte du thème
+    // (du blanc sur cardAlt en mode clair était illisible).
+    final fg = isOutline || variant == MaasgaButtonVariant.secondary
+        ? palette.accent
+        : Colors.white;
 
     return Opacity(
       opacity: enabled ? 1 : 0.6,

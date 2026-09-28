@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/network/api_client.dart';
@@ -25,11 +26,33 @@ class AuthController extends AsyncNotifier<bool> {
   /// connexion sans empiler les listeners `onMessage` / `onTokenRefresh`.
   /// Les échecs sont volontairement avalés — pas de push ne doit jamais
   /// empêcher une connexion réussie.
+  /// Pose / relie la ligne `clients` D1. Utible après Google : sans cet
+  /// appel, `/api/mobile/profile` n'a rien à lire pour savoir si un numéro
+  /// WhatsApp existe déjà.
+  Future<void> _syncBackendSession() async {
+    try {
+      final dio = await ref.read(dioProvider.future);
+      await ref.read(authRepositoryProvider).syncSession(dio);
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint('_syncBackendSession erreur: $e');
+      } else {
+        debugPrint('_syncBackendSession erreur: $e');
+      }
+    }
+  }
+
   Future<void> _registerForPush() async {
     try {
       final dio = await ref.read(dioProvider.future);
       await ref.read(pushServiceProvider).initialize(dio: dio);
-    } catch (_) {}
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint('_registerForPush erreur: $e');
+      } else {
+        debugPrint('_registerForPush erreur: $e');
+      }
+    }
   }
 
   /// Jette le cookie de session backend avant d'ouvrir une nouvelle session.
@@ -44,7 +67,13 @@ class AuthController extends AsyncNotifier<bool> {
   Future<void> _startCleanSession() async {
     try {
       await clearSessionCookies(ref);
-    } catch (_) {}
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint('_startCleanSession erreur: $e');
+      } else {
+        debugPrint('_startCleanSession erreur: $e');
+      }
+    }
   }
 
   Future<void> login({
@@ -56,6 +85,7 @@ class AuthController extends AsyncNotifier<bool> {
       final repo = ref.read(authRepositoryProvider);
       await _startCleanSession();
       await repo.login(identifier: identifier, password: password);
+      await _syncBackendSession();
       await _registerForPush();
       return true;
     });
@@ -83,13 +113,18 @@ class AuthController extends AsyncNotifier<bool> {
       // existe déjà, échouer ici ne doit pas casser l'inscription.
       try {
         final dio = await ref.read(dioProvider.future);
-        await repo.syncProfile(
+        final success = await repo.syncProfile(
           dio: dio,
           name: name,
           phone: phone,
           quartier: quartier,
         );
-      } catch (_) {}
+        if (!success) {
+          debugPrint('syncProfile échoué (retour false)');
+        }
+      } catch (e) {
+        debugPrint('syncProfile exception: $e');
+      }
       await _registerForPush();
       return true;
     });
@@ -101,6 +136,7 @@ class AuthController extends AsyncNotifier<bool> {
       final repo = ref.read(authRepositoryProvider);
       await _startCleanSession();
       await repo.loginWithGoogle();
+      await _syncBackendSession();
       await _registerForPush();
       return true;
     });
@@ -119,6 +155,7 @@ class AuthController extends AsyncNotifier<bool> {
         idToken: idToken,
         accessToken: accessToken,
       );
+      await _syncBackendSession();
       await _registerForPush();
       return true;
     });
@@ -147,20 +184,28 @@ class AuthController extends AsyncNotifier<bool> {
     try {
       final dio = await ref.read(dioProvider.future);
       await ref.read(pushServiceProvider).unregisterToken(dio: dio);
-    } catch (_) {}
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint('logout unregisterToken erreur: $e');
+      }
+    }
 
     await ref.read(authRepositoryProvider).logout();
 
     try {
       await clearSessionCookies(ref);
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('logout clearSessionCookies erreur: $e');
+    }
 
     ref.read(cartProvider.notifier).clear();
 
     try {
       final prefs = await ref.read(userPrefsServiceProvider.future);
       await prefs.clear();
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('logout prefs.clear erreur: $e');
+    }
 
     state = const AsyncData(false);
   }

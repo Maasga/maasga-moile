@@ -1,16 +1,15 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:geocoding/geocoding.dart';
 
 import '../../../core/network/api_client.dart';
 import '../../../shared/services/user_prefs_service.dart';
 import '../../../shared/widgets/maasga_primary_button.dart';
 import '../../../shared/widgets/maasga_shell.dart';
 import '../../client_space/data/client_dashboard_repository.dart';
+import '../../notifications/data/activity_repository.dart';
 import '../../rdv/domain/neighborhoods.dart';
 import 'cart_state.dart';
 
@@ -30,13 +29,6 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
   bool _loading = false;
   String? _error;
 
-  // Location state
-  GoogleMapController? _mapController;
-  LatLng? _selectedLocation;
-  String? _preciseAddress;
-  Set<Marker> _markers = {};
-  final LatLng _initialPos = const LatLng(12.3647, -1.5335); // Ouagadougou
-
   @override
   void initState() {
     super.initState();
@@ -49,7 +41,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
       final dashboard = ref.read(clientDashboardProvider);
       if (dashboard.hasValue) {
         final profile = dashboard.value!.profile;
-        if (mounted) {
+        if (_isMounted()) {
           setState(() {
             if (_nameCtrl.text.isEmpty && profile.fullName.isNotEmpty) {
               _nameCtrl.text = profile.fullName;
@@ -69,7 +61,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     // 2. Fallback : UserPrefsService (Firebase Auth + SharedPreferences)
     try {
       final prefs = ref.read(userPrefsProvider);
-      if (prefs != null && mounted) {
+      if (prefs != null && _isMounted()) {
         setState(() {
           if (_nameCtrl.text.isEmpty) _nameCtrl.text = prefs.savedName;
           if (_phoneCtrl.text.isEmpty) _phoneCtrl.text = prefs.savedPhone;
@@ -103,56 +95,6 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
         },
       ),
     );
-  }
-
-  Future<void> _updateLocation(LatLng pos) async {
-    setState(() {
-      _selectedLocation = pos;
-      _markers = {
-        Marker(
-          markerId: const MarkerId('order_pos'),
-          position: pos,
-          draggable: true,
-          onDragEnd: _updateLocation,
-        ),
-      };
-    });
-
-    try {
-      List<Placemark> placemarks = await Geocoding().placemarkFromCoordinates(
-        pos.latitude,
-        pos.longitude,
-      );
-      if (placemarks.isNotEmpty) {
-        final p = placemarks.first;
-        setState(() {
-          _preciseAddress = '${p.street}, ${p.subLocality}, ${p.locality}';
-        });
-      }
-    } catch (_) {}
-  }
-
-  Future<void> _getCurrentLocation() async {
-    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Service de localisation désactivé')),
-        );
-      }
-      return;
-    }
-
-    LocationPermission permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) return;
-    }
-
-    final position = await Geolocator.getCurrentPosition();
-    final latLng = LatLng(position.latitude, position.longitude);
-    _mapController?.animateCamera(CameraUpdate.newLatLngZoom(latLng, 16));
-    _updateLocation(latLng);
   }
 
   @override
@@ -234,74 +176,17 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
           ),
           const SizedBox(height: 16),
 
-          _buildLabel('Localisation précise (optionnel)'),
-          Container(
-            height: 180,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: const Color(0xFFD8EAFB)),
+          _buildLabel('Adresse précise (optionnel)'),
+          TextField(
+            decoration: _buildInputDecoration(
+              'Numéro, rue, repère...',
+              Icons.location_on_outlined,
             ),
-            clipBehavior: Clip.antiAlias,
-            child: GoogleMap(
-              initialCameraPosition: CameraPosition(
-                target: _initialPos,
-                zoom: 12,
-              ),
-              onMapCreated: (c) => _mapController = c,
-              onTap: _updateLocation,
-              markers: _markers,
-              myLocationEnabled: true,
-              myLocationButtonEnabled: false,
-              zoomControlsEnabled: false,
+            style: GoogleFonts.poppins(
+              fontSize: 14,
+              color: const Color(0xFF1A1A1A),
             ),
           ),
-          const SizedBox(height: 8),
-
-          Row(
-            children: [
-              const Icon(Icons.my_location, color: Color(0xFF1B3A8D), size: 18),
-              TextButton(
-                onPressed: _getCurrentLocation,
-                child: Text(
-                  'Me localiser automatiquement',
-                  style: GoogleFonts.poppins(
-                    color: const Color(0xFF1B3A8D),
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ],
-          ),
-
-          if (_preciseAddress != null)
-            Container(
-              padding: const EdgeInsets.all(12),
-              margin: const EdgeInsets.only(bottom: 8),
-              decoration: BoxDecoration(
-                color: const Color(0xFFF0F4FF),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Row(
-                children: [
-                  const Icon(
-                    Icons.location_on,
-                    color: Color(0xFF1B3A8D),
-                    size: 16,
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      _preciseAddress!,
-                      style: GoogleFonts.poppins(
-                        fontSize: 11,
-                        color: const Color(0xFF1B3A8D),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
 
           const SizedBox(height: 24),
 
@@ -559,6 +444,15 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     );
   }
 
+  String _normalizeBurkinaPhone(String rawPhone) {
+    final clean = rawPhone.trim();
+    if (clean.startsWith('+226')) return clean;
+    if (clean.startsWith('226')) return '+$clean';
+    return '+226$clean';
+  }
+
+  bool _isMounted() => mounted;
+
   Future<void> _submitOrder(
     BuildContext context,
     WidgetRef ref,
@@ -602,64 +496,117 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
           )
           .toList();
 
-      final response = await dio.post(
-        '/api/mobile/commandes',
-        data: {
-          'client_name': _nameCtrl.text.trim(),
-          'client_phone': _phoneCtrl.text.trim(),
-          'quartier': _quartierCtrl.text.trim(),
-          'items': items,
-          // Conservés pour compatibilité avec la version actuelle du worker.
-          'product_id': lines.isNotEmpty ? lines.first.product.id : null,
-          'quantity': quantity,
-          'total_price': total,
-          'latitude': _selectedLocation?.latitude,
-          'longitude': _selectedLocation?.longitude,
-          'adresse_precise': _preciseAddress,
-          'notes': _notesCtrl.text.trim().isEmpty
-              ? null
-              : _notesCtrl.text.trim(),
+      final cleanPhone = _normalizeBurkinaPhone(_phoneCtrl.text);
+      final user = FirebaseAuth.instance.currentUser;
+      final dashboardAsync = ref.read(clientDashboardProvider);
+      final clientId = dashboardAsync.value?.profile.id;
+      final prefs = ref.read(userPrefsProvider);
+      final email =
+          user?.email ??
+          dashboardAsync.value?.profile.email ??
+          prefs?.savedEmail;
+
+      // Payload avec champs dupliqués pour compatibilité avec différentes
+      // versions du worker Cloudflare. Les champs `client_*` sont les versions
+      // modernes, tandis que les champs sans préfixe sont conservés pour la
+      // compatibilité avec l'ancienne API. Les champs `user_id` et `firebase_uid`
+      // sont également dupliqués pour la même raison.
+      final payload = {
+        'client_name': _nameCtrl.text.trim(),
+        'name': _nameCtrl.text.trim(),
+        'client_phone': cleanPhone,
+        'phone': cleanPhone,
+        if (email != null && email.isNotEmpty) ...{
+          'client_email': email,
+          'email': email,
         },
-      );
+        if (clientId != null && clientId.isNotEmpty) ...{
+          'client_id': int.tryParse(clientId) ?? clientId,
+        },
+        if (user?.uid != null) ...{
+          'user_id': user!.uid,
+          'firebase_uid': user.uid,
+        },
+        'quartier': _quartierCtrl.text.trim(),
+        'items': items,
+        // Conservés pour compatibilité avec la version actuelle du worker.
+        'product_id': lines.isNotEmpty ? lines.first.product.id : null,
+        'quantity': quantity,
+        'total_price': total,
+
+        'notes': _notesCtrl.text.trim().isEmpty ? null : _notesCtrl.text.trim(),
+      };
+
+      final response = await dio.post('/api/mobile/commandes', data: payload);
 
       final resData = response.data as Map<String, dynamic>? ?? const {};
-      final orderId = resData['orderId'] ?? resData['id'];
+      final orderId =
+          resData['orderId'] ?? resData['id'] ?? resData['order_id'];
 
-      if (!context.mounted) return;
+      if (!_isMounted()) return;
 
       // Sauvegarder pour auto-remplissage futur
-      final prefs = ref.read(userPrefsProvider);
-      await prefs?.save(
-        name: _nameCtrl.text.trim(),
-        phone: _phoneCtrl.text.trim(),
-        quartier: _quartierCtrl.text.trim(),
-      );
+      if (prefs != null) {
+        await prefs.save(
+          name: _nameCtrl.text.trim(),
+          phone: cleanPhone,
+          email: email,
+          quartier: _quartierCtrl.text.trim(),
+        );
+      } else {
+        debugPrint(
+          'UserPrefsService non disponible, sauvegarde auto-remplissage ignorée',
+        );
+      }
 
-      // Invalider le dashboard pour rafraîchir la liste des commandes
+      // Sauvegarder dans l'historique local pour affichage immédiat dans le profil
+      if (user != null && prefs != null) {
+        final orderMap = {
+          'id':
+              orderId?.toString() ??
+              'CMD-${DateTime.now().millisecondsSinceEpoch}',
+          'product_name': lines
+              .map((l) => '${l.quantity}x ${l.product.name}')
+              .join(', '),
+          'total_price': total,
+          'status': 'pending',
+          'created_at': DateTime.now().toIso8601String(),
+          'items': items,
+          'quartier': _quartierCtrl.text.trim(),
+          'client_name': _nameCtrl.text.trim(),
+          'client_phone': cleanPhone,
+        };
+        await prefs.saveLocalOrder(user.uid, orderMap);
+      } else if (user != null) {
+        debugPrint(
+          'UserPrefsService non disponible, sauvegarde locale de commande ignorée',
+        );
+      }
+
+      // Invalider le dashboard et les activités pour rafraîchir l'espace client
       ref.invalidate(clientDashboardProvider);
+      ref.invalidate(userActivityProvider);
       ref.read(cartProvider.notifier).clear();
 
-      // Re-vérifié : le `await prefs?.save` ci-dessus a pu démonter l'écran
-      // depuis la garde de la ligne 627. La commande est déjà enregistrée et
-      // le panier vidé, il ne reste que la navigation à abandonner.
-      if (!context.mounted) return;
+      if (!_isMounted()) return;
 
       // Rediriger vers l'écran de confirmation avec les infos utiles
+      // ignore: use_build_context_synchronously
       context.go(
         '/order-confirmation',
         extra: {
           'orderId': orderId?.toString() ?? '',
           'clientName': _nameCtrl.text.trim(),
-          'clientPhone': _phoneCtrl.text.trim(),
+          'clientPhone': cleanPhone,
           'total': total,
         },
       );
     } catch (e) {
-      if (mounted) {
+      if (_isMounted()) {
         setState(() => _error = 'Erreur lors de l\'envoi de la commande : $e');
       }
     } finally {
-      if (mounted) setState(() => _loading = false);
+      if (_isMounted()) setState(() => _loading = false);
     }
   }
 }

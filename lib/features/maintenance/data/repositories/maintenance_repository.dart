@@ -12,12 +12,21 @@ class MaintenanceRepository {
       final payload = {
         'name': data['name'] ?? '',
         'phone': data['phone'] ?? '',
-        'plan_type': data['plan_type'] ?? 'semestriel',
+        'email': data['email'] ?? '',
+        'quartier': data['quartier'] ?? '',
+        'plan_type': (data['plan_type'] ?? data['formule'] ?? 'residentiel')
+            .toString()
+            .toLowerCase(),
+        'nb_climatiseurs': data['nb_climatiseurs'] ?? 1,
+        'frequence_visites': data['frequence_visites'] ?? 'Confort',
+        'type_etablissement': data['type_etablissement'] ?? '',
+        'exigences': data['exigences'] ?? '',
+        'preferred_date': data['preferred_date'] ?? '',
         'payment_method': data['payment_method'] ?? 'a_confirmer',
-        'request_type': 'contrat',
-        'description':
-            'Souscription contrat maintenance - ${data['plan_type'] ?? ''}',
-        'equipment_type': 'Split mural',
+        'request_type': data['request_type'] ?? 'contrat',
+        'description': data['description'] ??
+            'Souscription contrat maintenance ${data['plan_type'] ?? data['formule'] ?? ''}',
+        'equipment_type': data['equipment_type'] ?? 'Split mural',
       };
       final response = await _dio.post(
         '/api/mobile/maintenance',

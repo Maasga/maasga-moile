@@ -1,7 +1,8 @@
-import 'package:dio/dio.dart';
+﻿import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/network/api_client.dart';
+import '../models/brand.dart';
 import '../models/promo.dart';
 
 class HomeRepository {
@@ -15,8 +16,19 @@ class HomeRepository {
       return list
           .map((e) => Promo.fromJson(e as Map<String, dynamic>))
           .toList();
-    } catch (e) {
-      // Fallback or rethrow based on strategy
+    } catch (_) {
+      return [];
+    }
+  }
+
+  Future<List<Brand>> getBrands() async {
+    try {
+      final response = await _dio.get('/api/mobile/brands');
+      final list = response.data as List<dynamic>? ?? const [];
+      return list
+          .map((e) => Brand.fromJson(e as Map<String, dynamic>))
+          .toList();
+    } catch (_) {
       return [];
     }
   }
@@ -30,4 +42,9 @@ final homeRepositoryProvider = FutureProvider<HomeRepository>((ref) async {
 final bannersProvider = FutureProvider<List<Promo>>((ref) async {
   final repo = await ref.watch(homeRepositoryProvider.future);
   return repo.getBanners();
+});
+
+final brandsProvider = FutureProvider<List<Brand>>((ref) async {
+  final repo = await ref.watch(homeRepositoryProvider.future);
+  return repo.getBrands();
 });

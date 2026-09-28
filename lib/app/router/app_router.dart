@@ -19,7 +19,6 @@ import '../../features/home/presentation/home_screen.dart';
 import '../../features/home/presentation/onboarding_screen.dart';
 import '../../features/home/presentation/splash_screen.dart';
 import '../../features/home/presentation/search_screen.dart';
-import '../../features/home/presentation/address_selection_screen.dart';
 import '../../features/notifications/presentation/notifications_screen.dart';
 import '../../features/rdv/presentation/rdv_screen.dart';
 import '../../features/simulator/presentation/simulator_screen.dart';
@@ -29,9 +28,9 @@ import '../../features/maintenance/presentation/screens/maintenance_screen.dart'
 
 /// Routes qui exigent une session Firebase valide.
 ///
-/// `/espace-client` et `/client-space` sont volontairement absents : l'écran
-/// affiche déjà lui-même un état « connectez-vous » avec un bouton, ce qui est
-/// une meilleure expérience qu'une redirection sèche.
+/// `/espace-client` et `/client-space` sont volontairement absents : l'Ã©cran
+/// affiche dÃ©jÃ  lui-mÃªme un Ã©tat Â« connectez-vous Â» avec un bouton, ce qui est
+/// une meilleure expÃ©rience qu'une redirection sÃ¨che.
 const Set<String> _protectedRoutes = {
   '/checkout',
   '/order-confirmation',
@@ -39,18 +38,21 @@ const Set<String> _protectedRoutes = {
   '/settings',
 };
 
+final rootNavigatorKey = GlobalKey<NavigatorState>();
+
 final appRouterProvider = Provider<GoRouter>((ref) {
   final refresh = _AuthRefreshNotifier(_authStateChanges());
   ref.onDispose(refresh.dispose);
 
   return GoRouter(
+    navigatorKey: rootNavigatorKey,
     initialLocation: '/splash',
     refreshListenable: refresh,
     redirect: (context, state) {
       final location = state.matchedLocation;
       if (!_protectedRoutes.contains(location)) return null;
       if (_currentUser() != null) return null;
-      // Mémorise la destination pour y revenir juste après la connexion.
+      // MÃ©morise la destination pour y revenir juste aprÃ¨s la connexion.
       return Uri(
         path: '/auth/login',
         queryParameters: {'from': location},
@@ -169,21 +171,16 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         pageBuilder: (context, state) =>
             _buildPage(state, const MaintenanceScreen()),
       ),
-      GoRoute(
-        path: '/address',
-        pageBuilder: (context, state) =>
-            _buildPage(state, const AddressSelectionScreen()),
-      ),
     ],
   );
 });
 
-/// Accès défensif à Firebase Auth.
+/// AccÃ¨s dÃ©fensif Ã  Firebase Auth.
 ///
-/// En production, `Firebase.initializeApp()` a toujours été appelé avant
-/// `runApp`. En test widget (aucun binding Firebase), l'accès lèverait et
-/// empêcherait toute construction du router : on retombe alors sur « pas de
-/// session », ce qui est le comportement voulu.
+/// En production, `Firebase.initializeApp()` a toujours Ã©tÃ© appelÃ© avant
+/// `runApp`. En test widget (aucun binding Firebase), l'accÃ¨s lÃ¨verait et
+/// empÃªcherait toute construction du router : on retombe alors sur Â« pas de
+/// session Â», ce qui est le comportement voulu.
 User? _currentUser() {
   try {
     return FirebaseAuth.instance.currentUser;
@@ -200,8 +197,8 @@ Stream<User?> _authStateChanges() {
   }
 }
 
-/// Fait réévaluer `redirect` par GoRouter à chaque changement d'état Firebase
-/// (connexion, déconnexion, révocation du token).
+/// Fait rÃ©Ã©valuer `redirect` par GoRouter Ã  chaque changement d'Ã©tat Firebase
+/// (connexion, dÃ©connexion, rÃ©vocation du token).
 class _AuthRefreshNotifier extends ChangeNotifier {
   _AuthRefreshNotifier(Stream<User?> stream) {
     _sub = stream.listen((_) => notifyListeners());

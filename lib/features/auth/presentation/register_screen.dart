@@ -73,9 +73,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       }
     });
 
+    final palette = context.maasga;
+
     return Scaffold(
       body: Container(
-        decoration: BoxDecoration(gradient: context.maasga.pageGradient),
+        decoration: BoxDecoration(gradient: palette.pageGradient),
         child: SafeArea(
           child: Center(
             child: SingleChildScrollView(
@@ -84,10 +86,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 constraints: const BoxConstraints(maxWidth: 430),
                 child: Card(
                   elevation: 0,
-                  color: Colors.white,
+                  color: palette.card,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(MaasgaTokens.radiusLg),
-                    side: const BorderSide(color: Color(0xFFE1F1FF)),
+                    side: BorderSide(color: palette.cardBorder),
                   ),
                   child: Padding(
                     padding: const EdgeInsets.all(20),
@@ -100,20 +102,20 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                           fit: BoxFit.contain,
                         ),
                         const SizedBox(height: 12),
-                        const Text(
+                        Text(
                           'Créer un compte',
                           style: TextStyle(
                             fontSize: 28,
                             fontWeight: FontWeight.w800,
-                            color: Color(0xFF1A1A1A),
+                            color: palette.textPrimary,
                           ),
                         ),
                         const SizedBox(height: 6),
-                        const Text(
+                        Text(
                           'Renseignez vos informations pour démarrer',
                           style: TextStyle(
                             fontSize: 14,
-                            color: Color(0xFF475467),
+                            color: palette.textSecondary,
                           ),
                         ),
                         const SizedBox(height: 16),
@@ -133,7 +135,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                               color: context.maasga.accent,
                             ),
                             filled: true,
-                            fillColor: Colors.white,
+                            fillColor: palette.cardAlt,
                           ),
                         ),
                         const SizedBox(height: 10),
@@ -155,7 +157,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                             ),
                             prefixText: '+226 ',
                             filled: true,
-                            fillColor: Colors.white,
+                            fillColor: palette.cardAlt,
                           ),
                         ),
                         const SizedBox(height: 10),
@@ -175,7 +177,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                               color: context.maasga.accent,
                             ),
                             filled: true,
-                            fillColor: Colors.white,
+                            fillColor: palette.cardAlt,
                           ),
                         ),
                         const SizedBox(height: 10),
@@ -195,7 +197,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                               color: context.maasga.accent,
                             ),
                             filled: true,
-                            fillColor: Colors.white,
+                            fillColor: palette.cardAlt,
                           ),
                         ),
                         const SizedBox(height: 10),
@@ -227,7 +229,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                               ),
                             ),
                             filled: true,
-                            fillColor: Colors.white,
+                            fillColor: palette.cardAlt,
                           ),
                         ),
 
@@ -236,23 +238,25 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                           Container(
                             padding: const EdgeInsets.all(10),
                             decoration: BoxDecoration(
-                              color: Colors.red.shade50,
+                              color: palette.dangerSurface,
                               borderRadius: BorderRadius.circular(10),
-                              border: Border.all(color: Colors.red.shade200),
+                              border: Border.all(
+                                color: palette.danger.withValues(alpha: 0.4),
+                              ),
                             ),
                             child: Row(
                               children: [
-                                const Icon(
+                                Icon(
                                   Icons.error_outline,
-                                  color: Colors.red,
+                                  color: palette.danger,
                                   size: 18,
                                 ),
                                 const SizedBox(width: 8),
                                 Expanded(
                                   child: Text(
                                     _error!,
-                                    style: const TextStyle(
-                                      color: Colors.red,
+                                    style: TextStyle(
+                                      color: palette.danger,
                                       fontSize: 13,
                                     ),
                                   ),

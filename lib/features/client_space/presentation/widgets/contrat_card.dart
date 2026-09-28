@@ -62,20 +62,42 @@ class ContratCard extends StatelessWidget {
                   ],
                 ),
               ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFE8F5E9),
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: Text(
-                  contrat.status,
-                  style: GoogleFonts.poppins(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                    color: const Color(0xFF43A047),
-                  ),
-                ),
+              Builder(
+                builder: (context) {
+                  final st = contrat.status.toLowerCase();
+                  final isPending = st.contains('attente') || st == 'pending';
+                  final isCancelled = st.contains('annul') || st.contains('refus') || st == 'cancelled';
+                  final bgColor = isPending
+                      ? const Color(0xFFFFF3E0)
+                      : isCancelled
+                          ? const Color(0xFFFFEBEE)
+                          : const Color(0xFFE8F5E9);
+                  final textColor = isPending
+                      ? const Color(0xFFE65100)
+                      : isCancelled
+                          ? const Color(0xFFC62828)
+                          : const Color(0xFF2E7D32);
+                  final label = isPending
+                      ? 'En attente de validation'
+                      : isCancelled
+                          ? 'Annulé'
+                          : contrat.status;
+                  return Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: bgColor,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(
+                      label,
+                      style: GoogleFonts.poppins(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: textColor,
+                      ),
+                    ),
+                  );
+                },
               ),
             ],
           ),

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../../shared/design_tokens/maasga_tokens.dart';
+
 class ServiceTypeCard extends StatelessWidget {
   final IconData icon;
   final String title;
@@ -19,25 +21,24 @@ class ServiceTypeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const primaryBlue = Color(0xFF1B3A8D);
-    const borderColor = Color(0xFFE0E0E0);
-    const selectedBg = Color(0xFFF0F4FF);
-    const selectedIconBg = Color(0xFFE8EEFF);
+    final palette = context.maasga;
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       decoration: BoxDecoration(
-        color: isSelected ? selectedBg : Colors.white,
+        color: isSelected ? palette.infoSurface : palette.card,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: isSelected ? primaryBlue : borderColor,
+          color: isSelected ? palette.accent : palette.cardBorder,
           width: isSelected ? 2 : 1,
         ),
         boxShadow: [
           BoxShadow(
             color: isSelected
-                ? primaryBlue.withValues(alpha: 0.1)
-                : Colors.black.withValues(alpha: 0.05),
+                ? palette.accent.withValues(alpha: 0.12)
+                : palette.shadow.withValues(
+                    alpha: context.isDarkMode ? 0.35 : 0.05,
+                  ),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -54,10 +55,10 @@ class ServiceTypeCard extends StatelessWidget {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: isSelected ? selectedIconBg : const Color(0xFFF5F5F5),
+                  color: isSelected ? palette.infoSurface : palette.cardAlt,
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Icon(icon, color: primaryBlue, size: 26),
+                child: Icon(icon, color: palette.accent, size: 26),
               ),
               const SizedBox(width: 14),
               Expanded(
@@ -69,7 +70,7 @@ class ServiceTypeCard extends StatelessWidget {
                       style: GoogleFonts.poppins(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
-                        color: const Color(0xFF1A1A1A),
+                        color: palette.textPrimary,
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -78,7 +79,7 @@ class ServiceTypeCard extends StatelessWidget {
                       style: GoogleFonts.poppins(
                         fontSize: 12,
                         fontWeight: FontWeight.w400,
-                        color: const Color(0xFF757575),
+                        color: palette.textMuted,
                       ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
@@ -87,11 +88,7 @@ class ServiceTypeCard extends StatelessWidget {
                 ),
               ),
               if (isSelected)
-                const Icon(
-                  Icons.check_circle,
-                  color: Color(0xFF43A047),
-                  size: 22,
-                ),
+                Icon(Icons.check_circle, color: palette.success, size: 22),
             ],
           ),
         ),

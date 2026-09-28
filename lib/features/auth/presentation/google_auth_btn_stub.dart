@@ -16,13 +16,15 @@ class _GoogleSignInButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final palette = context.maasga;
     return OutlinedButton.icon(
       style: OutlinedButton.styleFrom(
         minimumSize: const Size(double.infinity, 48),
+        foregroundColor: palette.textPrimary,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(MaasgaTokens.radiusPill),
         ),
-        side: const BorderSide(color: Color(0xFFE2E8F0)),
+        side: BorderSide(color: palette.cardBorder),
       ),
       onPressed: () async {
         try {

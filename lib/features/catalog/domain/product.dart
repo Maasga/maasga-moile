@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 class Product {
   Product({
     required this.id,
@@ -48,25 +50,15 @@ class Product {
       // « 12000 BTU » sur un produit dont le serveur ne dit rien est un
       // argument commercial faux. Une liste vide laisse l'UI masquer la
       // section.
-      specs:
-          (json['features'] as List<dynamic>? ??
-                  json['specs'] as List<dynamic>?)
-              ?.map((e) => '$e')
-              .where((e) => e.trim().isNotEmpty)
-              .toList() ??
-          const <String>[],
+      specs: _parseListField(json['features'] ?? json['specs']),
       image: json['image'] as String? ?? '',
       imageUrl: json['imageUrl'] as String? ?? json['image_url'] as String?,
       btu: (json['btu'] as num?)?.toInt(),
-      images:
-          (json['media'] as List<dynamic>? ?? json['images'] as List<dynamic>?)
-              ?.map((e) {
-                if (e is Map) return e['url']?.toString() ?? '';
-                return '$e';
-              })
-              .where((s) => s.isNotEmpty)
-              .toList() ??
-          [],
+      images: _parseImagesField(
+        json['media_urls'] as String? ??
+            json['media'] as List<dynamic>? ??
+            json['images'] as List<dynamic>?,
+      ),
       oldPrice: (json['old_price'] as num?)?.toInt(),
       description: json['description'] as String? ?? '',
       technicalSpecs:
@@ -75,5 +67,62 @@ class Product {
               ?.map((k, v) => MapEntry(k, '$v')) ??
           {},
     );
+  }
+
+  /// Parse un champ qui peut être une chaîne JSON ou une liste directe
+  static List<String> _parseListField(dynamic value) {
+    if (value == null) return [];
+
+    if (value is List) {
+      return value.map((e) => '$e').where((e) => e.trim().isNotEmpty).toList();
+    }
+
+    if (value is String) {
+      try {
+        final decoded = jsonDecode(value);
+        if (decoded is List) {
+          return decoded
+              .map((e) => '$e')
+              .where((e) => e.trim().isNotEmpty)
+              .toList();
+        }
+      } catch (_) {}
+      return [value].where((e) => e.trim().isNotEmpty).toList();
+    }
+
+    return [];
+  }
+
+  /// Parse le champ images qui peut être une chaîne JSON, une liste de maps, ou une liste de strings
+  static List<String> _parseImagesField(dynamic value) {
+    if (value == null) return [];
+
+    if (value is List) {
+      return value
+          .map((e) {
+            if (e is Map) return e['url']?.toString() ?? '';
+            return '$e';
+          })
+          .where((s) => s.isNotEmpty)
+          .toList();
+    }
+
+    if (value is String) {
+      try {
+        final decoded = jsonDecode(value);
+        if (decoded is List) {
+          return decoded
+              .map((e) {
+                if (e is Map) return e['url']?.toString() ?? '';
+                return '$e';
+              })
+              .where((s) => s.isNotEmpty)
+              .toList();
+        }
+      } catch (_) {}
+      return [value].where((s) => s.isNotEmpty).toList();
+    }
+
+    return [];
   }
 }

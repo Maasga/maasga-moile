@@ -1,7 +1,11 @@
+import 'dart:io';
+import '../domain/user_profile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../core/config/maasga_contact.dart';
 import '../../../core/network/api_client.dart';
@@ -139,6 +143,363 @@ class ClientSpaceScreen extends ConsumerWidget {
 class _LoggedInView extends ConsumerWidget {
   const _LoggedInView({required this.data});
   final ClientDashboardData data;
+
+  ImageProvider? _getProfileImageProvider(String? photoUrl) {
+    if (photoUrl == null || photoUrl.trim().isEmpty) return null;
+    final clean = photoUrl.trim();
+    if (clean.startsWith('http://') || clean.startsWith('https://')) {
+      return NetworkImage(clean);
+    }
+    final file = File(clean);
+    if (file.existsSync()) {
+      return FileImage(file);
+    }
+    return null;
+  }
+
+  void _showEditProfileDialog(
+    BuildContext context,
+    WidgetRef ref,
+    UserProfile profile,
+  ) {
+    final nameCtrl = TextEditingController(text: profile.fullName);
+    final phoneCtrl = TextEditingController(text: profile.phone);
+    final emailCtrl = TextEditingController(text: profile.email);
+    final quartierCtrl = TextEditingController(text: profile.quartier);
+    String? currentPhotoUrl = profile.photoUrl;
+    bool isSaving = false;
+
+    Future<void> pickImage(ImageSource source, StateSetter modalSetState) async {
+      try {
+        final picker = ImagePicker();
+        final picked = await picker.pickImage(
+          source: source,
+          maxWidth: 800,
+          maxHeight: 800,
+          imageQuality: 85,
+        );
+        if (picked != null) {
+          final appDir = await getApplicationDocumentsDirectory();
+          final fileName = 'avatar_${DateTime.now().millisecondsSinceEpoch}.jpg';
+          final savedFile = await File(picked.path).copy('${appDir.path}/$fileName');
+          modalSetState(() {
+            currentPhotoUrl = savedFile.path;
+          });
+        }
+      } catch (e) {
+        debugPrint('Erreur sélection image: $e');
+      }
+    }
+
+    void showPhotoPickerOptions(BuildContext ctx, StateSetter modalSetState) {
+      showModalBottomSheet(
+        context: ctx,
+        backgroundColor: Colors.white,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        builder: (bottomSheetCtx) => SafeArea(
+          child: Wrap(
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
+                child: Text(
+                  'Photo de profil',
+                  style: GoogleFonts.poppins(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              ListTile(
+                leading: const Icon(Icons.camera_alt_outlined, color: Color(0xFF1B3A8D)),
+                title: Text('Prendre une photo', style: GoogleFonts.poppins()),
+                onTap: () {
+                  Navigator.pop(bottomSheetCtx);
+                  pickImage(ImageSource.camera, modalSetState);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.photo_library_outlined, color: Color(0xFF1B3A8D)),
+                title: Text('Choisir dans la galerie', style: GoogleFonts.poppins()),
+                onTap: () {
+                  Navigator.pop(bottomSheetCtx);
+                  pickImage(ImageSource.gallery, modalSetState);
+                },
+              ),
+              if (currentPhotoUrl != null && currentPhotoUrl!.isNotEmpty)
+                ListTile(
+                  leading: const Icon(Icons.delete_outline, color: Colors.red),
+                  title: Text(
+                    'Supprimer la photo',
+                    style: GoogleFonts.poppins(color: Colors.red),
+                  ),
+                  onTap: () {
+                    Navigator.pop(bottomSheetCtx);
+                    modalSetState(() {
+                      currentPhotoUrl = '';
+                    });
+                  },
+                ),
+              const SizedBox(height: 12),
+            ],
+          ),
+        ),
+      );
+    }
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setState) {
+          final photoImage = _getProfileImageProvider(currentPhotoUrl);
+
+          return Padding(
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.of(ctx).viewInsets.bottom,
+            ),
+            child: Container(
+              constraints: BoxConstraints(
+                maxHeight: MediaQuery.of(ctx).size.height * 0.88,
+              ),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Header
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(24, 16, 16, 8),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Modifier mon profil',
+                          style: GoogleFonts.poppins(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                            color: const Color(0xFF1A1A1A),
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: () => Navigator.pop(ctx),
+                          icon: const Icon(Icons.close),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const Divider(height: 1),
+                  Flexible(
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          // Photo de profil avec badge caméra
+                          Center(
+                            child: Stack(
+                              alignment: Alignment.bottomRight,
+                              children: [
+                                GestureDetector(
+                                  onTap: () => showPhotoPickerOptions(ctx, setState),
+                                  child: CircleAvatar(
+                                    radius: 44,
+                                    backgroundColor: const Color(0xFF1B3A8D),
+                                    backgroundImage: photoImage,
+                                    child: photoImage == null
+                                        ? Text(
+                                            nameCtrl.text.trim().isNotEmpty
+                                                ? nameCtrl.text.trim().substring(0, 1).toUpperCase()
+                                                : 'M',
+                                            style: GoogleFonts.poppins(
+                                              fontSize: 32,
+                                              fontWeight: FontWeight.w700,
+                                              color: Colors.white,
+                                            ),
+                                          )
+                                        : null,
+                                  ),
+                                ),
+                                Positioned(
+                                  bottom: 0,
+                                  right: 0,
+                                  child: GestureDetector(
+                                    onTap: () => showPhotoPickerOptions(ctx, setState),
+                                    child: Container(
+                                      padding: const EdgeInsets.all(6),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFF1B3A8D),
+                                        shape: BoxShape.circle,
+                                        border: Border.all(color: Colors.white, width: 2),
+                                      ),
+                                      child: const Icon(
+                                        Icons.camera_alt,
+                                        color: Colors.white,
+                                        size: 16,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          TextButton(
+                            onPressed: () => showPhotoPickerOptions(ctx, setState),
+                            child: Text(
+                              'Modifier la photo',
+                              style: GoogleFonts.poppins(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w500,
+                                color: const Color(0xFF1B3A8D),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          // Nom complet
+                          TextField(
+                            controller: nameCtrl,
+                            decoration: InputDecoration(
+                              labelText: 'Nom complet',
+                              prefixIcon: const Icon(Icons.person_outline),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          // Numéro de téléphone
+                          TextField(
+                            controller: phoneCtrl,
+                            keyboardType: TextInputType.phone,
+                            decoration: InputDecoration(
+                              labelText: 'Numéro de téléphone',
+                              hintText: '+226 XX XX XX XX',
+                              prefixIcon: const Icon(Icons.phone_outlined),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          // Email
+                          TextField(
+                            controller: emailCtrl,
+                            keyboardType: TextInputType.emailAddress,
+                            decoration: InputDecoration(
+                              labelText: 'Adresse e-mail',
+                              hintText: 'exemple@gmail.com',
+                              prefixIcon: const Icon(Icons.email_outlined),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          // Quartier / Ville
+                          TextField(
+                            controller: quartierCtrl,
+                            decoration: InputDecoration(
+                              labelText: 'Quartier / Ville',
+                              hintText: 'Ex: Ouaga 2000',
+                              prefixIcon: const Icon(Icons.location_on_outlined),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+                          // Bouton Enregistrer
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton(
+                              onPressed: isSaving
+                                  ? null
+                                  : () async {
+                                      setState(() => isSaving = true);
+                                      try {
+                                        final repo = await ref.read(
+                                          clientDashboardRepositoryProvider.future,
+                                        );
+
+                                        String phone = phoneCtrl.text.trim().replaceAll(RegExp(r'\s+'), '');
+                                        if (phone.isNotEmpty && !phone.startsWith('+')) {
+                                          if (phone.startsWith('226')) {
+                                            phone = '+$phone';
+                                          } else if (phone.length == 8) {
+                                            phone = '+226$phone';
+                                          }
+                                        }
+
+                                        await repo.updateProfile(
+                                          name: nameCtrl.text.trim(),
+                                          phone: phone,
+                                          email: emailCtrl.text.trim(),
+                                          quartier: quartierCtrl.text.trim(),
+                                          photoUrl: currentPhotoUrl,
+                                        );
+
+                                        ref.invalidate(clientDashboardProvider);
+                                        if (ctx.mounted) {
+                                          Navigator.pop(ctx);
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            const SnackBar(
+                                              content: Text('Profil mis à jour avec succès'),
+                                              backgroundColor: Color(0xFF2E7D32),
+                                            ),
+                                          );
+                                        }
+                                      } catch (e) {
+                                        setState(() => isSaving = false);
+                                        if (ctx.mounted) {
+                                          ScaffoldMessenger.of(ctx).showSnackBar(
+                                            SnackBar(content: Text('Erreur: $e')),
+                                          );
+                                        }
+                                      }
+                                    },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF1B3A8D),
+                                padding: const EdgeInsets.symmetric(vertical: 14),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              child: isSaving
+                                  ? const SizedBox(
+                                      width: 20,
+                                      height: 20,
+                                      child: CircularProgressIndicator(
+                                        color: Colors.white,
+                                        strokeWidth: 2,
+                                      ),
+                                    )
+                                  : Text(
+                                      'Enregistrer',
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
 
   Future<void> _launchWhatsApp() async {
     final url = MaasgaContact.whatsAppDirectLink;
@@ -316,24 +677,112 @@ class _LoggedInView extends ConsumerWidget {
     }
   }
 
+  Future<void> _handleCancelOrder(
+    WidgetRef ref,
+    BuildContext context,
+    String orderId,
+  ) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Annuler la commande'),
+        content: const Text(
+          'Souhaitez-vous vraiment annuler cette commande ? Cette action est irréversible.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Annuler'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            child: const Text('Annuler', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      try {
+        final repo = await ref.read(clientDashboardRepositoryProvider.future);
+        await repo.cancelOrder(orderId);
+        ref.invalidate(clientDashboardProvider);
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Commande annulée avec succès')),
+          );
+        }
+      } catch (e) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('Erreur: $e')));
+        }
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final profile = data.profile;
 
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Carte profil utilisateur
+    return RefreshIndicator(
+      onRefresh: () async {
+        ref.invalidate(clientDashboardProvider);
+        ref.invalidate(userActivityProvider);
+        try {
+          await ref.read(clientDashboardProvider.future);
+        } catch (_) {}
+      },
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Carte profil utilisateur
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
-            child: Text(
-              'Mon Compte MAASGA',
-              style: GoogleFonts.poppins(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: const Color(0xFF1A1A1A),
-              ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Mon Compte MAASGA',
+                  style: GoogleFonts.poppins(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: const Color(0xFF1A1A1A),
+                  ),
+                ),
+                InkWell(
+                  onTap: () => _showEditProfileDialog(context, ref, profile),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.edit_outlined,
+                          size: 16,
+                          color: Color(0xFF1B3A8D),
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          'Modifier',
+                          style: GoogleFonts.poppins(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                            color: const Color(0xFF1B3A8D),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
           Container(
@@ -355,12 +804,12 @@ class _LoggedInView extends ConsumerWidget {
                 CircleAvatar(
                   radius: 32,
                   backgroundColor: const Color(0xFF1B3A8D),
-                  backgroundImage: profile.photoUrl != null
-                      ? NetworkImage(profile.photoUrl!)
-                      : null,
-                  child: profile.photoUrl == null
+                  backgroundImage: _getProfileImageProvider(profile.photoUrl),
+                  child: _getProfileImageProvider(profile.photoUrl) == null
                       ? Text(
-                          profile.fullName.substring(0, 1).toUpperCase(),
+                          profile.fullName.trim().isNotEmpty
+                              ? profile.fullName.trim().substring(0, 1).toUpperCase()
+                              : 'M',
                           style: GoogleFonts.poppins(
                             fontSize: 22,
                             fontWeight: FontWeight.w700,
@@ -493,13 +942,7 @@ class _LoggedInView extends ConsumerWidget {
                             onRejectDevis: () =>
                                 _handleRejectDevis(ref, context, o.id),
                             onCancel: () =>
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text(
-                                      'Action "Annuler et rembourser" bientôt disponible',
-                                    ),
-                                  ),
-                                ),
+                                _handleCancelOrder(ref, context, o.id),
                           ),
                         )
                         .toList(),
@@ -672,6 +1115,7 @@ class _LoggedInView extends ConsumerWidget {
             ),
           ),
         ],
+        ),
       ),
     );
   }

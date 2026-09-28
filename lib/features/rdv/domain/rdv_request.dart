@@ -6,14 +6,14 @@ class RdvRequest {
   final String phone;
   final String? email;
   final String quartier;
-  final double? lat;
-  final double? lng;
   final String? address;
   final DateTime date;
   final TimeOfDay? startTime;
   final TimeOfDay? endTime;
   final String? notes;
   final bool consented;
+  final String? clientId;
+  final String? userId;
 
   RdvRequest({
     required this.serviceType,
@@ -21,25 +21,30 @@ class RdvRequest {
     required this.phone,
     this.email,
     required this.quartier,
-    this.lat,
-    this.lng,
     this.address,
     required this.date,
     this.startTime,
     this.endTime,
     this.notes,
     required this.consented,
+    this.clientId,
+    this.userId,
   });
 
   Map<String, dynamic> toJson() {
     return {
       'type': serviceType,
+      'service_type': serviceType,
       'name': fullName,
+      'client_name': fullName,
       'phone': phone,
+      'client_phone': phone,
       'email': email,
+      'client_email': email,
+      'client_id': clientId,
+      'user_id': userId,
+      'firebase_uid': userId,
       'quartier': quartier,
-      'lat': lat,
-      'lng': lng,
       'address': address,
       'date': date.toIso8601String().split('T')[0], // YYYY-MM-DD
       'start_time': startTime != null

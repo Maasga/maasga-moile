@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../../shared/design_tokens/maasga_tokens.dart';
+
 class StepIndicator extends StatelessWidget {
   final int currentStep;
 
@@ -8,26 +10,28 @@ class StepIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.maasga;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        border: Border(bottom: BorderSide(color: Color(0xFFF0F0F0))),
+      decoration: BoxDecoration(
+        color: palette.card,
+        border: Border(bottom: BorderSide(color: palette.divider)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          _buildStep(0, 'Type'),
-          _buildConnector(1),
-          _buildStep(1, 'Détails'),
-          _buildConnector(2),
-          _buildStep(2, 'Confirmation'),
+          _buildStep(context, 0, 'Type'),
+          _buildConnector(context, 1),
+          _buildStep(context, 1, 'Détails'),
+          _buildConnector(context, 2),
+          _buildStep(context, 2, 'Confirmation'),
         ],
       ),
     );
   }
 
-  Widget _buildStep(int step, String label) {
+  Widget _buildStep(BuildContext context, int step, String label) {
+    final palette = context.maasga;
     final bool isActiveIndex = currentStep == step;
     final bool isPassed = currentStep > step;
     final bool isActive = isActiveIndex || isPassed;
@@ -40,7 +44,7 @@ class StepIndicator extends StatelessWidget {
           height: 28,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: isActive ? const Color(0xFF1B3A8D) : const Color(0xFFF0F0F0),
+            color: isActive ? palette.accent : palette.cardAlt,
           ),
           alignment: Alignment.center,
           child: Text(
@@ -48,7 +52,7 @@ class StepIndicator extends StatelessWidget {
             style: GoogleFonts.poppins(
               fontSize: 13,
               fontWeight: FontWeight.w600,
-              color: isActive ? Colors.white : const Color(0xFF9E9E9E),
+              color: isActive ? palette.onAccent : palette.textMuted,
             ),
           ),
         ),
@@ -58,23 +62,22 @@ class StepIndicator extends StatelessWidget {
           style: GoogleFonts.poppins(
             fontSize: 10,
             fontWeight: isActiveIndex ? FontWeight.w600 : FontWeight.w400,
-            color: isActiveIndex
-                ? const Color(0xFF1B3A8D)
-                : const Color(0xFF9E9E9E),
+            color: isActiveIndex ? palette.accent : palette.textMuted,
           ),
         ),
       ],
     );
   }
 
-  Widget _buildConnector(int nextStep) {
+  Widget _buildConnector(BuildContext context, int nextStep) {
+    final palette = context.maasga;
     final bool isPassed = currentStep >= nextStep;
     return Expanded(
       child: Padding(
-        padding: const EdgeInsets.only(bottom: 14), // Align with circles
+        padding: const EdgeInsets.only(bottom: 14),
         child: Container(
           height: 2,
-          color: isPassed ? const Color(0xFF1B3A8D) : const Color(0xFFE0E0E0),
+          color: isPassed ? palette.accent : palette.divider,
         ),
       ),
     );

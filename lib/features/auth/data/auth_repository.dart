@@ -39,6 +39,24 @@ class AuthRepository {
     return RegExp(r'^(\+?226)?[0-9]{8}$').hasMatch(digits);
   }
 
+  /// Compte ouvert (ou lié) via Google Sign-In.
+  static bool isGoogleUser(User? user) {
+    if (user == null) return false;
+    return user.providerData.any((p) => p.providerId == 'google.com');
+  }
+
+  /// Numéro déjà connu côté Firebase (OTP, ou e-mail synthétique téléphone).
+  static String? phoneFromFirebaseUser(User user) {
+    final fb = user.phoneNumber ?? '';
+    if (isValidPhone(fb)) return fb;
+    final email = user.email ?? '';
+    if (isSyntheticEmail(email)) {
+      final extracted = email.replaceAll(syntheticEmailDomain, '');
+      if (isValidPhone(extracted)) return extracted;
+    }
+    return null;
+  }
+
   static bool isValidEmail(String email) =>
       RegExp(r'^[\w.+-]+@[\w-]+\.[\w.-]+$').hasMatch(email.trim());
 
@@ -311,6 +329,28 @@ class AuthRepository {
   /// timeouts, du cookie jar et de l'interceptor qui pose le Bearer Firebase.
   /// Renvoie `false` en cas d'échec — l'appelant décide quoi en faire plutôt
   /// que de voir l'erreur disparaître silencieusement.
+  /// Upsert du client D1 à partir du token Firebase (sans téléphone).
+  Future<void> syncSession(Dio dio) async {
+    try {
+      await dio.post('/api/mobile/login');
+    } catch (e) {
+      if (kDebugMode) debugPrint('syncSession échec (non bloquant): $e');
+    }
+  }
+
+  /// Profil D1 (`/api/mobile/profile`), ou `null` si hors-ligne / 401.
+  Future<Map<String, dynamic>?> fetchBackendProfile(Dio dio) async {
+    try {
+      final response = await dio.get('/api/mobile/profile');
+      final data = response.data;
+      if (data is Map<String, dynamic>) return data;
+      if (data is Map) return Map<String, dynamic>.from(data);
+    } catch (e) {
+      if (kDebugMode) debugPrint('fetchBackendProfile: $e');
+    }
+    return null;
+  }
+
   Future<bool> syncProfile({
     required Dio dio,
     String? name,

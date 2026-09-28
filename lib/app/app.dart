@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../features/auth/presentation/whatsapp_gate.dart';
 import 'router/app_router.dart';
 import 'theme/app_theme.dart';
 import 'theme/theme_controller.dart';
@@ -20,6 +21,8 @@ class MaasgaMobileApp extends ConsumerWidget {
       darkTheme: AppTheme.dark(),
       themeMode: themeMode,
       routerConfig: router,
+      builder: (context, child) =>
+          WhatsappGateHost(child: child ?? const SizedBox.shrink()),
     );
   }
 }

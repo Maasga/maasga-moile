@@ -592,13 +592,9 @@ class _MaintenanceScreenState extends ConsumerState<MaintenanceScreen> {
                           targetRange: '1 à 4 climatiseurs',
                           unitRateText: '8 500 F / unité / visite',
                           frequencyTag: 'Essentiel (1x) ou Confort (2x)',
-                          price: _simulatedAcCount <= 4
-                              ? _formatCurrency(8500 * _simulatedAcCount * activeVisits)
-                              : '34 000',
-                          period: '/ an',
-                          subtitle: _simulatedAcCount <= 4
-                              ? 'soit ${_formatCurrency(8500 * _simulatedAcCount)} F par visite globale'
-                              : 'Ex: 2 clim, Confort (2 visites) = 34 000 F/an',
+                          price: '8 500',
+                          period: '/ clim / visite',
+                          subtitle: 'Tarif unitaire applicable de 1 à 4 climatiseurs',
                           target: 'Idéal pour : logements et petits bureaux',
                           inclusions: const [
                             'Nettoyage des filtres',
@@ -608,12 +604,18 @@ class _MaintenanceScreenState extends ConsumerState<MaintenanceScreen> {
                             'Diagnostic technique préventif',
                           ],
                           isHighlighted: _simulatedAcCount <= 4,
-                          ctaText: 'Choisir cette formule',
-                          onSelect: () => _showSubscriptionForm(
-                            'RÉSIDENTIEL',
-                            acCount: _simulatedAcCount <= 4 ? _simulatedAcCount : 2,
-                            frequency: _simulatedFrequency,
-                          ),
+                          ctaText: 'Simuler mon prix',
+                          onSelect: () {
+                            setState(() {
+                              _simulatedAcCount = 2;
+                              _simulatedFrequency = 'Confort';
+                            });
+                            _scrollController.animateTo(
+                              180,
+                              duration: const Duration(milliseconds: 500),
+                              curve: Curves.easeInOut,
+                            );
+                          },
                         ),
 
                         // CARTE 2 — PROFESSIONNEL / PME ⭐ RECOMMANDÉ
@@ -623,13 +625,9 @@ class _MaintenanceScreenState extends ConsumerState<MaintenanceScreen> {
                           targetRange: '5 à 15 climatiseurs',
                           unitRateText: '7 500 F (5-8) ou 6 000 F (9-15)',
                           frequencyTag: 'Confort (2x) ou Pro (3x)',
-                          price: (_simulatedAcCount >= 5 && _simulatedAcCount <= 15)
-                              ? _formatCurrency(activeUnitRate * _simulatedAcCount * activeVisits)
-                              : '120 000',
-                          period: '/ an',
-                          subtitle: (_simulatedAcCount >= 5 && _simulatedAcCount <= 15)
-                              ? 'soit ${_formatCurrency(activeUnitRate * _simulatedAcCount)} F par visite globale'
-                              : 'Ex: 8 clim, Confort (2 visites) = 120 000 F/an',
+                          price: '7 500 à 6 000',
+                          period: '/ clim / visite',
+                          subtitle: 'Tarif dégressif : 7 500 F (5-8 clims) · 6 000 F (9-15 clims)',
                           target: 'Idéal pour : bureaux, commerces, PME',
                           isRecommended: true,
                           isHighlighted: _simulatedAcCount >= 5 && _simulatedAcCount <= 15,
@@ -642,14 +640,18 @@ class _MaintenanceScreenState extends ConsumerState<MaintenanceScreen> {
                             'Priorité sur les interventions de dépannage',
                             'Conseils d\'optimisation énergétique',
                           ],
-                          ctaText: 'Choisir cette formule',
-                          onSelect: () => _showSubscriptionForm(
-                            'PROFESSIONNEL / PME',
-                            acCount: (_simulatedAcCount >= 5 && _simulatedAcCount <= 15)
-                                ? _simulatedAcCount
-                                : 8,
-                            frequency: _simulatedFrequency,
-                          ),
+                          ctaText: 'Simuler mon prix',
+                          onSelect: () {
+                            setState(() {
+                              _simulatedAcCount = 8;
+                              _simulatedFrequency = 'Confort';
+                            });
+                            _scrollController.animateTo(
+                              180,
+                              duration: const Duration(milliseconds: 500),
+                              curve: Curves.easeInOut,
+                            );
+                          },
                         ),
 
                         // CARTE 3 — INDUSTRIEL 🏆 MEILLEUR CHOIX
@@ -828,10 +830,10 @@ class _MaintenanceScreenState extends ConsumerState<MaintenanceScreen> {
             'formule': formule,
             'nb_climatiseurs': acCount,
             'frequence': data['frequence_visites'] ?? 'Confort',
-            'period': 'En cours de validation',
+            'period': 'En attente de validation admin',
             'price': priceStr,
-            'status': 'Actif',
-            'statut': 'Actif',
+            'status': 'En attente',
+            'statut': 'En attente',
             'quartier': data['quartier'] ?? 'Ouagadougou',
             'visites_totales': data['visites_an'] ?? 2,
             'visites_effectuees': 0,

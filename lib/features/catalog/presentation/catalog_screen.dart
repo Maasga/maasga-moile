@@ -14,6 +14,7 @@ import 'category_chip.dart';
 import 'filter_bottom_sheet.dart';
 import 'product_list_card.dart';
 import '../../../features/notifications/data/activity_repository.dart';
+import '../../../shared/design_tokens/maasga_tokens.dart';
 
 class CatalogScreen extends ConsumerStatefulWidget {
   const CatalogScreen({super.key});
@@ -48,10 +49,10 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
         ).animate().slideX(begin: 1, end: 0),
         behavior: SnackBarBehavior.floating,
         duration: const Duration(seconds: 3),
-        backgroundColor: const Color(0xFF1B3A8D),
+        backgroundColor: context.maasga.accent,
         action: SnackBarAction(
           label: 'VOIR',
-          textColor: Colors.white,
+          textColor: context.maasga.onAccent,
           onPressed: () {
             ScaffoldMessenger.of(context).hideCurrentSnackBar();
             context.push('/cart');
@@ -66,6 +67,10 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
     final productsAsync = ref.watch(productsProvider);
     final allProducts = productsAsync.asData?.value ?? [];
     final activeFilters = ref.watch(catalogFilterProvider);
+
+    debugPrint('📦 État produitsAsync: $productsAsync');
+    debugPrint('📦 Nombre total produits: ${allProducts.length}');
+    debugPrint('📦 Catégorie sélectionnée: $_selectedCategory');
 
     // Filtrage dynamique
     final filteredProducts = allProducts.where((product) {
@@ -92,13 +97,15 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
       return true;
     }).toList();
 
+    debugPrint('📦 Produits filtrés: ${filteredProducts.length}');
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: context.maasga.pageGradient.colors.first,
       appBar: MaasgaAppBar(
         notificationsCount: ref.watch(unreadNotificationCountProvider),
         trailingAction: IconButton(
           onPressed: _openFilterBottomSheet,
-          icon: const Icon(Icons.tune, color: Color(0xFF1A1A1A)),
+          icon: Icon(Icons.tune, color: context.maasga.textPrimary),
           padding: EdgeInsets.zero,
         ),
       ),

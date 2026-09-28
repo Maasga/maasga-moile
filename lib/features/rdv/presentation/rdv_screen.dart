@@ -1,8 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../../../shared/widgets/main_bottom_nav.dart';
 import '../../../shared/widgets/maasga_app_bar.dart';
@@ -41,7 +41,6 @@ class _RdvScreenState extends ConsumerState<RdvScreen> {
   final _emailCtrl = TextEditingController();
   final _notesCtrl = TextEditingController();
   String? _selectedQuartier;
-  LatLng? _selectedLocation;
   String? _selectedAddress;
   DateTime? _selectedDate;
   TimeOfDay? _startTime;
@@ -160,20 +159,30 @@ class _RdvScreenState extends ConsumerState<RdvScreen> {
 
     setState(() => _isLoading = true);
 
+    final user = FirebaseAuth.instance.currentUser;
+    final dashboardData = ref.read(clientDashboardProvider).asData?.value;
+    final clientId = dashboardData?.profile.id;
+    final rawPhone = _phoneCtrl.text.trim();
+    final normalizedPhone = rawPhone.startsWith('+226')
+        ? rawPhone
+        : rawPhone.startsWith('226')
+            ? '+$rawPhone'
+            : '+226$rawPhone';
+
     final request = RdvRequest(
       serviceType: _selectedServiceType!,
       fullName: _nameCtrl.text.trim(),
-      phone: _phoneCtrl.text.trim(),
+      phone: normalizedPhone,
       email: _emailCtrl.text.trim().isEmpty ? null : _emailCtrl.text.trim(),
       quartier: _selectedQuartier!,
-      lat: _selectedLocation?.latitude,
-      lng: _selectedLocation?.longitude,
       address: _selectedAddress,
       date: _selectedDate!,
       startTime: _startTime,
       endTime: _endTime,
       notes: _notesCtrl.text.trim().isEmpty ? null : _notesCtrl.text.trim(),
       consented: _isConsented,
+      clientId: clientId,
+      userId: user?.uid,
     );
 
     try {
@@ -182,12 +191,39 @@ class _RdvScreenState extends ConsumerState<RdvScreen> {
 
       // Sauvegarder pour auto-remplissage futur
       final prefs = ref.read(userPrefsProvider);
-      await prefs?.save(
-        name: request.fullName,
-        phone: request.phone,
-        email: request.email,
-        quartier: request.quartier,
-      );
+      if (prefs != null) {
+        await prefs.save(
+          name: request.fullName,
+          phone: request.phone,
+          email: request.email,
+          quartier: request.quartier,
+        );
+
+        // Sauvegarde locale de l'activité pour affichage immédiat dans l'espace client
+        if (user != null) {
+          final timeStr = request.startTime != null
+              ? '${request.startTime!.hour.toString().padLeft(2, '0')}:${request.startTime!.minute.toString().padLeft(2, '0')}'
+              : '';
+          final dateStr = request.date.toIso8601String().split('T')[0];
+          final rdvMap = {
+            'id': 'rdv_${DateTime.now().millisecondsSinceEpoch}',
+            'type': request.serviceType,
+            'service_type': request.serviceType,
+            'date': timeStr.isNotEmpty ? '$dateStr, $timeStr' : dateStr,
+            'status': 'En attente',
+            'statut': 'En attente',
+            'quartier': request.quartier,
+            'address': request.address,
+            'notes': request.notes,
+            'client_name': request.fullName,
+            'name': request.fullName,
+            'client_phone': request.phone,
+            'phone': request.phone,
+            'created_at': DateTime.now().toIso8601String(),
+          };
+          await prefs.saveLocalRdv(user.uid, rdvMap);
+        }
+      }
 
       // Invalider les fournisseurs pour rafraîchir les données dans l'espace client
       ref.invalidate(clientDashboardProvider);
@@ -297,11 +333,6 @@ class _RdvScreenState extends ConsumerState<RdvScreen> {
       notesCtrl: _notesCtrl,
       selectedQuartier: _selectedQuartier,
       onQuartierChanged: (val) => setState(() => _selectedQuartier = val),
-      selectedLocation: _selectedLocation,
-      onLocationChanged: (pos, addr) => setState(() {
-        _selectedLocation = pos;
-        _selectedAddress = addr;
-      }),
       selectedDate: _selectedDate,
       onDateChanged: (val) => setState(() => _selectedDate = val),
       startTime: _startTime,
@@ -315,6 +346,7 @@ class _RdvScreenState extends ConsumerState<RdvScreen> {
       }),
       isConsented: _isConsented,
       address: _selectedAddress,
+      onAddressChanged: (val) => setState(() => _selectedAddress = val),
       onConsentChanged: (val) => setState(() => _isConsented = val ?? false),
     );
   }

@@ -1,122 +1,162 @@
 # MAASGA Mobile — Backlog d'implémentation
 
-Mis à jour : 21 août 2026. Ce fichier décrit l'état **réel** du code de ce
-dépôt, et non le plan initial : les sprints V1 sont terminés, ce qui suit est
-la liste de ce qui reste.
+Mis à jour : **6 septembre 2026**. Ce fichier décrit l'état **réel** du code de
+ce dépôt. Les sprints V1 et V1.1 de stabilisation sont terminés.
+
+---
 
 ## Périmètre technique actuel
 
-- **Auth : Firebase Auth** (e-mail, téléphone `+226` via e-mail synthétique,
-  Google Sign-In). Il n'y a plus d'endpoint d'*authentification* `/api/login` ni
-  `/api/register` côté site. En revanche `/api/mobile/register` subsiste — non
-  pour authentifier, mais pour pousser nom / téléphone / quartier vers D1 juste
-  après la création du compte Firebase (`AuthRepository.syncProfile`).
-  Réinitialisation de mot de passe et vérification d'e-mail en place.
-- **Réseau** : Dio + cookie jar persistant, token Firebase ID envoyé en
-  `Bearer` (`lib/core/network/api_client.dart`).
+- **Auth** : Firebase Auth (e-mail, téléphone `+226` via e-mail synthétique,
+  Google Sign-In). Réinitialisation de mot de passe et vérification d'e-mail
+  en place.
+- **Réseau** : Dio + cookie jar persistant, token Firebase ID en `Bearer`,
+  retry automatique sur 401 (`lib/core/network/api_client.dart`).
 - **Endpoints consommés** : `/api/mobile/products`, `/api/mobile/banners`,
-  `/api/mobile/commandes`, `/api/mobile/rdv`, `/api/mobile/maintenance`,
+  `/api/mobile/commandes`, `/api/mobile/commandes/{id}/annuler`,
+  `/api/mobile/rdv`, `/api/mobile/maintenance`,
   `/api/mobile/client-dashboard`, `/api/mobile/order/{id}/devis-action`,
   `/api/mobile/activity`, `/api/mobile/register`, `/api/simulateur/btu`,
-  `/api/maintenance/invoice/{id}`, `/api/client/push-token`.
+  `/api/maintenance/invoice/{id}`, `/api/client/push-token` (POST + DELETE).
 - **Plateformes** : Android uniquement. `web/` et `windows/` sont des
-  scaffolds Flutter jamais testés, il n'y a pas de dossier `ios/`.
-- **Paiement en ligne : retiré.** `payment_redirect_screen.dart` et
-  `payment_webview_screen.dart` ont été supprimés au profit de
-  `order_confirmation_screen.dart` — la commande est enregistrée, le paiement
-  se convient hors application.
+  scaffolds Flutter jamais testés, pas de dossier `ios/`.
+- **Paiement en ligne : retiré** — décision V1.1 en attente.
 
-## Bloquant — compilation depuis un clone neuf
+---
 
-- [x] Versionner `android/app/google-services.json` et
-      `lib/core/config/firebase_options.dart`. Fait : `lib/main.dart` importe
-      le second et `android/app/build.gradle.kts` applique
-      `com.google.gms.google-services`, donc sans eux ni un clone neuf ni le
-      job `build-apk` de la CI ne compilait. Ces fichiers ne contiennent que
-      des identifiants client, déjà présents en clair dans chaque APK
-      distribué — la protection réelle est la restriction de la clé côté
-      Google Cloud Console (voir la section Sécurité).
+## ✅ Accompli — Sprint stabilisation (6 sept. 2026)
 
-## Backend (worker MAASGA — hors de ce dépôt)
+### Compilation / CI
+- [x] Typo `flutter_riverbot` → `flutter_riverpod` dans `app_router.dart`
+- [x] Import fantôme `address_selection_screen.dart` supprimé du router
+- [x] Import `flutter/foundation.dart` ajouté dans `auth_controller.dart`
+- [x] Lint `unnecessary_underscores` corrigé dans `activity_repository.dart`
+- [x] Syntaxe lambda `Provider` corrigée dans `push_service.dart`
+- [x] `print()` → `debugPrint()` dans `auth_controller.dart` (avoid_print)
+- [x] `handler.request()` → `dio.fetch() + handler.resolve()` dans `api_client.dart`
+- [x] Import `dart:developer` inutilisé supprimé dans `api_client.dart`
+- [x] Tests `auth_repository_test.dart` corrigés (méthodes privées inaccessibles)
+- [x] **`flutter analyze` : No issues found**
 
-- [ ] **Recalculer le total côté serveur** dans `/api/mobile/commandes`. Le
-      client envoie `total_price` *et* le détail `items[]` avec les
-      `unit_price` : le worker doit ignorer `total_price` et recalculer à
-      partir de ses propres prix. Sans ça, un client modifié peut annoncer
-      1 FCFA (cf. `lib/features/cart/presentation/checkout_screen.dart`).
-- [ ] Confirmer `/api/client/push-token` (POST + DELETE) — seul endpoint hors
-      du préfixe `/api/mobile/*`. S'il n'existe pas, aucun token FCM n'est
-      enregistré et l'échec est **silencieux** (`push_service.dart` avale
-      l'exception).
-- [ ] Confirmer `/api/mobile/register` (POST). Appelé par `syncProfile` juste
-      après l'inscription pour enregistrer nom / téléphone / quartier. L'appel
-      est **non bloquant et son échec silencieux** en release :
-      `auth_controller.dart` l'entoure d'un `catch (_) {}` et `syncProfile` se
-      contente d'un `debugPrint`. Si l'endpoint manque, aucun profil client
-      n'arrive côté serveur et rien ne le signale — alors que le numéro de
-      téléphone est justement ce qui permet de livrer et de rappeler le client.
-- [ ] Endpoint d'annulation de commande, requis par « Annuler et rembourser »
-      dans l'espace client.
-- [ ] Trancher le retour éventuel du paiement en ligne (Orange Money / Moov)
-      en V1.1, et prévoir alors le callback (deep link + `intent-filter`).
-- [ ] Recherche serveur (`?q=`) sur `/api/mobile/products` : la recherche est
-      pour l'instant faite en mémoire côté app, ce qui suffit tant que le
-      catalogue reste petit.
+### Backend (worker maasga-code)
+- [x] `/api/client/push-token` POST + DELETE implémentés (table `push_tokens`)
+- [x] `/api/mobile/register` confirmé présent
+- [x] `/api/mobile/commandes/{id}/annuler` POST implémenté (mobileAuth)
+- [x] Recalcul du `total_price` côté serveur dans `/api/mobile/commandes`
+      (ignoré du client, recalculé depuis `products.price × quantity` en D1)
+- [x] Migration D1 `0040_push_tokens.sql` créée
 
-## Fonctionnel
+### Publication Android
+- [x] Keystore de publication généré : `~/maasga-upload.jks`
+      alias=`upload`, RSA 2048, validité 10 000 jours
+      SHA-1 : `54:C1:F8:B2:A6:5A:27:83:8F:70:75:FA:11:AD:F4:55:57:29:8C:2B`
+      SHA-256 : `B3:9F:69:5A:65:D5:BF:D2:DC:42:9D:8C:9B:14:26:55:CA:0D:8B:C8:2E:8E:EA:1F:B1:02:67:59:01:C9:51:F4`
+- [x] `android/key.properties` mis à jour (pointe sur le vrai keystore)
+- [x] `proguard-rules.pro` complété : Google Sign-In, OkHttp/Dio, cookie_jar,
+      path_provider, flutter_local_notifications
+- [x] `android:autoVerify="true"` ajouté sur l'intent-filter deep link
+- [x] `assetlinks.json` créé dans `docs/` (mobile) et `public/.well-known/`
+      (maasga-code) — déployé automatiquement via `npm run build`
+- [x] `KEYSTORE_GUIDE.md` mis à jour avec empreintes et instructions GCP
 
-- [x] Recherche produit (`/search`) : filtrage plein texte insensible aux
-      accents sur le catalogue chargé, suggestions par marque et catégorie,
-      barre de recherche de l'accueil branchée dessus.
-- [x] Bouton « Découvrir » des bannières promo : navigue vers le
-      `target_page` renvoyé par le serveur, filtré par liste blanche (comme
-      les routes de notification push).
-- [x] Écran Réglages réel : sélecteur de thème auto / clair / sombre, envoi
-      d'une notification de test, version affichée. Les tuiles purement
-      décoratives ont été retirées, dont « Sécurité — PIN / biométrie
-      (bientôt) » qui annonçait une fonctionnalité absente du code.
-- [ ] `/address` : `address_selection_screen.dart` est encore un placeholder
-      et aucun écran n'y navigue. Soit implémenter la sélection d'adresse
-      (le checkout gère déjà GPS + quartier + adresse précise), soit
-      supprimer l'écran et sa route.
-- [ ] « Annuler et rembourser » une commande : le bouton n'affiche qu'un
-      SnackBar « bientôt disponible » (`client_space_screen.dart`).
-- [ ] Cloche de notifications : le compteur vaut `3` en dur en **trois**
-      endroits — la valeur par défaut de `MaasgaAppBar.notificationsCount`,
-      `home_screen.dart` et `maintenance_screen.dart`. Le brancher sur le
-      nombre réel d'éléments non lus (`/api/mobile/activity`).
+---
 
-## Sécurité / publication
+## 🔴 Actions manuelles requises avant mise en production
 
-- [ ] Restreindre la clé Google Maps de `AndroidManifest.xml` au package
-      `com.maasga.app` + empreinte SHA-1 dans Google Cloud Console. Elle est
-      versionnée en clair, ce qui n'est acceptable *que* si elle est
-      restreinte.
-- [ ] Générer le keystore de publication et `android/key.properties` (non
-      versionné) : sans lui, `flutter build appbundle --release` échoue
-      volontairement.
-- [ ] QA manuelle d'un APK release réellement signé. R8 est activé et la CI
-      compile déjà une release de test, mais une règle ProGuard manquante ne
-      se voit qu'à l'exécution.
-- [ ] Choisir le format de livraison : `appbundle` pour le Play Store, ou
-      `--split-per-abi` pour une distribution directe. L'APK universel mesuré
-      pèse 68 Mo, dont 63 Mo de code natif dupliqué pour trois ABI — y compris
-      `x86_64`, qui ne sert qu'aux émulateurs. Un seul ABI représente ~25 Mo,
-      ce qui compte pour un téléchargement hors Play Store.
-- [ ] Aucun `intent-filter` de deep link / App Links : les liens web MAASGA
-      n'ouvrent pas l'application.
+### 1 — Appliquer la migration D1
+```bash
+wrangler d1 migrations apply maasga_db --remote
+```
+Sans cette commande, les routes `/api/client/push-token` retournent une erreur
+D1 `no such table: push_tokens`.
 
-## Qualité
+### 2 — Restreindre la clé Google Maps dans GCP
+Console → APIs & Services → Credentials → `AIzaSyA7...`
+- Application restriction : **Android apps**
+- Package : `com.maasga.app`
+- SHA-1 : `54:C1:F8:B2:A6:5A:27:83:8F:70:75:FA:11:AD:F4:55:57:29:8C:2B`
+- API restriction : **Maps SDK for Android** uniquement
 
-- [ ] Tests : seuls `test/widget_test.dart` (smoke de démarrage) et
-      `test/widgets_test.dart` (3 widgets présentationnels) existent.
-      Manquent le panier (`cart_state.dart`), le calcul BTU
-      (`btu_calculator.dart`), la normalisation `+226`
-      (`auth_repository.dart`), les repositories avec Dio mocké, et les
-      parcours RDV / checkout.
-- [ ] Supprimer `lib/app/bootstrap/bootstrap.dart` — fichier vide qui porte
-      lui-même la mention « FICHIER MORT ».
-- [ ] `api_client.dart` : sur une 401, se contente d'un `debugPrint`. Forcer
-      un `getIdToken(true)` puis rejouer la requête une seule fois.
-- [ ] Décider du sort de `web/` et `windows/`, et créer le projet iOS
-      (+ config Firebase / Maps / Sign-In) si le multiplateforme est visé.
+### 3 — QA release sur appareil physique
+```bash
+flutter build apk --release
+# Installer l'APK et tester : login → catalogue → panier → commande → notifications
+```
+R8 est actif — une règle ProGuard manquante ne se voit qu'à l'exécution sur
+un APK release, jamais en debug.
+
+---
+
+## Format de livraison APK — Décision
+
+| Scénario | Commande | Taille | Notes |
+|----------|----------|--------|-------|
+| **Play Store** | `flutter build appbundle --release` | ~15 Mo (AAB) | Google gère le split ABI côté store |
+| **Distribution directe (recommandé)** | `flutter build apk --release --split-per-abi` | ~25 Mo / ABI | Distribuer `arm64-v8a` pour les téléphones récents |
+| Distribution directe universelle | `flutter build apk --release` | ~68 Mo | 63 Mo de code natif dupliqué — à éviter |
+
+**Recommandation** : pour la distribution directe (hors Play Store), utiliser
+`--split-per-abi` et distribuer uniquement `app-arm64-v8a-release.apk` —
+couvre 95 %+ des appareils Android actuels au Burkina Faso. Garder
+`app-armeabi-v7a-release.apk` en réserve pour les appareils anciens.
+
+---
+
+## En suspens — Fonctionnel
+
+- [x] `/address` : `address_selection_screen.dart` supprimé (fichier vide,
+      aucun écran n'y naviguait).
+- [ ] Paiement en ligne V1.1 (Orange Money / Moov) : décision produit en
+      attente. Prévoir alors un deep link callback + `intent-filter` dédié.
+- [ ] Recherche serveur `?q=` sur `/api/mobile/products` : suffisant en
+      mémoire tant que le catalogue reste petit.
+
+## En suspens — Sécurité / Publication
+
+- [ ] **Appliquer migration `0040_push_tokens`** (voir Actions manuelles #1)
+- [ ] **Restreindre clé Google Maps dans GCP** (voir Actions manuelles #2)
+- [ ] **QA release sur appareil physique** (voir Actions manuelles #3)
+- [ ] Tester les App Links sur appareil en build release :
+      `adb shell pm get-app-links com.maasga.app`
+
+## En suspens — Qualité
+
+- [x] Tests checkout : `test/checkout_state_test.dart` (10 tests — CartLine,
+      total panier, payload items[])
+- [x] Tests RDV : `test/rdv_request_test.dart` (12 tests — sérialisation JSON,
+      validation téléphone, quartiers)
+- [ ] Tests repositories avec Dio mocké (nécessite `mockito` + setup réseau)
+
+## Plateformes — Décisions
+
+### `web/` et `windows/` — À supprimer
+
+Ces deux dossiers sont des **scaffolds Flutter générés automatiquement**, jamais
+configurés ni testés. Les retenir représente une dette sans valeur :
+
+- Aucune dépendance plugin n'est configurée pour le web (Firebase Web SDK,
+  Google Maps JS, cookie storage) — l'app planterait immédiatement au démarrage
+- `windows/` n'a aucune configuration Firebase ni Maps
+- Maintenir ces dossiers donne l'illusion d'un support multiplateforme inexistant
+
+**Recommandation : supprimer `web/` et `windows/` via** :
+```bash
+flutter config --no-enable-web
+flutter config --no-enable-windows-desktop
+# Puis supprimer manuellement les dossiers
+Remove-Item -Recurse -Force web, windows
+# Et retirer les entrées correspondantes dans pubspec.yaml si présentes
+```
+
+### iOS — Non commencé, à planifier séparément
+
+Créer un projet iOS (si multiplateforme visé) implique :
+1. `flutter create --platforms=ios .` depuis un Mac avec Xcode
+2. `firebase_options.dart` mis à jour avec les options iOS (FlutterFire CLI)
+3. `GoogleService-Info.plist` ajouté dans `ios/Runner/`
+4. Clé Google Maps iOS dans `AppDelegate.swift`
+5. Google Sign-In configuré dans `Info.plist` (URL scheme)
+6. Tests sur simulateur puis appareil physique (TestFlight)
+
+Ce travail ne peut pas se faire depuis Windows — il nécessite un Mac avec
+Xcode 15+. À prévoir si la distribution iOS est dans la roadmap.

@@ -43,6 +43,7 @@ dependencies:
   firebase_core: ^4.7.0
   firebase_auth: ^6.5.4
   firebase_messaging: ^16.2.0
+  firebase_analytics: ^12.4.3
   path_provider: ^2.1.5
   url_launcher: ^6.3.2
   google_sign_in: ^7.2.0
@@ -50,9 +51,6 @@ dependencies:
   google_fonts: ^8.1.0
   carousel_slider: ^5.0.0
   smooth_page_indicator: ^2.0.1
-  google_maps_flutter: ^2.14.2
-  geolocator: ^14.0.2
-  geocoding: ^5.0.0
   google_nav_bar: ^5.0.6
   animations: ^2.1.2
   another_flutter_splash_screen: ^1.2.1
@@ -70,6 +68,11 @@ dependencies:
   vibration: ^3.1.8
   cached_network_image: ^3.4.1
   flutter_local_notifications: ^18.0.1
+  image_picker: ^1.2.0
+  logger: ^2.0.0
+  in_app_review: ^2.0.0
+  # sentry_flutter: ^8.0.0 # Temporairement désactivé - problème de compatibilité Kotlin
+  flutter_native_splash: ^2.3.0
 
 dev_dependencies:
   flutter_test:
@@ -77,6 +80,8 @@ dev_dependencies:
 
   flutter_lints: ^6.0.0
   flutter_launcher_icons: ^0.14.3
+  mockito: ^5.4.4
+  build_runner: ^2.4.8
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -139,3 +144,11 @@ flutter_launcher_icons:
   min_sdk_android: 21
   adaptive_icon_background: "#FFFFFF"
   adaptive_icon_foreground: "assets/logo_maasga.png"
+
+flutter_native_splash:
+  color: "#FFFFFF"
+  image: "assets/logo_maasga.png"
+  android: true
+  ios: false
+  android_gravity: center
+  fullscreen: true

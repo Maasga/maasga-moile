@@ -1,5 +1,6 @@
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../shared/design_tokens/maasga_tokens.dart';
@@ -72,9 +73,20 @@ class AppTheme {
       // pour éviter le texte invisible sur fond blanc en mode clair.
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: Colors.white,
+        fillColor: palette.cardAlt,
         labelStyle: const TextStyle(color: _textMedium),
         hintStyle: TextStyle(color: _textMedium.withValues(alpha: 0.6)),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: palette.cardBorder),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: palette.accent, width: 1.6),
+        ),
+      ),
+      appBarTheme: base.appBarTheme.copyWith(
+        systemOverlayStyle: SystemUiOverlayStyle.dark,
       ),
     );
   }
@@ -171,6 +183,9 @@ class AppTheme {
         ),
       ),
       iconTheme: IconThemeData(color: palette.textSecondary),
+      appBarTheme: base.appBarTheme.copyWith(
+        systemOverlayStyle: SystemUiOverlayStyle.light,
+      ),
     );
   }
 }

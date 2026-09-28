@@ -1,9 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:geocoding/geocoding.dart';
-import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import '../../domain/neighborhoods.dart';
@@ -18,8 +14,6 @@ class RdvFormStep extends StatefulWidget {
   final TextEditingController notesCtrl;
   final String? selectedQuartier;
   final Function(String) onQuartierChanged;
-  final LatLng? selectedLocation;
-  final Function(LatLng, String?) onLocationChanged;
   final DateTime? selectedDate;
   final Function(DateTime) onDateChanged;
   final TimeOfDay? startTime;
@@ -27,6 +21,7 @@ class RdvFormStep extends StatefulWidget {
   final Function(TimeOfDay, bool isStart) onTimeChanged;
   final bool isConsented;
   final String? address;
+  final Function(String) onAddressChanged;
   final Function(bool?) onConsentChanged;
 
   const RdvFormStep({
@@ -40,8 +35,6 @@ class RdvFormStep extends StatefulWidget {
     required this.notesCtrl,
     required this.selectedQuartier,
     required this.onQuartierChanged,
-    required this.selectedLocation,
-    required this.onLocationChanged,
     required this.selectedDate,
     required this.onDateChanged,
     required this.startTime,
@@ -49,6 +42,7 @@ class RdvFormStep extends StatefulWidget {
     required this.onTimeChanged,
     required this.isConsented,
     required this.address,
+    required this.onAddressChanged,
     required this.onConsentChanged,
   });
 
@@ -57,73 +51,10 @@ class RdvFormStep extends StatefulWidget {
 }
 
 class _RdvFormStepState extends State<RdvFormStep> {
-  GoogleMapController? _mapController;
-  final LatLng _initialPos = const LatLng(12.3647, -1.5335); // Ouagadougou
-  Set<Marker> _markers = {};
-
   static const _inputTextStyle = TextStyle(
     fontSize: 14,
     color: Color(0xFF1A1A1A),
   );
-
-  @override
-  void initState() {
-    super.initState();
-    if (widget.selectedLocation != null) {
-      _markers.add(
-        Marker(
-          markerId: const MarkerId('selected_pos'),
-          position: widget.selectedLocation!,
-          draggable: true,
-          onDragEnd: (newPos) => _updateLocation(newPos),
-        ),
-      );
-    }
-  }
-
-  Future<void> _updateLocation(LatLng pos) async {
-    setState(() {
-      _markers = {
-        Marker(
-          markerId: const MarkerId('selected_pos'),
-          position: pos,
-          draggable: true,
-          onDragEnd: (newPos) => _updateLocation(newPos),
-        ),
-      };
-    });
-
-    String? address;
-    try {
-      List<Placemark> placemarks = await Geocoding().placemarkFromCoordinates(
-        pos.latitude,
-        pos.longitude,
-      );
-      if (placemarks.isNotEmpty) {
-        final p = placemarks.first;
-        address = '${p.street}, ${p.subLocality}, ${p.locality}';
-      }
-    } catch (_) {}
-
-    widget.onLocationChanged(pos, address);
-  }
-
-  Future<void> _getCurrentLocation() async {
-    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) return;
-
-    LocationPermission permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) return;
-    }
-
-    final position = await Geolocator.getCurrentPosition();
-    final latLng = LatLng(position.latitude, position.longitude);
-
-    _mapController?.animateCamera(CameraUpdate.newLatLngZoom(latLng, 15));
-    _updateLocation(latLng);
-  }
 
   void _showQuartierPicker() {
     showModalBottomSheet(
@@ -280,80 +211,16 @@ class _RdvFormStepState extends State<RdvFormStep> {
             ),
             const SizedBox(height: 16),
 
-            _buildLabel('Localisation précise'),
-            Container(
-              height: 200,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: const Color(0xFFD8EAFB)),
+            _buildLabel('Adresse précise (optionnel)'),
+            TextFormField(
+              initialValue: widget.address,
+              onChanged: widget.onAddressChanged,
+              style: _inputTextStyle,
+              decoration: _buildInputDecoration(
+                'Numéro, rue, repère...',
+                Icons.location_on_outlined,
               ),
-              clipBehavior: Clip.antiAlias,
-              child: kIsWeb
-                  ? Center(
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Text(
-                          "La carte interactive n'est pas disponible en version Web. Veuillez indiquer votre adresse précise ci-dessous.",
-                          textAlign: TextAlign.center,
-                          style: GoogleFonts.poppins(
-                            fontSize: 12,
-                            color: const Color(0xFF475467),
-                          ),
-                        ),
-                      ),
-                    )
-                  : GoogleMap(
-                      initialCameraPosition: CameraPosition(
-                        target: _initialPos,
-                        zoom: 12,
-                      ),
-                      onMapCreated: (c) => _mapController = c,
-                      onTap: _updateLocation,
-                      markers: _markers,
-                      myLocationEnabled: true,
-                      myLocationButtonEnabled: false,
-                      zoomControlsEnabled: false,
-                    ),
             ),
-            Row(
-              children: [
-                const Icon(Icons.my_location, color: primaryBlue, size: 18),
-                TextButton(
-                  onPressed: _getCurrentLocation,
-                  child: Text(
-                    'Me localiser automatiquement',
-                    style: GoogleFonts.poppins(
-                      color: primaryBlue,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            if (widget.selectedLocation != null)
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF0F4FF),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.location_on, color: primaryBlue, size: 16),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        widget.address ?? 'Position sélectionnée',
-                        style: GoogleFonts.poppins(
-                          fontSize: 12,
-                          color: primaryBlue,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
             const SizedBox(height: 24),
 
             _buildLabel('Date souhaitée *'),

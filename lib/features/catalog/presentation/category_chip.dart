@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../shared/design_tokens/maasga_tokens.dart';
+
 class CategoryChip extends StatelessWidget {
   const CategoryChip({
     required this.label,
@@ -15,24 +17,23 @@ class CategoryChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.maasga;
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
         margin: const EdgeInsets.only(right: 10),
         decoration: BoxDecoration(
-          color: selected ? const Color(0xFF1B3A8D) : Colors.white,
+          color: selected ? palette.accent : palette.card,
           borderRadius: BorderRadius.circular(20),
-          border: selected
-              ? null
-              : Border.all(color: const Color(0xFFE0E0E0), width: 1),
+          border: selected ? null : Border.all(color: palette.cardBorder),
         ),
         child: Text(
           label,
           style: GoogleFonts.poppins(
             fontSize: 13,
-            fontWeight: FontWeight.w500, // Medium
-            color: selected ? Colors.white : const Color(0xFF757575),
+            fontWeight: FontWeight.w500,
+            color: selected ? palette.onAccent : palette.textSecondary,
           ),
         ),
       ),

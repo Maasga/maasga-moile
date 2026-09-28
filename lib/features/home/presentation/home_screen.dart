@@ -14,7 +14,7 @@ import '../../../shared/widgets/main_bottom_nav.dart';
 import '../../../shared/widgets/maasga_app_bar.dart';
 import '../../../shared/utils/asset_utils.dart';
 import '../widgets/promo_banner.dart';
-import '../../../features/notifications/data/activity_repository.dart';
+import '../../../shared/design_tokens/maasga_tokens.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -24,14 +24,6 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
-  final List<String> _brandAssets = const <String>[
-    'assets/brands/daikin.png',
-    'assets/brands/mitsubishi.png',
-    'assets/brands/panasonic.png',
-    'assets/brands/toshiba.png',
-    'assets/brands/aero.png',
-  ];
-
   String _formatPrice(int price) {
     final f = NumberFormat.currency(
       locale: 'fr_FR',
@@ -43,12 +35,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final productsAsync = ref.watch(productsProvider);
-    final unreadNotificationCount = ref.watch(unreadNotificationCountProvider);
-
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
-      appBar: MaasgaAppBar(notificationsCount: unreadNotificationCount),
+      backgroundColor: context.maasga.pageGradient.colors.first,
+      appBar: MaasgaAppBar(notificationsCount: 0),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -58,17 +47,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 .fadeIn(duration: 400.ms)
                 .slideY(begin: -0.2, end: 0),
             _LocationRow().animate().fadeIn(delay: 100.ms),
-            BrandScroll(
-              brandAssetPaths: _brandAssets,
-            ).animate().fadeIn(delay: 200.ms),
+            const BrandScroll().animate().fadeIn(delay: 200.ms),
             const PromoBanner()
                 .animate()
                 .fadeIn(delay: 300.ms)
                 .scale(begin: const Offset(0.95, 0.95)),
-            _InnovationsSection(
-              productsAsync: productsAsync,
-              formatPrice: _formatPrice,
-            ),
+            _InnovationsSection(formatPrice: _formatPrice),
             const SizedBox(height: 18),
           ],
         ),
@@ -82,16 +66,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 class _SearchBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    const textColor = Color(0xFF9E9E9E);
+    final palette = context.maasga;
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: palette.card,
         borderRadius: BorderRadius.circular(25),
-        border: Border.all(color: const Color(0xFFE0E0E0)),
+        border: Border.all(color: palette.cardBorder),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: palette.shadow.withValues(
+              alpha: context.isDarkMode ? 0.35 : 0.05,
+            ),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -106,14 +92,14 @@ class _SearchBar extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
           child: Row(
             children: [
-              const Icon(Icons.search, color: textColor, size: 20),
+              Icon(Icons.search, color: palette.textMuted, size: 20),
               const SizedBox(width: 10),
               Text(
                 'Rechercher votre climatiseur...',
                 style: GoogleFonts.poppins(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
-                  color: textColor,
+                  color: palette.textMuted,
                 ),
               ),
             ],
@@ -128,18 +114,19 @@ class _SearchBar extends StatelessWidget {
 class _LocationRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final palette = context.maasga;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
       child: Row(
         children: [
-          const Icon(Icons.location_on, color: Color(0xFFFF6F00), size: 18),
+          Icon(Icons.location_on, color: palette.warning, size: 18),
           const SizedBox(width: 8),
           Text(
             'Ouagadougou, Burkina Faso',
             style: GoogleFonts.poppins(
               fontSize: 13,
               fontWeight: FontWeight.w500,
-              color: const Color(0xFF1A1A1A),
+              color: palette.textPrimary,
             ),
           ),
         ],
@@ -149,17 +136,15 @@ class _LocationRow extends StatelessWidget {
 }
 
 // ─── Innovations Section (uses real API data) ──────────────────────────────────
-class _InnovationsSection extends StatelessWidget {
-  const _InnovationsSection({
-    required this.productsAsync,
-    required this.formatPrice,
-  });
+class _InnovationsSection extends ConsumerWidget {
+  const _InnovationsSection({required this.formatPrice});
 
-  final AsyncValue<List<Product>> productsAsync;
   final String Function(int price) formatPrice;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final productsAsync = ref.watch(productsProvider);
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
@@ -173,7 +158,7 @@ class _InnovationsSection extends StatelessWidget {
                 style: GoogleFonts.poppins(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
-                  color: const Color(0xFF1A1A1A),
+                  color: context.maasga.textPrimary,
                 ),
               ),
               const Spacer(),
@@ -184,7 +169,7 @@ class _InnovationsSection extends StatelessWidget {
                   style: GoogleFonts.poppins(
                     fontSize: 13,
                     fontWeight: FontWeight.w500,
-                    color: const Color(0xFF1B3A8D),
+                    color: context.maasga.accent,
                   ),
                 ),
               ),
@@ -222,7 +207,9 @@ class _InnovationsSection extends StatelessWidget {
                   padding: const EdgeInsets.all(24),
                   child: Text(
                     'Impossible de charger les produits.',
-                    style: GoogleFonts.poppins(color: const Color(0xFF475467)),
+                    style: GoogleFonts.poppins(
+                      color: context.maasga.textSecondary,
+                    ),
                     textAlign: TextAlign.center,
                   ),
                 ),
@@ -236,7 +223,7 @@ class _InnovationsSection extends StatelessWidget {
                       child: Text(
                         'Aucun produit disponible.',
                         style: GoogleFonts.poppins(
-                          color: const Color(0xFF475467),
+                          color: context.maasga.textSecondary,
                         ),
                       ),
                     ),
@@ -282,15 +269,19 @@ class _ProductCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.maasga;
     return GestureDetector(
       onTap: () => context.go('/catalog'),
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: palette.card,
           borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: palette.cardBorder),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.07),
+              color: palette.shadow.withValues(
+                alpha: context.isDarkMode ? 0.35 : 0.07,
+              ),
               blurRadius: 12,
               offset: const Offset(0, 4),
             ),
@@ -308,7 +299,7 @@ class _ProductCard extends StatelessWidget {
                   child: Container(
                     width: double.infinity,
                     height: 130,
-                    color: const Color(0xFFF5F5F5),
+                    color: palette.cardAlt,
                     alignment: Alignment.center,
                     child:
                         product.imageUrl != null &&
@@ -366,7 +357,7 @@ class _ProductCard extends StatelessWidget {
                     style: GoogleFonts.poppins(
                       fontSize: 10,
                       fontWeight: FontWeight.w500,
-                      color: const Color(0xFF9E9E9E),
+                      color: palette.textMuted,
                     ),
                   ),
                   const SizedBox(height: 2),
@@ -375,7 +366,7 @@ class _ProductCard extends StatelessWidget {
                     style: GoogleFonts.poppins(
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
-                      color: const Color(0xFF1A1A1A),
+                      color: palette.textPrimary,
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
@@ -386,7 +377,7 @@ class _ProductCard extends StatelessWidget {
                     style: GoogleFonts.poppins(
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
-                      color: const Color(0xFF1B3A8D),
+                      color: palette.accent,
                     ),
                   ),
                 ],

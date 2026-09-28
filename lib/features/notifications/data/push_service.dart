@@ -210,7 +210,7 @@ class PushService {
     );
   }
 
-  /// Envoie une notification locale de test (utile en développement).
+  /// Affiche une notification locale de test (utile en développement).
   Future<void> showTestNotification() async {
     await _showLocalNotification(
       title: 'MAASGA',
@@ -224,7 +224,8 @@ class PushService {
     if (_lastToken == null) return;
     try {
       await dio.delete('/api/client/push-token', data: {'token': _lastToken});
-    } catch (_) {
+    } catch (e) {
+      if (kDebugMode) debugPrint('Erreur suppression FCM token: $e');
     } finally {
       _lastToken = null;
     }
@@ -237,7 +238,9 @@ class PushService {
         data: {'token': token, 'platform': 'android', 'appVersion': '1.0.0'},
       );
       if (kDebugMode) debugPrint('FCM token enregistré');
-    } catch (_) {}
+    } catch (e) {
+      if (kDebugMode) debugPrint('Erreur enregistrement FCM token: $e');
+    }
   }
 }
 

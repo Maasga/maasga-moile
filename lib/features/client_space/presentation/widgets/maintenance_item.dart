@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../../shared/design_tokens/maasga_tokens.dart';
+
 class MaintenanceItem extends StatelessWidget {
   const MaintenanceItem({
     required this.date,
@@ -15,6 +17,11 @@ class MaintenanceItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.maasga;
+    final accent = isCompleted ? palette.success : palette.warning;
+    final surface = isCompleted
+        ? palette.successSurface
+        : palette.warningSurface;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
@@ -22,9 +29,7 @@ class MaintenanceItem extends StatelessWidget {
           Icon(
             isCompleted ? Icons.check_circle : Icons.pending_outlined,
             size: 20,
-            color: isCompleted
-                ? const Color(0xFF43A047)
-                : const Color(0xFFFB8C00),
+            color: accent,
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -36,14 +41,14 @@ class MaintenanceItem extends StatelessWidget {
                   style: GoogleFonts.poppins(
                     fontSize: 13,
                     fontWeight: FontWeight.w500,
-                    color: const Color(0xFF1A1A1A),
+                    color: palette.textPrimary,
                   ),
                 ),
                 Text(
                   'Tech: $technicianName',
                   style: GoogleFonts.poppins(
                     fontSize: 11,
-                    color: const Color(0xFF757575),
+                    color: palette.textMuted,
                   ),
                 ),
               ],
@@ -52,9 +57,7 @@ class MaintenanceItem extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
-              color: isCompleted
-                  ? const Color(0xFFE8F5E9)
-                  : const Color(0xFFFFF3E0),
+              color: surface,
               borderRadius: BorderRadius.circular(6),
             ),
             child: Text(
@@ -62,9 +65,7 @@ class MaintenanceItem extends StatelessWidget {
               style: GoogleFonts.poppins(
                 fontSize: 10,
                 fontWeight: FontWeight.w600,
-                color: isCompleted
-                    ? const Color(0xFF43A047)
-                    : const Color(0xFFFB8C00),
+                color: accent,
               ),
             ),
           ),

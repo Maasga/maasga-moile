@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../design_tokens/maasga_tokens.dart';
@@ -26,16 +27,25 @@ class MaasgaShell extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final unreadNotificationCount = ref.watch(unreadNotificationCountProvider);
 
-    return Scaffold(
-      drawer: null,
-      appBar: MaasgaAppBar(notificationsCount: unreadNotificationCount),
-      body: Container(
-        decoration: BoxDecoration(gradient: context.maasga.pageGradient),
-        child: SafeArea(child: child),
+    final overlay = context.isDarkMode
+        ? SystemUiOverlayStyle.light
+        : SystemUiOverlayStyle.dark;
+
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: overlay,
+      child: Scaffold(
+        drawer: null,
+        appBar: MaasgaAppBar(notificationsCount: unreadNotificationCount),
+        body: Container(
+          decoration: BoxDecoration(gradient: context.maasga.pageGradient),
+          child: SafeArea(child: child),
+        ),
+        bottomNavigationBar:
+            bottomNavigationBar ??
+            MainBottomNav(
+              currentPath: GoRouterState.of(context).uri.toString(),
+            ),
       ),
-      bottomNavigationBar:
-          bottomNavigationBar ??
-          MainBottomNav(currentPath: GoRouterState.of(context).uri.toString()),
     );
   }
 }

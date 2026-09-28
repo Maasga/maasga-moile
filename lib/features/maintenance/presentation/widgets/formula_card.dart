@@ -3,6 +3,10 @@ import 'package:google_fonts/google_fonts.dart';
 
 class FormulaCard extends StatelessWidget {
   final String title;
+  final String? badgeText;
+  final String? unitRateText;
+  final String? targetRange;
+  final String? frequencyTag;
   final String price;
   final String period;
   final String subtitle;
@@ -11,57 +15,83 @@ class FormulaCard extends StatelessWidget {
   final String target;
   final String? bonusTitle;
   final String? bonusDesc;
+  final String? customDescription;
+  final String ctaText;
   final bool isRecommended;
   final bool isPremium;
+  final bool isCustom;
+  final bool isHighlighted;
   final VoidCallback onSelect;
 
   const FormulaCard({
     super.key,
     required this.title,
+    this.badgeText,
+    this.unitRateText,
+    this.targetRange,
+    this.frequencyTag,
     required this.price,
-    required this.period,
+    this.period = '/ an',
     required this.subtitle,
     this.economy = '',
-    required this.inclusions,
+    this.inclusions = const [],
     required this.target,
     this.bonusTitle,
     this.bonusDesc,
+    this.customDescription,
+    this.ctaText = 'Choisir cette formule',
     this.isRecommended = false,
     this.isPremium = false,
+    this.isCustom = false,
+    this.isHighlighted = false,
     required this.onSelect,
   });
 
   @override
   Widget build(BuildContext context) {
-    final primaryColor = const Color(0xFF1B3A8D);
-    final backgroundColor = isPremium ? primaryColor : Colors.white;
-    final textColor = isPremium ? Colors.white : const Color(0xFF1A1A1A);
-    final secondaryTextColor = isPremium
-        ? Colors.white.withValues(alpha: 0.7)
+    const primaryColor = Color(0xFF1B3A8D);
+    final isDark = isPremium && !isCustom;
+    final backgroundColor = isDark ? primaryColor : Colors.white;
+    final textColor = isDark ? Colors.white : const Color(0xFF1A1A1A);
+    final secondaryTextColor = isDark
+        ? Colors.white.withValues(alpha: 0.75)
         : const Color(0xFF757575);
-    final borderColor = isRecommended
-        ? primaryColor
-        : (isPremium ? Colors.transparent : const Color(0xFFE0E0E0));
+
+    Color borderColor;
+    if (isHighlighted) {
+      borderColor = const Color(0xFFFF6F00);
+    } else if (isRecommended) {
+      borderColor = primaryColor;
+    } else if (isDark) {
+      borderColor = Colors.transparent;
+    } else {
+      borderColor = const Color(0xFFE0E0E0);
+    }
 
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
         color: backgroundColor,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: borderColor, width: isRecommended ? 2 : 1),
+        border: Border.all(
+          color: borderColor,
+          width: (isHighlighted || isRecommended) ? 2 : 1,
+        ),
         boxShadow: [
           BoxShadow(
-            color: isRecommended
-                ? primaryColor.withValues(alpha: 0.15)
-                : Colors.black.withValues(alpha: 0.05),
-            blurRadius: 12,
+            color: isHighlighted
+                ? const Color(0xFFFF6F00).withValues(alpha: 0.18)
+                : (isRecommended
+                    ? primaryColor.withValues(alpha: 0.15)
+                    : Colors.black.withValues(alpha: 0.05)),
+            blurRadius: 14,
             offset: const Offset(0, 4),
           ),
         ],
       ),
       child: Stack(
         children: [
-          if (isRecommended || isPremium)
+          if (badgeText != null && badgeText!.isNotEmpty)
             Positioned(
               top: 0,
               right: 0,
@@ -71,21 +101,21 @@ class FormulaCard extends StatelessWidget {
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: isPremium
-                      ? Colors.white.withValues(alpha: 0.2)
-                      : primaryColor,
+                  color: isDark
+                      ? const Color(0xFFFFD700)
+                      : (isRecommended ? primaryColor : const Color(0xFFE65100)),
                   borderRadius: const BorderRadius.only(
                     topRight: Radius.circular(20),
                     bottomLeft: Radius.circular(12),
                   ),
                 ),
                 child: Text(
-                  isPremium ? 'MEILLEUR CHOIX' : 'RECOMMANDÉ',
+                  badgeText!,
                   style: GoogleFonts.poppins(
-                    color: Colors.white,
+                    color: isDark ? const Color(0xFF1A1A1A) : Colors.white,
                     fontSize: 10,
                     fontWeight: FontWeight.bold,
-                    letterSpacing: 1.0,
+                    letterSpacing: 0.8,
                   ),
                 ),
               ),
@@ -105,49 +135,119 @@ class FormulaCard extends StatelessWidget {
                           Text(
                             title,
                             style: GoogleFonts.poppins(
-                              color: isPremium
-                                  ? Colors.white.withValues(alpha: 0.8)
+                              color: isDark
+                                  ? Colors.white.withValues(alpha: 0.9)
                                   : (isRecommended
-                                        ? primaryColor
-                                        : const Color(0xFF757575)),
-                              fontSize: 13,
+                                      ? primaryColor
+                                      : const Color(0xFF616161)),
+                              fontSize: 14,
                               fontWeight: FontWeight.bold,
-                              letterSpacing: 1.2,
+                              letterSpacing: 1.1,
                             ),
                           ),
-                          const SizedBox(height: 4),
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.baseline,
-                            textBaseline: TextBaseline.alphabetic,
+                          const SizedBox(height: 6),
+                          Wrap(
+                            spacing: 6,
+                            runSpacing: 4,
                             children: [
-                              Text(
-                                price,
-                                style: GoogleFonts.poppins(
-                                  color: textColor,
-                                  fontSize: 28,
-                                  fontWeight: FontWeight.bold,
+                              if (targetRange != null)
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 3,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: isDark
+                                        ? Colors.white.withValues(alpha: 0.15)
+                                        : const Color(0xFFEEF2FF),
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: Text(
+                                    targetRange!,
+                                    style: GoogleFonts.poppins(
+                                      color: isDark
+                                          ? Colors.white
+                                          : primaryColor,
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                ' F CFA',
-                                style: GoogleFonts.poppins(
-                                  color: secondaryTextColor,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.normal,
+                              if (unitRateText != null)
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 3,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: isDark
+                                        ? Colors.white.withValues(alpha: 0.12)
+                                        : const Color(0xFFF5F5F5),
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: Text(
+                                    unitRateText!,
+                                    style: GoogleFonts.poppins(
+                                      color: isDark
+                                          ? Colors.white.withValues(alpha: 0.85)
+                                          : const Color(0xFF616161),
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
                                 ),
-                              ),
                             ],
                           ),
-                          Text(
-                            subtitle,
-                            style: GoogleFonts.poppins(
-                              color: isPremium
-                                  ? Colors.white.withValues(alpha: 0.6)
-                                  : const Color(0xFF9E9E9E),
-                              fontSize: 11,
+                          const SizedBox(height: 8),
+                          if (price.isNotEmpty)
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.baseline,
+                              textBaseline: TextBaseline.alphabetic,
+                              children: [
+                                Text(
+                                  price,
+                                  style: GoogleFonts.poppins(
+                                    color: textColor,
+                                    fontSize: price.length > 8 ? 22 : 26,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                if (period.isNotEmpty) ...[
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    ' F CFA $period',
+                                    style: GoogleFonts.poppins(
+                                      color: secondaryTextColor,
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.normal,
+                                    ),
+                                  ),
+                                ],
+                              ],
                             ),
-                          ),
+                          if (subtitle.isNotEmpty)
+                            Text(
+                              subtitle,
+                              style: GoogleFonts.poppins(
+                                color: isDark
+                                    ? Colors.white.withValues(alpha: 0.7)
+                                    : const Color(0xFF757575),
+                                fontSize: 12,
+                              ),
+                            ),
+                          if (frequencyTag != null) ...[
+                            const SizedBox(height: 4),
+                            Text(
+                              'Fréquence : $frequencyTag',
+                              style: GoogleFonts.poppins(
+                                color: isDark
+                                    ? Colors.white.withValues(alpha: 0.6)
+                                    : const Color(0xFF858585),
+                                fontSize: 11,
+                                fontStyle: FontStyle.italic,
+                              ),
+                            ),
+                          ],
                           if (economy.isNotEmpty) ...[
                             const SizedBox(height: 6),
                             Container(
@@ -156,7 +256,7 @@ class FormulaCard extends StatelessWidget {
                                 vertical: 4,
                               ),
                               decoration: BoxDecoration(
-                                color: isPremium
+                                color: isDark
                                     ? Colors.white.withValues(alpha: 0.15)
                                     : const Color(0xFFE8F5E9),
                                 borderRadius: BorderRadius.circular(6),
@@ -164,7 +264,7 @@ class FormulaCard extends StatelessWidget {
                               child: Text(
                                 economy,
                                 style: GoogleFonts.poppins(
-                                  color: isPremium
+                                  color: isDark
                                       ? Colors.white
                                       : const Color(0xFF43A047),
                                   fontSize: 11,
@@ -180,54 +280,76 @@ class FormulaCard extends StatelessWidget {
                       width: 44,
                       height: 44,
                       decoration: BoxDecoration(
-                        color: isPremium
+                        color: isDark
                             ? Colors.white.withValues(alpha: 0.15)
                             : (isRecommended
-                                  ? const Color(0xFFE8EEFF)
-                                  : const Color(0xFFF5F5F5)),
+                                ? const Color(0xFFE8EEFF)
+                                : const Color(0xFFF5F5F5)),
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
-                        isPremium
-                            ? Icons.workspace_premium_outlined
-                            : (isRecommended
-                                  ? Icons.calendar_month_outlined
-                                  : Icons.calendar_view_week_outlined),
-                        color: isPremium
+                        isCustom
+                            ? Icons.handshake_outlined
+                            : (isDark
+                                ? Icons.factory_outlined
+                                : (isRecommended
+                                    ? Icons.business_outlined
+                                    : Icons.home_outlined)),
+                        color: isDark
                             ? Colors.white
                             : (isRecommended
-                                  ? primaryColor
-                                  : const Color(0xFF757575)),
+                                ? primaryColor
+                                : const Color(0xFF757575)),
                         size: 22,
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 14),
                 Divider(
-                  color: isPremium
+                  color: isDark
                       ? Colors.white.withValues(alpha: 0.2)
                       : const Color(0xFFF0F0F0),
                 ),
-                const SizedBox(height: 12),
-                Text(
-                  'Ce qui est inclus :',
-                  style: GoogleFonts.poppins(
-                    color: secondaryTextColor,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
+                const SizedBox(height: 10),
+
+                // Description personnalisée pour Sur Mesure
+                if (customDescription != null) ...[
+                  Text(
+                    customDescription!,
+                    style: GoogleFonts.poppins(
+                      color: secondaryTextColor,
+                      fontSize: 13,
+                      height: 1.45,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 12),
-                ...inclusions.map(
-                  (item) => _BulletItem(text: item, isPremium: isPremium),
-                ),
-                const SizedBox(height: 12),
+                  const SizedBox(height: 14),
+                ],
+
+                // Inclusions
+                if (inclusions.isNotEmpty) ...[
+                  Text(
+                    'Ce qui est inclus :',
+                    style: GoogleFonts.poppins(
+                      color: secondaryTextColor,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  ...inclusions.map(
+                    (item) => _BulletItem(text: item, isDark: isDark),
+                  ),
+                  const SizedBox(height: 10),
+                ],
+
+                // Bonus
                 if (bonusTitle != null && bonusDesc != null) ...[
                   Container(
+                    width: double.infinity,
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: isPremium
+                      color: isDark
                           ? Colors.white.withValues(alpha: 0.12)
                           : const Color(0xFFFFF8E1),
                       borderRadius: BorderRadius.circular(10),
@@ -238,7 +360,7 @@ class FormulaCard extends StatelessWidget {
                         Text(
                           bonusTitle!,
                           style: GoogleFonts.poppins(
-                            color: isPremium
+                            color: isDark
                                 ? const Color(0xFFFFD700)
                                 : const Color(0xFFFB8C00),
                             fontSize: 12,
@@ -249,7 +371,7 @@ class FormulaCard extends StatelessWidget {
                         Text(
                           bonusDesc!,
                           style: GoogleFonts.poppins(
-                            color: isPremium
+                            color: isDark
                                 ? Colors.white.withValues(alpha: 0.9)
                                 : const Color(0xFF757575),
                             fontSize: 12,
@@ -260,12 +382,13 @@ class FormulaCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
                 ],
+
                 if (target.isNotEmpty)
                   Text(
                     target,
                     style: GoogleFonts.poppins(
-                      color: isPremium
-                          ? Colors.white.withValues(alpha: 0.6)
+                      color: isDark
+                          ? Colors.white.withValues(alpha: 0.65)
                           : const Color(0xFF9E9E9E),
                       fontSize: 12,
                       fontStyle: FontStyle.italic,
@@ -278,23 +401,25 @@ class FormulaCard extends StatelessWidget {
                   child: ElevatedButton(
                     onPressed: onSelect,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: isPremium
+                      backgroundColor: isDark
                           ? Colors.white
                           : (isRecommended
-                                ? primaryColor
-                                : const Color(0xFFF5F5F5)),
-                      foregroundColor: isPremium
+                              ? primaryColor
+                              : (isCustom
+                                  ? const Color(0xFF263238)
+                                  : const Color(0xFFF0F3FA))),
+                      foregroundColor: isDark
                           ? primaryColor
-                          : (isRecommended
-                                ? Colors.white
-                                : const Color(0xFF1A1A1A)),
+                          : (isRecommended || isCustom
+                              ? Colors.white
+                              : primaryColor),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
                       elevation: 0,
                     ),
                     child: Text(
-                      'Choisir cette offre',
+                      ctaText,
                       style: GoogleFonts.poppins(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
@@ -313,9 +438,9 @@ class FormulaCard extends StatelessWidget {
 
 class _BulletItem extends StatelessWidget {
   final String text;
-  final bool isPremium;
+  final bool isDark;
 
-  const _BulletItem({required this.text, required this.isPremium});
+  const _BulletItem({required this.text, required this.isDark});
 
   @override
   Widget build(BuildContext context) {
@@ -326,7 +451,7 @@ class _BulletItem extends StatelessWidget {
         children: [
           Icon(
             Icons.check_circle_outline,
-            color: isPremium
+            color: isDark
                 ? const Color(0xFFFFD700)
                 : const Color(0xFF43A047),
             size: 16,
@@ -336,7 +461,7 @@ class _BulletItem extends StatelessWidget {
             child: Text(
               text,
               style: GoogleFonts.poppins(
-                color: isPremium ? Colors.white : const Color(0xFF1A1A1A),
+                color: isDark ? Colors.white : const Color(0xFF1A1A1A),
                 fontSize: 13,
               ),
             ),

@@ -65,9 +65,29 @@ final dioProvider = FutureProvider<Dio>((ref) async {
       },
       onError: (e, handler) async {
         if (e.response?.statusCode == 401) {
-          // Token expiré — Firebase le renouvelle automatiquement au prochain appel
+          // Token expiré — essayer de le rafraîchir et de rejouer la requête une fois
+          final user = FirebaseAuth.instance.currentUser;
+          if (user != null) {
+            try {
+              await user.getIdToken(true); // Force refresh
+              // Renouveler le token dans les options originales et rejouer la requête
+              final opts = e.requestOptions;
+              final refreshedToken = await user.getIdToken();
+              opts.headers['Authorization'] = 'Bearer $refreshedToken';
+              // Rejouer la requête avec le nouveau token
+              final response = await dio.fetch<dynamic>(opts);
+              return handler.resolve(response);
+            } catch (refreshError) {
+              // Si le rafraîchissement échoue, propager l'erreur originale
+              if (kDebugMode) {
+                debugPrint(
+                  'API 401 — échec du rafraîchissement du token: $refreshError',
+                );
+              }
+            }
+          }
           if (kDebugMode) {
-            debugPrint('API 401 — token Firebase peut-être expiré');
+            debugPrint('API 401 — token Firebase expiré');
           }
         }
         return handler.next(e);

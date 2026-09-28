@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/network/api_client.dart';
 import '../../../core/session/session_providers.dart';
+import '../../../shared/services/activity_read_tracker_service.dart';
 
 class UserActivity {
   UserActivity({
@@ -12,6 +13,7 @@ class UserActivity {
     required this.createdAt,
     this.notes,
     this.totalPrice,
+    this.read = false,
   });
 
   final int id;
@@ -20,6 +22,7 @@ class UserActivity {
   final String createdAt;
   final String? notes;
   final int? totalPrice;
+  final bool read; // Whether this activity has been read by the user
 
   factory UserActivity.fromJson(Map<String, dynamic> json) {
     return UserActivity(
@@ -29,19 +32,40 @@ class UserActivity {
       createdAt: json['created_at'] as String? ?? '',
       notes: json['notes'] as String?,
       totalPrice: (json['total_price'] as num?)?.toInt(),
+      read: false, // Default to unread; will be updated based on local storage
     );
   }
 }
 
 class ActivityRepository {
-  ActivityRepository(this._dio);
+  ActivityRepository(this._dio, this._readTrackerService);
   final Dio _dio;
+  final ActivityReadTrackerService _readTrackerService;
 
   Future<List<UserActivity>> fetchActivity() async {
     try {
       final response = await _dio.get('/api/mobile/activity');
       final list = response.data as List<dynamic>? ?? [];
-      return list.map((e) => UserActivity.fromJson(e)).toList();
+      final activities = list.map((e) => UserActivity.fromJson(e)).toList();
+
+      // Create a new list with correct read status
+      final updatedActivities = <UserActivity>[];
+      for (final activity in activities) {
+        final isRead = await _readTrackerService.isRead(activity.id);
+        updatedActivities.add(
+          UserActivity(
+            id: activity.id,
+            type: activity.type,
+            status: activity.status,
+            createdAt: activity.createdAt,
+            notes: activity.notes,
+            totalPrice: activity.totalPrice,
+            read: isRead,
+          ),
+        );
+      }
+
+      return updatedActivities;
     } catch (e) {
       return [];
     }
@@ -52,7 +76,10 @@ final activityRepositoryProvider = FutureProvider<ActivityRepository>((
   ref,
 ) async {
   final dio = await ref.watch(dioProvider.future);
-  return ActivityRepository(dio);
+  final readTrackerService = await ref.watch(
+    activityReadTrackerServiceProvider.future,
+  );
+  return ActivityRepository(dio, readTrackerService);
 });
 
 /// Activité (commandes + rendez-vous) du compte connecté.
@@ -66,16 +93,10 @@ final userActivityProvider = FutureProvider<List<UserActivity>>((ref) async {
 });
 
 /// Nombre d'activités non lues (notifications).
-///
-/// NOTE: Pour l'instant, nous considérons toutes les activités comme non lues.
-/// Une amélioration future pourrait filtrer par un statut "lu" si l'API le fournit.
 final unreadNotificationCountProvider = Provider<int>((ref) {
   final asyncActivities = ref.watch(userActivityProvider);
 
   // Retourne 0 tant que les données ne sont pas chargées
-  return asyncActivities.when(
-    data: (activities) => activities.length,
-    loading: () => 0,
-    error: (_, _) => 0,
-  );
+  final activities = asyncActivities.value ?? [];
+  return activities.where((activity) => !activity.read).length;
 });

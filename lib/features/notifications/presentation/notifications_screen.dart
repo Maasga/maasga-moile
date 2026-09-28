@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import '../../../shared/widgets/maasga_shell.dart';
 import '../../../shared/widgets/main_bottom_nav.dart';
 import '../data/activity_repository.dart';
+import '../../../shared/services/activity_read_tracker_service.dart';
 
 class NotificationsScreen extends ConsumerWidget {
   const NotificationsScreen({super.key});
@@ -22,6 +23,25 @@ class NotificationsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final activityAsync = ref.watch(userActivityProvider);
+    final readTrackerService = ref.watch(activityReadTrackerProvider);
+
+    // Mark all activities as read when the notifications screen is opened
+    // This ensures the badge count goes to zero when user views notifications
+    // Using a post-frame callback to avoid calling during build
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Since we're using ref.watch, these won't be null in build context
+      final activityList = ref.read(userActivityProvider);
+      // Handle the AsyncValue properly
+      activityList.when(
+        data: (activities) {
+          for (final activity in activities) {
+            readTrackerService?.markAsRead(activity.id);
+          }
+        },
+        loading: () => {},
+        error: (_, _) => {},
+      );
+    });
 
     return MaasgaShell(
       title: 'Mon Activité',

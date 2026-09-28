@@ -1,0 +1,5 @@
+Analyzing maasga-mobile...                                      
+
+   info - Unnecessary use of multiple underscores - lib\features\notifications\data\activity_repository.dart:79:16 - unnecessary_underscores
+
+1 issue found. (ran in 23.4s)

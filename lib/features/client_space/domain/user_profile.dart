@@ -17,6 +17,26 @@ class UserProfile {
   final String memberSince;
   final String? photoUrl;
 
+  UserProfile copyWith({
+    String? id,
+    String? fullName,
+    String? phone,
+    String? email,
+    String? quartier,
+    String? memberSince,
+    String? photoUrl,
+  }) {
+    return UserProfile(
+      id: id ?? this.id,
+      fullName: fullName ?? this.fullName,
+      phone: phone ?? this.phone,
+      email: email ?? this.email,
+      quartier: quartier ?? this.quartier,
+      memberSince: memberSince ?? this.memberSince,
+      photoUrl: photoUrl ?? this.photoUrl,
+    );
+  }
+
   factory UserProfile.fromJson(Map<String, dynamic> json) {
     // Handle memberSince from created_at
     String year = '2024';

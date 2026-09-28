@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -14,6 +15,7 @@ class UserPrefsService {
   static const _keyPhone = 'maasga_pref_phone';
   static const _keyEmail = 'maasga_pref_email';
   static const _keyQuartier = 'maasga_pref_quartier';
+  static const _keyPhotoUrl = 'maasga_pref_photo_url';
 
   final SharedPreferences _prefs;
 
@@ -55,6 +57,12 @@ class UserPrefsService {
 
   String get savedQuartier => _prefs.getString(_keyQuartier) ?? '';
 
+  String get savedPhotoUrl {
+    final stored = _prefs.getString(_keyPhotoUrl) ?? '';
+    if (stored.isNotEmpty) return stored;
+    return FirebaseAuth.instance.currentUser?.photoURL ?? '';
+  }
+
   // ─── Écriture ─────────────────────────────────────────────────────────────
 
   Future<void> save({
@@ -62,6 +70,7 @@ class UserPrefsService {
     String? phone,
     String? email,
     String? quartier,
+    String? photoUrl,
   }) async {
     if (name != null && name.isNotEmpty) await _prefs.setString(_keyName, name);
     if (phone != null && phone.isNotEmpty) {
@@ -73,6 +82,13 @@ class UserPrefsService {
     if (quartier != null && quartier.isNotEmpty) {
       await _prefs.setString(_keyQuartier, quartier);
     }
+    if (photoUrl != null) {
+      if (photoUrl.isEmpty) {
+        await _prefs.remove(_keyPhotoUrl);
+      } else {
+        await _prefs.setString(_keyPhotoUrl, photoUrl);
+      }
+    }
   }
 
   Future<void> clear() async {
@@ -80,6 +96,71 @@ class UserPrefsService {
     await _prefs.remove(_keyPhone);
     await _prefs.remove(_keyEmail);
     await _prefs.remove(_keyQuartier);
+    await _prefs.remove(_keyPhotoUrl);
+  }
+
+  // ─── Activités locales (Commandes, RDV, Contrats) ─────────────────────────
+
+  List<Map<String, dynamic>> getLocalOrders(String uid) {
+    final raw = _prefs.getString('maasga_orders_$uid');
+    if (raw == null || raw.isEmpty) return [];
+    try {
+      final list = jsonDecode(raw);
+      if (list is List) {
+        return list.map((e) => Map<String, dynamic>.from(e as Map)).toList();
+      }
+    } catch (_) {}
+    return [];
+  }
+
+  Future<void> saveLocalOrder(String uid, Map<String, dynamic> order) async {
+    final list = getLocalOrders(uid);
+    list.removeWhere((item) => item['id']?.toString() == order['id']?.toString());
+    list.insert(0, order);
+    await _prefs.setString('maasga_orders_$uid', jsonEncode(list));
+  }
+
+  List<Map<String, dynamic>> getLocalRdvs(String uid) {
+    final raw = _prefs.getString('maasga_rdvs_$uid');
+    if (raw == null || raw.isEmpty) return [];
+    try {
+      final list = jsonDecode(raw);
+      if (list is List) {
+        return list.map((e) => Map<String, dynamic>.from(e as Map)).toList();
+      }
+    } catch (_) {}
+    return [];
+  }
+
+  Future<void> saveLocalRdv(String uid, Map<String, dynamic> rdv) async {
+    final list = getLocalRdvs(uid);
+    list.removeWhere((item) => item['id']?.toString() == rdv['id']?.toString());
+    list.insert(0, rdv);
+    await _prefs.setString('maasga_rdvs_$uid', jsonEncode(list));
+  }
+
+  List<Map<String, dynamic>> getLocalContracts(String uid) {
+    final raw = _prefs.getString('maasga_contracts_$uid');
+    if (raw == null || raw.isEmpty) return [];
+    try {
+      final list = jsonDecode(raw);
+      if (list is List) {
+        return list.map((e) => Map<String, dynamic>.from(e as Map)).toList();
+      }
+    } catch (_) {}
+    return [];
+  }
+
+  Future<void> saveLocalContract(
+    String uid,
+    Map<String, dynamic> contract,
+  ) async {
+    final list = getLocalContracts(uid);
+    list.removeWhere(
+      (item) => item['id']?.toString() == contract['id']?.toString(),
+    );
+    list.insert(0, contract);
+    await _prefs.setString('maasga_contracts_$uid', jsonEncode(list));
   }
 }
 

@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
 import '../../../shared/utils/asset_utils.dart';
+import '../../../shared/design_tokens/maasga_tokens.dart';
 import '../domain/product.dart';
 
 class ProductListCard extends StatelessWidget {
@@ -28,17 +29,21 @@ class ProductListCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.maasga;
     return GestureDetector(
       onTap: onTap,
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: palette.card,
           borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: palette.cardBorder),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.06),
+              color: palette.shadow.withValues(
+                alpha: context.isDarkMode ? 0.35 : 0.06,
+              ),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -53,7 +58,7 @@ class ProductListCard extends StatelessWidget {
               child: Container(
                 width: 100,
                 height: 100,
-                color: const Color(0xFFF5F5F5),
+                color: palette.cardAlt,
                 child: product.imageUrl != null && product.imageUrl!.isNotEmpty
                     ? Image.network(
                         product.imageUrl!,
