@@ -1,15 +1,23 @@
 ﻿import 'dart:convert';
+
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../../shared/design_tokens/maasga_tokens.dart';
 import '../../../shared/utils/asset_utils.dart';
 import '../../../shared/utils/price_formatter.dart';
 import '../../cart/presentation/cart_state.dart';
+import '../data/review_repository.dart';
 import '../domain/product.dart';
+import '../domain/product_review.dart';
+import 'favorites_notifier.dart';
+import 'recent_products_notifier.dart';
 import 'widgets/compare_bottom_sheet.dart';
 import 'widgets/fiche_complete_bottom_sheet.dart';
 import 'widgets/spec_card.dart';
@@ -26,25 +34,28 @@ class ProductDetailScreen extends ConsumerStatefulWidget {
 
 class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
   int _selectedImageIndex = 0;
-  bool _isFavorite = false;
   int _quantity = 1;
   final CarouselSliderController _carouselController =
       CarouselSliderController();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(recentProductsProvider.notifier).addRecent(widget.product);
+    });
+  }
 
   void _incrementQty() => setState(() => _quantity++);
   void _decrementQty() {
     if (_quantity > 1) setState(() => _quantity--);
   }
 
-  void _toggleFavorite() {
-    setState(() => _isFavorite = !_isFavorite);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          _isFavorite ? 'Ajouté aux favoris' : 'Retiré des favoris',
-        ),
-        duration: const Duration(seconds: 1),
-      ),
+  void _shareProduct() {
+    Share.share(
+      'Découvrez le ${widget.product.name} de ${widget.product.brand} — '
+      '${PriceFormatter.format(widget.product.price)}\n\n'
+      'Voir le catalogue MAASGA : https://maasga.com',
     );
   }
 
@@ -121,6 +132,132 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
     );
   }
 
+  void _showReviewBottomSheet() {
+    double rating = 0;
+    final commentController = TextEditingController();
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (ctx, setModalState) {
+            final palette = ctx.maasga;
+            return Padding(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(ctx).viewInsets.bottom,
+              ),
+              child: Container(
+                padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
+                decoration: BoxDecoration(
+                  color: palette.card,
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(24),
+                  ),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Center(
+                      child: Container(
+                        width: 40,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: palette.divider,
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Laisser un avis',
+                      style: GoogleFonts.poppins(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: palette.textPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Center(
+                      child: RatingBar.builder(
+                        initialRating: rating,
+                        minRating: 1,
+                        itemCount: 5,
+                        itemPadding:
+                            const EdgeInsets.symmetric(horizontal: 4),
+                        itemBuilder: (context, _) => Icon(
+                          Icons.star,
+                          color: palette.warning,
+                        ),
+                        onRatingUpdate: (r) {
+                          setModalState(() => rating = r);
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: commentController,
+                      maxLines: 3,
+                      style: palette.inputTextStyle,
+                      decoration: InputDecoration(
+                        hintText: 'Votre commentaire...',
+                        hintStyle: TextStyle(color: palette.textMuted),
+                        filled: true,
+                        fillColor: palette.cardAlt,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 52,
+                      child: ElevatedButton(
+                        onPressed: rating == 0
+                            ? null
+                            : () {
+                                ref
+                                    .read(
+                                      reviewsProvider(
+                                        widget.product.id,
+                                      ).notifier,
+                                    )
+                                    .submitReview(
+                                      rating.round(),
+                                      commentController.text.trim(),
+                                    );
+                                Navigator.of(ctx).pop();
+                              },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: palette.accent,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                        ),
+                        child: Text(
+                          'Envoyer',
+                          style: GoogleFonts.poppins(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -135,10 +272,11 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
               _buildThumbnails(),
               _buildProductInfo(),
               _buildTechnicalBrief(),
+              _buildReviewsSection(),
               _buildFullSheetButton(),
               const SliverToBoxAdapter(
                 child: SizedBox(height: 120),
-              ), // Space for fixed bottom bar
+              ),
             ],
           ),
           _buildBottomAction(),
@@ -169,6 +307,13 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
       ),
       centerTitle: true,
       actions: [
+        Padding(
+          padding: const EdgeInsets.only(right: 8),
+          child: _buildCircleButton(
+            icon: Icons.share_outlined,
+            onTap: _shareProduct,
+          ),
+        ),
         Padding(
           padding: const EdgeInsets.only(right: 16),
           child: _buildCircleButton(
@@ -296,6 +441,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
   }
 
   Widget _buildProductInfo() {
+    final isFavorite = ref.watch(favoritesProvider).contains(widget.product.id);
     final discount = widget.product.oldPrice != null
         ? (((widget.product.oldPrice! - widget.product.price) /
                       widget.product.oldPrice!) *
@@ -335,7 +481,22 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                   ),
                 ),
                 GestureDetector(
-                  onTap: _toggleFavorite,
+                  onTap: () {
+                    final wasFavorite = isFavorite;
+                    ref
+                        .read(favoritesProvider.notifier)
+                        .toggle(widget.product.id);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          wasFavorite
+                              ? 'Retiré des favoris'
+                              : 'Ajouté aux favoris',
+                        ),
+                        duration: const Duration(seconds: 1),
+                      ),
+                    );
+                  },
                   child: Container(
                     width: 44,
                     height: 44,
@@ -344,9 +505,9 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                       border: Border.all(color: const Color(0xFFE0E0E0)),
                     ),
                     child: Icon(
-                      _isFavorite ? Icons.favorite : Icons.favorite_border,
-                      color: _isFavorite
-                          ? const Color(0xFFE53935)
+                      isFavorite ? Icons.favorite : Icons.favorite_border,
+                      color: isFavorite
+                          ? context.maasga.danger
                           : context.maasga.textMuted,
                       size: 24,
                     ),
@@ -460,6 +621,180 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
     );
   }
 
+  Widget _buildReviewsSection() {
+    final palette = context.maasga;
+    final reviewsAsync = ref.watch(reviewsProvider(widget.product.id));
+    final avg = ref.watch(averageRatingProvider(widget.product.id));
+    final isLoggedIn = FirebaseAuth.instance.currentUser != null;
+
+    return SliverToBoxAdapter(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Divider(height: 1, color: palette.divider),
+            const SizedBox(height: 20),
+            Text(
+              'AVIS CLIENTS',
+              style: GoogleFonts.poppins(
+                fontSize: 13,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 1.2,
+                color: palette.textPrimary,
+              ),
+            ),
+            const SizedBox(height: 12),
+            reviewsAsync.when(
+              loading: () => const Center(
+                child: Padding(
+                  padding: EdgeInsets.all(16),
+                  child: CircularProgressIndicator(),
+                ),
+              ),
+              error: (_, _) => Text(
+                'Impossible de charger les avis',
+                style: GoogleFonts.poppins(
+                  fontSize: 13,
+                  color: palette.textMuted,
+                ),
+              ),
+              data: (reviews) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (reviews.isNotEmpty) ...[
+                      Row(
+                        children: [
+                          RatingBarIndicator(
+                            rating: avg,
+                            itemBuilder: (context, _) => Icon(
+                              Icons.star,
+                              color: palette.warning,
+                            ),
+                            itemCount: 5,
+                            itemSize: 18,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            '${avg.toStringAsFixed(1)} (${reviews.length} avis)',
+                            style: GoogleFonts.poppins(
+                              fontSize: 13,
+                              color: palette.textSecondary,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      ...reviews.take(3).map(_buildReviewItem),
+                      if (reviews.length > 3)
+                        TextButton(
+                          onPressed: () {},
+                          child: Text(
+                            'Voir tous les avis (${reviews.length})',
+                            style: GoogleFonts.poppins(
+                              fontSize: 13,
+                              color: palette.accent,
+                            ),
+                          ),
+                        ),
+                    ] else
+                      Text(
+                        'Aucun avis pour ce produit.',
+                        style: GoogleFonts.poppins(
+                          fontSize: 13,
+                          color: palette.textMuted,
+                        ),
+                      ),
+                    if (isLoggedIn) ...[
+                      const SizedBox(height: 12),
+                      OutlinedButton.icon(
+                        onPressed: _showReviewBottomSheet,
+                        icon: const Icon(Icons.rate_review_outlined, size: 18),
+                        label: Text(
+                          'Laisser un avis',
+                          style: GoogleFonts.poppins(fontSize: 13),
+                        ),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: palette.accent,
+                          side: BorderSide(color: palette.accent),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
+                );
+              },
+            ),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildReviewItem(ProductReview review) {
+    final palette = context.maasga;
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: palette.cardAlt,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  review.userName,
+                  style: GoogleFonts.poppins(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: palette.textPrimary,
+                  ),
+                ),
+              ),
+              RatingBarIndicator(
+                rating: review.rating.toDouble(),
+                itemBuilder: (context, _) => Icon(
+                  Icons.star,
+                  color: palette.warning,
+                ),
+                itemCount: 5,
+                itemSize: 14,
+              ),
+            ],
+          ),
+          if (review.comment.isNotEmpty) ...[
+            const SizedBox(height: 4),
+            Text(
+              review.comment,
+              style: GoogleFonts.poppins(
+                fontSize: 12,
+                color: palette.textSecondary,
+              ),
+            ),
+          ],
+          const SizedBox(height: 4),
+          Text(
+            '${review.createdAt.day.toString().padLeft(2, '0')}/'
+            '${review.createdAt.month.toString().padLeft(2, '0')}/'
+            '${review.createdAt.year}',
+            style: GoogleFonts.poppins(
+              fontSize: 11,
+              color: palette.textMuted,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildFullSheetButton() {
     return SliverToBoxAdapter(
       child: Padding(
@@ -511,7 +846,6 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
         ),
         child: Row(
           children: [
-            // Quantity Selector
             Container(
               padding: const EdgeInsets.all(4),
               decoration: BoxDecoration(

@@ -73,6 +73,8 @@ dependencies:
   in_app_review: ^2.0.0
   # sentry_flutter: ^8.0.0 # Temporairement désactivé - problème de compatibilité Kotlin
   flutter_native_splash: ^2.3.0
+  flutter_rating_bar: ^4.0.1
+  share_plus: ^10.1.4
 
 dev_dependencies:
   flutter_test:
