@@ -1,11 +1,13 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../shared/design_tokens/maasga_tokens.dart';
 import '../../../shared/utils/asset_utils.dart';
+import '../../../shared/utils/price_formatter.dart';
 import '../../cart/presentation/cart_state.dart';
 import '../domain/product.dart';
 import 'widgets/compare_bottom_sheet.dart';
@@ -55,7 +57,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
         content: Text('${widget.product.name} ajouté au panier'),
         behavior: SnackBarBehavior.floating,
         duration: const Duration(seconds: 3),
-        backgroundColor: const Color(0xFF1B3A8D),
+        backgroundColor: context.maasga.accent,
         action: SnackBarAction(
           label: 'VOIR',
           textColor: Colors.white,
@@ -122,7 +124,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: context.maasga.pageGradient.colors.first,
       body: Stack(
         children: [
           CustomScrollView(
@@ -147,7 +149,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
 
   Widget _buildAppBar() {
     return SliverAppBar(
-      backgroundColor: Colors.white,
+      backgroundColor: context.maasga.card,
       elevation: 0,
       pinned: true,
       leading: Padding(
@@ -162,7 +164,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
         style: GoogleFonts.poppins(
           fontSize: 17,
           fontWeight: FontWeight.w600,
-          color: const Color(0xFF1A1A1A),
+          color: context.maasga.textPrimary,
         ),
       ),
       centerTitle: true,
@@ -188,7 +190,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
         width: 36,
         height: 36,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: context.maasga.card,
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
@@ -198,7 +200,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
             ),
           ],
         ),
-        child: Icon(icon, color: const Color(0xFF1A1A1A), size: 20),
+        child: Icon(icon, color: context.maasga.textPrimary, size: 20),
       ),
     );
   }
@@ -211,7 +213,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
             items: widget.product.images.map((img) {
               return Container(
                 width: double.infinity,
-                color: const Color(0xFFF5F5F5),
+                color: context.maasga.cardAlt,
                 child: _buildImageWidget(img, BoxFit.contain),
               );
             }).toList(),
@@ -231,7 +233,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.85),
+                color: context.maasga.card.withValues(alpha: 0.9),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
@@ -239,7 +241,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                 style: GoogleFonts.poppins(
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
-                  color: const Color(0xFF1A1A1A),
+                  color: context.maasga.textPrimary,
                 ),
               ),
             ),
@@ -273,7 +275,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
                     color: isSelected
-                        ? const Color(0xFF1B3A8D)
+                        ? context.maasga.accent
                         : const Color(0xFFE0E0E0),
                     width: isSelected ? 2 : 1,
                   ),
@@ -319,14 +321,14 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                         style: GoogleFonts.poppins(
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
-                          color: const Color(0xFF1A1A1A),
+                          color: context.maasga.textPrimary,
                         ),
                       ),
                       Text(
                         'Marque: ${widget.product.brand} · ${widget.product.category}',
                         style: GoogleFonts.poppins(
                           fontSize: 14,
-                          color: const Color(0xFF757575),
+                          color: context.maasga.textMuted,
                         ),
                       ),
                     ],
@@ -345,7 +347,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                       _isFavorite ? Icons.favorite : Icons.favorite_border,
                       color: _isFavorite
                           ? const Color(0xFFE53935)
-                          : const Color(0xFF9E9E9E),
+                          : context.maasga.textMuted,
                       size: 24,
                     ),
                   ),
@@ -356,20 +358,20 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
             Row(
               children: [
                 Text(
-                  '${widget.product.price} FCFA',
+                  PriceFormatter.format(widget.product.price),
                   style: GoogleFonts.poppins(
                     fontSize: 26,
                     fontWeight: FontWeight.bold,
-                    color: const Color(0xFF1B3A8D),
+                    color: context.maasga.accent,
                   ),
                 ),
                 if (widget.product.oldPrice != null) ...[
                   const SizedBox(width: 12),
                   Text(
-                    '${widget.product.oldPrice} FCFA',
+                    PriceFormatter.format(widget.product.oldPrice!),
                     style: GoogleFonts.poppins(
                       fontSize: 16,
-                      color: const Color(0xFF9E9E9E),
+                      color: context.maasga.textMuted,
                       decoration: TextDecoration.lineThrough,
                     ),
                   ),
@@ -380,7 +382,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFE8F5E9),
+                      color: context.maasga.successSurface,
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
@@ -388,7 +390,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                       style: GoogleFonts.poppins(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
-                        color: const Color(0xFF43A047),
+                        color: context.maasga.success,
                       ),
                     ),
                   ),
@@ -396,7 +398,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
               ],
             ),
             const SizedBox(height: 20),
-            const Divider(height: 1, color: Color(0xFFF0F0F0)),
+            Divider(height: 1, color: context.maasga.divider),
           ],
         ),
       ),
@@ -416,7 +418,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                 fontSize: 13,
                 fontWeight: FontWeight.bold,
                 letterSpacing: 1.2,
-                color: const Color(0xFF1A1A1A),
+                color: context.maasga.textPrimary,
               ),
             ),
             const SizedBox(height: 16),
@@ -465,7 +467,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
         child: OutlinedButton(
           onPressed: _showFicheComplete,
           style: OutlinedButton.styleFrom(
-            side: const BorderSide(color: Color(0xFF1B3A8D), width: 2),
+            side: BorderSide(color: context.maasga.accent, width: 2),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(14),
             ),
@@ -477,7 +479,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
               fontSize: 13,
               fontWeight: FontWeight.bold,
               letterSpacing: 1.0,
-              color: const Color(0xFF1B3A8D),
+              color: context.maasga.accent,
             ),
           ),
         ),
@@ -498,7 +500,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
           MediaQuery.of(context).padding.bottom + 12,
         ),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: context.maasga.card,
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.08),
@@ -513,7 +515,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
             Container(
               padding: const EdgeInsets.all(4),
               decoration: BoxDecoration(
-                color: const Color(0xFFF5F5F5),
+                color: context.maasga.cardAlt,
                 borderRadius: BorderRadius.circular(30),
               ),
               child: Row(
@@ -559,7 +561,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                   ),
                 ),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF1B3A8D),
+                  backgroundColor: context.maasga.accent,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14),
                   ),
@@ -584,16 +586,16 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
         width: 38,
         height: 38,
         decoration: BoxDecoration(
-          color: isRemove ? Colors.white : const Color(0xFF1B3A8D),
+          color: isRemove ? context.maasga.card : context.maasga.accent,
           shape: BoxShape.circle,
           border: isRemove
-              ? Border.all(color: const Color(0xFF1B3A8D), width: 2)
+              ? Border.all(color: context.maasga.accent, width: 2)
               : null,
         ),
         child: Icon(
           icon,
           size: 18,
-          color: isRemove ? const Color(0xFF1B3A8D) : Colors.white,
+          color: isRemove ? context.maasga.accent : Colors.white,
         ),
       ),
     );

@@ -719,7 +719,7 @@ class _MaintenanceScreenState extends ConsumerState<MaintenanceScreen> {
           ),
         ],
       ),
-      bottomNavigationBar: const MainBottomNav(currentPath: '/maintenance'),
+      bottomNavigationBar: const MainBottomNav(),
     );
   }
 

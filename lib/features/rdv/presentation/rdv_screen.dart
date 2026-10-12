@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../shared/design_tokens/maasga_tokens.dart';
 import '../../../shared/widgets/main_bottom_nav.dart';
 import '../../../shared/widgets/maasga_app_bar.dart';
 import '../../../shared/services/user_prefs_service.dart';
@@ -25,7 +26,6 @@ class RdvScreen extends ConsumerStatefulWidget {
 }
 
 class _RdvScreenState extends ConsumerState<RdvScreen> {
-  static const _primaryBlue = Color(0xFF1B3A8D);
   static const _bgColor = Color(0xFFF5F5F5);
 
   final PageController _pageController = PageController();
@@ -266,7 +266,7 @@ class _RdvScreenState extends ConsumerState<RdvScreen> {
           if (_currentStep < 2) _buildFooter(),
         ],
       ),
-      bottomNavigationBar: const MainBottomNav(currentPath: '/rdv'),
+      bottomNavigationBar: const MainBottomNav(),
     );
   }
 
@@ -380,7 +380,7 @@ class _RdvScreenState extends ConsumerState<RdvScreen> {
             ? ElevatedButton(
                 onPressed: _selectedServiceType != null ? _nextPage : null,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: _primaryBlue,
+                  backgroundColor: context.maasga.accent,
                   disabledBackgroundColor: const Color(0xFFE0E0E0),
                   minimumSize: const Size(double.infinity, 50),
                   shape: RoundedRectangleBorder(
@@ -408,12 +408,12 @@ class _RdvScreenState extends ConsumerState<RdvScreen> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        side: const BorderSide(color: _primaryBlue),
+                        side: BorderSide(color: context.maasga.accent),
                       ),
                       child: Text(
                         'Retour',
                         style: GoogleFonts.poppins(
-                          color: _primaryBlue,
+                          color: context.maasga.accent,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -425,7 +425,7 @@ class _RdvScreenState extends ConsumerState<RdvScreen> {
                     child: ElevatedButton(
                       onPressed: _isLoading ? null : _submitDemande,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: _primaryBlue,
+                        backgroundColor: context.maasga.accent,
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),

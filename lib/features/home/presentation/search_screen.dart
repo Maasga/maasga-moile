@@ -92,7 +92,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           ),
         ],
       ),
-      bottomNavigationBar: const MainBottomNav(currentPath: '/search'),
+      bottomNavigationBar: const MainBottomNav(),
     );
   }
 

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
-import '../../domain/neighborhoods.dart';
+import '../../../../shared/widgets/quartier_picker.dart';
 
 class RdvFormStep extends StatefulWidget {
   final String selectedServiceType;
@@ -61,7 +61,7 @@ class _RdvFormStepState extends State<RdvFormStep> {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (ctx) => _QuartierSearchDialog(
+      builder: (ctx) => QuartierSearchBottomSheet(
         currentSelection: widget.selectedQuartier,
         onSelected: (val) {
           widget.onQuartierChanged(val);
@@ -473,100 +473,3 @@ class _RdvFormStepState extends State<RdvFormStep> {
   }
 }
 
-class _QuartierSearchDialog extends StatefulWidget {
-  final String? currentSelection;
-  final Function(String) onSelected;
-
-  const _QuartierSearchDialog({
-    required this.currentSelection,
-    required this.onSelected,
-  });
-
-  @override
-  State<_QuartierSearchDialog> createState() => _QuartierSearchDialogState();
-}
-
-class _QuartierSearchDialogState extends State<_QuartierSearchDialog> {
-  String _search = '';
-
-  @override
-  Widget build(BuildContext context) {
-    final filtered = ouagaNeighborhoods
-        .where((q) => q.toLowerCase().contains(_search.toLowerCase()))
-        .toList();
-
-    return Container(
-      height: MediaQuery.of(context).size.height * 0.75,
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      child: Column(
-        children: [
-          const SizedBox(height: 12),
-          Container(
-            width: 40,
-            height: 4,
-            decoration: BoxDecoration(
-              color: Colors.grey[300],
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
-          const SizedBox(height: 20),
-          Text(
-            'Sélectionner votre quartier',
-            style: GoogleFonts.poppins(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 16),
-          TextField(
-            onChanged: (v) => setState(() => _search = v),
-            style: const TextStyle(fontSize: 14, color: Color(0xFF1A1A1A)),
-            decoration: InputDecoration(
-              hintText: 'Rechercher un quartier...',
-              prefixIcon: const Icon(Icons.search),
-              filled: true,
-              fillColor: const Color(0xFFF5F5F5),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide.none,
-              ),
-            ),
-          ),
-          const SizedBox(height: 12),
-          Expanded(
-            child: ListView.separated(
-              itemCount: filtered.length,
-              separatorBuilder: (_, _) => const Divider(height: 1),
-              itemBuilder: (context, index) {
-                final q = filtered[index];
-                final isSelected = q == widget.currentSelection;
-                return ListTile(
-                  title: Text(
-                    q,
-                    style: GoogleFonts.poppins(
-                      fontSize: 14,
-                      color: isSelected
-                          ? const Color(0xFF1B3A8D)
-                          : Colors.black87,
-                      fontWeight: isSelected
-                          ? FontWeight.w600
-                          : FontWeight.w400,
-                    ),
-                  ),
-                  trailing: isSelected
-                      ? const Icon(Icons.check, color: Color(0xFF1B3A8D))
-                      : null,
-                  onTap: () => widget.onSelected(q),
-                );
-              },
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}

@@ -1,8 +1,9 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
 
+import '../../../shared/design_tokens/maasga_tokens.dart';
+import '../../../shared/utils/price_formatter.dart';
 import '../../../shared/widgets/main_bottom_nav.dart';
 import 'cart_item_card.dart';
 import 'cart_state.dart';
@@ -41,23 +42,24 @@ class _CartScreenState extends ConsumerState<CartScreen> {
   }
 
   Future<bool?> _showDeleteDialog(BuildContext context) {
+    final palette = context.maasga;
     return showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text(
           "Supprimer l'article ?",
-          style: GoogleFonts.poppins(
+          style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w600,
-            color: const Color(0xFF1A1A1A),
+            color: palette.textPrimary,
           ),
         ),
         content: Text(
           'Voulez-vous retirer ce produit du panier ?',
-          style: GoogleFonts.poppins(
+          style: TextStyle(
             fontSize: 14,
-            color: const Color(0xFF757575),
+            color: palette.textMuted,
           ),
         ),
         actions: [
@@ -65,24 +67,24 @@ class _CartScreenState extends ConsumerState<CartScreen> {
             onPressed: () => Navigator.of(ctx).pop(false),
             child: Text(
               'Annuler',
-              style: GoogleFonts.poppins(
+              style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
-                color: const Color(0xFF757575),
+                color: palette.textMuted,
               ),
             ),
           ),
           ElevatedButton(
             onPressed: () => Navigator.of(ctx).pop(true),
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFE53935),
+              backgroundColor: palette.danger,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10),
               ),
             ),
-            child: Text(
+            child: const Text(
               'Supprimer',
-              style: GoogleFonts.poppins(
+              style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
                 color: Colors.white,
@@ -94,16 +96,10 @@ class _CartScreenState extends ConsumerState<CartScreen> {
     );
   }
 
-  String _formatPrice(double price) {
-    final intPart = price.toInt().toString().replaceAllMapped(
-      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-      (m) => '${m[1]} ',
-    );
-    return '$intPart FCFA';
-  }
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.maasga;
     final cart = ref.watch(cartProvider);
     final cartNotifier = ref.read(cartProvider.notifier);
 
@@ -115,20 +111,20 @@ class _CartScreenState extends ConsumerState<CartScreen> {
     final double total = sousTotal - remise;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: palette.pageGradient.colors.first,
       body: SafeArea(
         child: Column(
           children: [
             // 1. HEADER
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-              decoration: const BoxDecoration(
-                color: Colors.white,
+              decoration: BoxDecoration(
+                color: palette.card,
                 boxShadow: [
                   BoxShadow(
-                    color: Color.fromRGBO(0, 0, 0, 0.05),
+                    color: palette.shadow.withValues(alpha: 0.05),
                     blurRadius: 12,
-                    offset: Offset(0, 2),
+                    offset: const Offset(0, 2),
                   ),
                 ],
               ),
@@ -142,10 +138,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                         context.go('/home');
                       }
                     },
-                    icon: const Icon(
-                      Icons.arrow_back,
-                      color: Color(0xFF1A1A1A),
-                    ),
+                    icon: Icon(Icons.arrow_back, color: palette.textPrimary),
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(),
                   ),
@@ -153,10 +146,10 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                     child: Center(
                       child: Text(
                         'Panier',
-                        style: GoogleFonts.poppins(
+                        style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
-                          color: const Color(0xFF1A1A1A),
+                          color: palette.textPrimary,
                         ),
                       ),
                     ),
@@ -173,18 +166,18 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(
+                          Icon(
                             Icons.shopping_cart_outlined,
                             size: 64,
-                            color: Color(0xFFBDBDBD),
+                            color: palette.textMuted,
                           ),
                           const SizedBox(height: 16),
                           Text(
                             'Votre panier est vide',
-                            style: GoogleFonts.poppins(
+                            style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w500,
-                              color: const Color(0xFF757575),
+                              color: palette.textMuted,
                             ),
                           ),
                         ],
@@ -210,14 +203,10 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                                 key: ValueKey(line.product.id),
                                 direction: DismissDirection.endToStart,
                                 confirmDismiss: (_) async {
-                                  return await _showDeleteDialog(context) ??
-                                      false;
+                                  return await _showDeleteDialog(context) ?? false;
                                 },
                                 onDismissed: (_) {
-                                  // Remove all quantity of this product
-                                  final notifier = ref.read(
-                                    cartProvider.notifier,
-                                  );
+                                  final notifier = ref.read(cartProvider.notifier);
                                   for (int i = 0; i < line.quantity; i++) {
                                     notifier.remove(line.product);
                                   }
@@ -225,7 +214,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                                 background: Container(
                                   margin: const EdgeInsets.only(bottom: 12),
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFFE53935),
+                                    color: palette.danger,
                                     borderRadius: BorderRadius.circular(16),
                                   ),
                                   alignment: Alignment.centerRight,
@@ -238,16 +227,22 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                                 ),
                                 child: CartItemCard(
                                   line: line,
-                                  onIncrement: () =>
-                                      cartNotifier.add(line.product),
-                                  onDecrement: () async {
+                                  onIncrement: () => cartNotifier.add(line.product),
+                                  onDecrement: () {
                                     if (line.quantity == 1) {
-                                      final confirmed =
-                                          await _showDeleteDialog(context) ??
-                                          false;
-                                      if (confirmed) {
-                                        cartNotifier.remove(line.product);
-                                      }
+                                      cartNotifier.remove(line.product);
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                          content: Text('${line.product.name} retiré'),
+                                          action: SnackBarAction(
+                                            label: 'Annuler',
+                                            onPressed: () =>
+                                                cartNotifier.add(line.product),
+                                          ),
+                                          behavior: SnackBarBehavior.floating,
+                                          duration: const Duration(seconds: 4),
+                                        ),
+                                      );
                                     } else {
                                       cartNotifier.remove(line.product);
                                     }
@@ -265,7 +260,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                             ),
                             padding: const EdgeInsets.all(16),
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: palette.card,
                               borderRadius: BorderRadius.circular(16),
                             ),
                             child: Column(
@@ -273,10 +268,10 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                               children: [
                                 Text(
                                   'Avez-vous un code promo ?',
-                                  style: GoogleFonts.poppins(
+                                  style: TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w600,
-                                    color: const Color(0xFF1A1A1A),
+                                    color: palette.textPrimary,
                                   ),
                                 ),
                                 const SizedBox(height: 10),
@@ -285,49 +280,35 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                                     Expanded(
                                       child: TextField(
                                         controller: _promoController,
-                                        textCapitalization:
-                                            TextCapitalization.characters,
-                                        style: GoogleFonts.poppins(
+                                        textCapitalization: TextCapitalization.characters,
+                                        style: TextStyle(
                                           fontSize: 13,
-                                          color: const Color(0xFF1A1A1A),
+                                          color: palette.textPrimary,
                                         ),
                                         decoration: InputDecoration(
                                           hintText: 'Entrez votre code',
-                                          hintStyle: GoogleFonts.poppins(
+                                          hintStyle: TextStyle(
                                             fontSize: 13,
                                             fontWeight: FontWeight.w400,
-                                            color: const Color(0xFF9E9E9E),
+                                            color: palette.textMuted,
                                           ),
-                                          contentPadding:
-                                              const EdgeInsets.symmetric(
-                                                horizontal: 12,
-                                                vertical: 14,
-                                              ),
+                                          contentPadding: const EdgeInsets.symmetric(
+                                            horizontal: 12,
+                                            vertical: 14,
+                                          ),
                                           filled: true,
-                                          fillColor: const Color(0xFFF5F5F5),
+                                          fillColor: palette.cardAlt,
                                           border: OutlineInputBorder(
-                                            borderRadius: BorderRadius.circular(
-                                              10,
-                                            ),
-                                            borderSide: const BorderSide(
-                                              color: Color(0xFFE0E0E0),
-                                            ),
+                                            borderRadius: BorderRadius.circular(10),
+                                            borderSide: BorderSide(color: palette.cardBorder),
                                           ),
                                           enabledBorder: OutlineInputBorder(
-                                            borderRadius: BorderRadius.circular(
-                                              10,
-                                            ),
-                                            borderSide: const BorderSide(
-                                              color: Color(0xFFE0E0E0),
-                                            ),
+                                            borderRadius: BorderRadius.circular(10),
+                                            borderSide: BorderSide(color: palette.cardBorder),
                                           ),
                                           focusedBorder: OutlineInputBorder(
-                                            borderRadius: BorderRadius.circular(
-                                              10,
-                                            ),
-                                            borderSide: const BorderSide(
-                                              color: Color(0xFF1B3A8D),
-                                            ),
+                                            borderRadius: BorderRadius.circular(10),
+                                            borderSide: BorderSide(color: palette.accent),
                                           ),
                                         ),
                                       ),
@@ -336,22 +317,18 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                                     ElevatedButton(
                                       onPressed: _applyPromo,
                                       style: ElevatedButton.styleFrom(
-                                        backgroundColor: const Color(
-                                          0xFF1B3A8D,
-                                        ),
+                                        backgroundColor: palette.accent,
                                         shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            10,
-                                          ),
+                                          borderRadius: BorderRadius.circular(10),
                                         ),
                                         padding: const EdgeInsets.symmetric(
                                           horizontal: 14,
                                           vertical: 14,
                                         ),
                                       ),
-                                      child: Text(
+                                      child: const Text(
                                         'Appliquer',
-                                        style: GoogleFonts.poppins(
+                                        style: TextStyle(
                                           fontSize: 13,
                                           fontWeight: FontWeight.w600,
                                           color: Colors.white,
@@ -364,27 +341,23 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                                   const SizedBox(height: 10),
                                   Row(
                                     children: [
-                                      const Icon(
-                                        Icons.check_circle,
-                                        color: Color(0xFF43A047),
-                                        size: 16,
-                                      ),
+                                      Icon(Icons.check_circle, color: palette.success, size: 16),
                                       const SizedBox(width: 6),
                                       Text(
                                         _promoController.text.trim(),
-                                        style: GoogleFonts.poppins(
+                                        style: TextStyle(
                                           fontSize: 13,
                                           fontWeight: FontWeight.w500,
-                                          color: const Color(0xFF1A1A1A),
+                                          color: palette.textPrimary,
                                         ),
                                       ),
                                       const Spacer(),
                                       Text(
-                                        'Available',
-                                        style: GoogleFonts.poppins(
+                                        'Disponible',
+                                        style: TextStyle(
                                           fontSize: 13,
                                           fontWeight: FontWeight.w500,
-                                          color: const Color(0xFF43A047),
+                                          color: palette.success,
                                         ),
                                       ),
                                     ],
@@ -393,10 +366,10 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                                   const SizedBox(height: 8),
                                   Text(
                                     'Code invalide',
-                                    style: GoogleFonts.poppins(
+                                    style: TextStyle(
                                       fontSize: 12,
                                       fontWeight: FontWeight.w400,
-                                      color: const Color(0xFFE53935),
+                                      color: palette.danger,
                                     ),
                                   ),
                                 ],
@@ -412,7 +385,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                             ),
                             padding: const EdgeInsets.all(16),
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: palette.card,
                               borderRadius: BorderRadius.circular(16),
                             ),
                             child: Column(
@@ -421,19 +394,19 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                                   children: [
                                     Text(
                                       'Sous-total',
-                                      style: GoogleFonts.poppins(
+                                      style: TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.w400,
-                                        color: const Color(0xFF757575),
+                                        color: palette.textMuted,
                                       ),
                                     ),
                                     const Spacer(),
                                     Text(
-                                      _formatPrice(sousTotal),
-                                      style: GoogleFonts.poppins(
+                                      PriceFormatter.format(sousTotal.toInt()),
+                                      style: TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.w600,
-                                        color: const Color(0xFF1A1A1A),
+                                        color: palette.textPrimary,
                                       ),
                                     ),
                                   ],
@@ -444,45 +417,42 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                                     children: [
                                       Text(
                                         'Remise',
-                                        style: GoogleFonts.poppins(
+                                        style: TextStyle(
                                           fontSize: 14,
                                           fontWeight: FontWeight.w400,
-                                          color: const Color(0xFF757575),
+                                          color: palette.textMuted,
                                         ),
                                       ),
                                       const Spacer(),
                                       Text(
-                                        '-${_formatPrice(remise)}',
-                                        style: GoogleFonts.poppins(
+                                        '-${PriceFormatter.format(remise.toInt())}',
+                                        style: TextStyle(
                                           fontSize: 14,
                                           fontWeight: FontWeight.w600,
-                                          color: const Color(0xFFE53935),
+                                          color: palette.danger,
                                         ),
                                       ),
                                     ],
                                   ),
                                 ],
-                                const Divider(
-                                  height: 20,
-                                  color: Color(0xFFF0F0F0),
-                                ),
+                                Divider(height: 20, color: palette.divider),
                                 Row(
                                   children: [
                                     Text(
                                       'Total',
-                                      style: GoogleFonts.poppins(
+                                      style: TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.w700,
-                                        color: const Color(0xFF1A1A1A),
+                                        color: palette.textPrimary,
                                       ),
                                     ),
                                     const Spacer(),
                                     Text(
-                                      _formatPrice(total),
-                                      style: GoogleFonts.poppins(
+                                      PriceFormatter.format(total.toInt()),
+                                      style: TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.w700,
-                                        color: const Color(0xFF1B3A8D),
+                                        color: palette.accent,
                                       ),
                                     ),
                                   ],
@@ -498,13 +468,13 @@ class _CartScreenState extends ConsumerState<CartScreen> {
             // 5. BOUTON VALIDER (fixe en bas)
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              decoration: const BoxDecoration(
-                color: Colors.white,
+              decoration: BoxDecoration(
+                color: palette.card,
                 boxShadow: [
                   BoxShadow(
-                    color: Color.fromRGBO(0, 0, 0, 0.08),
+                    color: palette.shadow.withValues(alpha: 0.08),
                     blurRadius: 12,
-                    offset: Offset(0, -3),
+                    offset: const Offset(0, -3),
                   ),
                 ],
               ),
@@ -512,19 +482,17 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                 width: double.infinity,
                 height: 54,
                 child: ElevatedButton(
-                  onPressed: cart.isEmpty
-                      ? null
-                      : () => context.push('/checkout'),
+                  onPressed: cart.isEmpty ? null : () => context.push('/checkout'),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF1B3A8D),
-                    disabledBackgroundColor: const Color(0xFFBDBDBD),
+                    backgroundColor: palette.accent,
+                    disabledBackgroundColor: palette.textMuted,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
                     ),
                   ),
-                  child: Text(
+                  child: const Text(
                     'Valider la commande',
-                    style: GoogleFonts.poppins(
+                    style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                       color: Colors.white,
@@ -535,7 +503,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
             ),
 
             // Bottom nav
-            const MainBottomNav(currentPath: '/cart'),
+            const MainBottomNav(),
           ],
         ),
       ),

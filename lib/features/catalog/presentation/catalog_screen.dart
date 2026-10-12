@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -68,9 +69,11 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
     final allProducts = productsAsync.asData?.value ?? [];
     final activeFilters = ref.watch(catalogFilterProvider);
 
-    debugPrint('📦 État produitsAsync: $productsAsync');
-    debugPrint('📦 Nombre total produits: ${allProducts.length}');
-    debugPrint('📦 Catégorie sélectionnée: $_selectedCategory');
+    if (kDebugMode) {
+      debugPrint('📦 État produitsAsync: $productsAsync');
+      debugPrint('📦 Nombre total produits: ${allProducts.length}');
+      debugPrint('📦 Catégorie sélectionnée: $_selectedCategory');
+    }
 
     // Filtrage dynamique
     final filteredProducts = allProducts.where((product) {
@@ -97,7 +100,9 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
       return true;
     }).toList();
 
-    debugPrint('📦 Produits filtrés: ${filteredProducts.length}');
+    if (kDebugMode) {
+      debugPrint('📦 Produits filtrés: ${filteredProducts.length}');
+    }
 
     return Scaffold(
       backgroundColor: context.maasga.pageGradient.colors.first,
@@ -200,7 +205,7 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
           ],
         ),
       ),
-      bottomNavigationBar: const MainBottomNav(currentPath: '/catalog'),
+      bottomNavigationBar: const MainBottomNav(),
     );
   }
 }

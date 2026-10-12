@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:intl/intl.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -13,6 +12,7 @@ import '../widgets/brand_scroll.dart';
 import '../../../shared/widgets/main_bottom_nav.dart';
 import '../../../shared/widgets/maasga_app_bar.dart';
 import '../../../shared/utils/asset_utils.dart';
+import '../../../shared/utils/price_formatter.dart';
 import '../widgets/promo_banner.dart';
 import '../../../shared/design_tokens/maasga_tokens.dart';
 
@@ -24,15 +24,6 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
-  String _formatPrice(int price) {
-    final f = NumberFormat.currency(
-      locale: 'fr_FR',
-      symbol: 'FCFA',
-      decimalDigits: 0,
-    );
-    return f.format(price);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -52,12 +43,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 .animate()
                 .fadeIn(delay: 300.ms)
                 .scale(begin: const Offset(0.95, 0.95)),
-            _InnovationsSection(formatPrice: _formatPrice),
+            _InnovationsSection(formatPrice: PriceFormatter.format),
             const SizedBox(height: 18),
           ],
         ),
       ),
-      bottomNavigationBar: const MainBottomNav(currentPath: '/home'),
+      bottomNavigationBar: const MainBottomNav(),
     );
   }
 }

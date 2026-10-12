@@ -84,17 +84,15 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/catalogue',
-        pageBuilder: (context, state) =>
-            _buildPage(state, const CatalogScreen()),
+        redirect: (context, state) => '/catalog',
       ),
       GoRoute(
         path: '/rendez-vous',
-        pageBuilder: (context, state) => _buildPage(state, const RdvScreen()),
+        redirect: (context, state) => '/rdv',
       ),
       GoRoute(
         path: '/espace-client',
-        pageBuilder: (context, state) =>
-            _buildPage(state, const ClientSpaceScreen()),
+        redirect: (context, state) => '/client-space',
       ),
       GoRoute(
         path: '/catalog',

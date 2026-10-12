@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../design_tokens/maasga_tokens.dart';
 import '../../app/theme/theme_controller.dart';
+import '../../features/cart/presentation/cart_state.dart';
 
 class MaasgaAppBar extends ConsumerWidget implements PreferredSizeWidget {
   const MaasgaAppBar({
@@ -11,6 +12,7 @@ class MaasgaAppBar extends ConsumerWidget implements PreferredSizeWidget {
     required this.notificationsCount,
     this.trailingAction,
     this.showBackButton = false,
+    this.cartCount,
   });
 
   /// Numéro à afficher sur la cloche.
@@ -19,20 +21,28 @@ class MaasgaAppBar extends ConsumerWidget implements PreferredSizeWidget {
   /// Permet d'ajouter une icône spécifique à côté de la cloche de notifications (ex: filtre).
   final Widget? trailingAction;
 
-  /// Remplace le menu hamburger par une flèche retour si context.canPop() est vrai,
+  /// Remplace le menu hamburger par une flèche retour si context.canPop() est vrai.
   final bool showBackButton;
+
+  /// Si fourni, affiche un badge panier avec ce compte.
+  /// Si null, calcule automatiquement depuis cartProvider.
+  final int? cartCount;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final themeMode = ref.watch(themeControllerProvider);
-    // La luminosité effective vient du thème, pas du mode choisi : `system` est
-    // la valeur la plus courante et ne dit rien de ce qui est réellement rendu.
     final isDark = context.isDarkMode;
     final palette = context.maasga;
     final colorScheme = Theme.of(context).colorScheme;
 
+    final resolvedCartCount =
+        cartCount ??
+        ref.watch(cartProvider).fold<int>(0, (s, l) => s + l.quantity);
+
+    // Compute right section width based on presence of trailingAction
+    final rightWidth = trailingAction != null ? 168 : 120;
+
     return Container(
-      // We apply standard safe area padding for the app bar
       padding: EdgeInsets.only(
         top: MediaQuery.of(context).padding.top + 8,
         bottom: 8,
@@ -84,9 +94,9 @@ class MaasgaAppBar extends ConsumerWidget implements PreferredSizeWidget {
             ),
           ),
 
-          // Right Actions (Theme Switcher + Trailing + Notifications)
+          // Right Actions (Theme Switcher + Cart + Trailing + Notifications)
           SizedBox(
-            width: trailingAction != null ? 144 : 96,
+            width: rightWidth.toDouble(),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
@@ -106,8 +116,50 @@ class MaasgaAppBar extends ConsumerWidget implements PreferredSizeWidget {
                   tooltip: 'Changer le thème',
                 ),
 
+                // Cart icon with badge
+                Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    IconButton(
+                      onPressed: () => context.go('/cart'),
+                      icon: const Icon(
+                        Icons.shopping_cart_outlined,
+                        size: 20,
+                      ),
+                      color: colorScheme.onSurface,
+                    ),
+                    if (resolvedCartCount > 0)
+                      Positioned(
+                        right: 4,
+                        top: 4,
+                        child: Container(
+                          padding: const EdgeInsets.all(2),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: palette.danger,
+                            border: Border.all(color: palette.card, width: 1),
+                          ),
+                          constraints: const BoxConstraints(
+                            minWidth: 14,
+                            minHeight: 14,
+                          ),
+                          alignment: Alignment.center,
+                          child: Text(
+                            resolvedCartCount > 9 ? '9+' : '$resolvedCartCount',
+                            style: GoogleFonts.poppins(
+                              fontSize: 8,
+                              color: Colors.white,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+
                 ?trailingAction,
 
+                // Notifications bell
                 Stack(
                   clipBehavior: Clip.none,
                   alignment: Alignment.center,
@@ -154,7 +206,6 @@ class MaasgaAppBar extends ConsumerWidget implements PreferredSizeWidget {
 
   @override
   Size get preferredSize {
-    // Custom height taking account of standard 56 + shadow space
     return const Size.fromHeight(60.0);
   }
 }
