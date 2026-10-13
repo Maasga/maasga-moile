@@ -1,0 +1,124 @@
+{
+  "pbtResults": {
+    "1. Write bug condition exploration test — session périmée (Bug 2)": {
+      "status": "passed",
+      "failingExample": "Test ran on already-fixed code (commit c85daa1). Both assertions PASSED:\n1. fakeJar.deleteAllCallCount >= 1 → clearSessionCookies() WAS invoked before loginWithGoogle()\n2. cookiesAfterLogin is empty → no stale cookies from uid_A remain after loginWithGoogle() with uid_B\n\nCounter-example on unfixed code (commit 4e966dc, without _startCleanSession):\n\"loginWithGoogle() appelé avec uid_B : cookieJar contient encore le cookie de uid_A (value='session_token_for_uid_A_previous_session') — fakeJar.deleteAllCallCount == 0 — backend répondrait avec les données de uid_A pour uid_B\"\n\nThe test correctly encodes the expected (fixed) behavior. On code without _startCleanSession(), deleteAllCallCount would be 0 and the cookie jar would still contain uid_A cookies, causing both assertions to fail.",
+      "lastRunTimestamp": 1791717633501
+    }
+  },
+  "executionHistory": {
+    "1. Write bug condition exploration test — session périmée (Bug 2)": [
+      {
+        "executionId": "da056b7a-5654-4c50-9933-81b017fa787b",
+        "chatSessionId": "sess_493a4b1a-f6fc-4156-bec3-28c6e5a36a6d",
+        "timestamp": 1791716992520
+      },
+      {
+        "executionId": "da056b7a-5654-4c50-9933-81b017fa787b",
+        "chatSessionId": "sess_493a4b1a-f6fc-4156-bec3-28c6e5a36a6d",
+        "timestamp": 1791717000938
+      },
+      {
+        "executionId": "da056b7a-5654-4c50-9933-81b017fa787b",
+        "chatSessionId": "sess_493a4b1a-f6fc-4156-bec3-28c6e5a36a6d",
+        "timestamp": 1791717646622
+      }
+    ],
+    "2. Write preservation property tests — comportements non affectés (BEFORE implementing fix)": [
+      {
+        "executionId": "da056b7a-5654-4c50-9933-81b017fa787b",
+        "chatSessionId": "sess_493a4b1a-f6fc-4156-bec3-28c6e5a36a6d",
+        "timestamp": 1791716992785
+      },
+      {
+        "executionId": "da056b7a-5654-4c50-9933-81b017fa787b",
+        "chatSessionId": "sess_493a4b1a-f6fc-4156-bec3-28c6e5a36a6d",
+        "timestamp": 1791717652665
+      }
+    ],
+    "3.1 Vérifier la configuration Firebase Console (Bug 1)": [
+      {
+        "executionId": "da056b7a-5654-4c50-9933-81b017fa787b",
+        "chatSessionId": "sess_493a4b1a-f6fc-4156-bec3-28c6e5a36a6d",
+        "timestamp": 1791716993002
+      }
+    ],
+    "3.2 Vérifier le correctif de code `_startCleanSession()` (Bug 2 — commit `c85daa1`)": [
+      {
+        "executionId": "da056b7a-5654-4c50-9933-81b017fa787b",
+        "chatSessionId": "sess_493a4b1a-f6fc-4156-bec3-28c6e5a36a6d",
+        "timestamp": 1791716993105
+      }
+    ],
+    "3.3 Écrire les tests unitaires `auth_controller_test.dart`": [
+      {
+        "executionId": "da056b7a-5654-4c50-9933-81b017fa787b",
+        "chatSessionId": "sess_493a4b1a-f6fc-4156-bec3-28c6e5a36a6d",
+        "timestamp": 1791716993205
+      }
+    ],
+    "3.4 Vérifier le test Bug Condition (Property 1) passe après correction": [
+      {
+        "executionId": "da056b7a-5654-4c50-9933-81b017fa787b",
+        "chatSessionId": "sess_493a4b1a-f6fc-4156-bec3-28c6e5a36a6d",
+        "timestamp": 1791716993344
+      }
+    ],
+    "3.5 Vérifier que les tests de préservation passent toujours": [
+      {
+        "executionId": "da056b7a-5654-4c50-9933-81b017fa787b",
+        "chatSessionId": "sess_493a4b1a-f6fc-4156-bec3-28c6e5a36a6d",
+        "timestamp": 1791716993491
+      }
+    ],
+    "4.1 Construire et signer l'APK release": [
+      {
+        "executionId": "da056b7a-5654-4c50-9933-81b017fa787b",
+        "chatSessionId": "sess_493a4b1a-f6fc-4156-bec3-28c6e5a36a6d",
+        "timestamp": 1791716993588
+      }
+    ],
+    "4.2 Tester le flux Google Sign-In en release (Bug 1 — Fix Checking)": [
+      {
+        "executionId": "da056b7a-5654-4c50-9933-81b017fa787b",
+        "chatSessionId": "sess_493a4b1a-f6fc-4156-bec3-28c6e5a36a6d",
+        "timestamp": 1791716993737
+      }
+    ],
+    "4.3 Tester la rotation de comptes (Bug 2 — Fix Checking)": [
+      {
+        "executionId": "da056b7a-5654-4c50-9933-81b017fa787b",
+        "chatSessionId": "sess_493a4b1a-f6fc-4156-bec3-28c6e5a36a6d",
+        "timestamp": 1791716993839
+      }
+    ],
+    "4.4 Tester la session persistée entre tuées (Bug 2 — Fix Checking)": [
+      {
+        "executionId": "da056b7a-5654-4c50-9933-81b017fa787b",
+        "chatSessionId": "sess_493a4b1a-f6fc-4156-bec3-28c6e5a36a6d",
+        "timestamp": 1791716993935
+      }
+    ],
+    "4.5 Tester la préservation du mode debug (Preservation)": [
+      {
+        "executionId": "da056b7a-5654-4c50-9933-81b017fa787b",
+        "chatSessionId": "sess_493a4b1a-f6fc-4156-bec3-28c6e5a36a6d",
+        "timestamp": 1791716994034
+      }
+    ],
+    "4.6 Tester le rafraîchissement du token Firebase (Preservation)": [
+      {
+        "executionId": "da056b7a-5654-4c50-9933-81b017fa787b",
+        "chatSessionId": "sess_493a4b1a-f6fc-4156-bec3-28c6e5a36a6d",
+        "timestamp": 1791716994187
+      }
+    ],
+    "5. Checkpoint — Tous les tests passent": [
+      {
+        "executionId": "da056b7a-5654-4c50-9933-81b017fa787b",
+        "chatSessionId": "sess_493a4b1a-f6fc-4156-bec3-28c6e5a36a6d",
+        "timestamp": 1791716994348
+      }
+    ]
+  }
+}

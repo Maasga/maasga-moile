@@ -1,0 +1,333 @@
+{
+  "pbtResults": {},
+  "executionHistory": {
+    "2.1 Remplacer dans `product_list_card.dart`": [
+      {
+        "executionId": "64acbecf-2bdb-4c3d-8a49-d33ec3f9fd06",
+        "chatSessionId": "sess_493a4b1a-f6fc-4156-bec3-28c6e5a36a6d",
+        "timestamp": 1791747994106
+      },
+      {
+        "executionId": "64acbecf-2bdb-4c3d-8a49-d33ec3f9fd06",
+        "chatSessionId": "sess_493a4b1a-f6fc-4156-bec3-28c6e5a36a6d",
+        "timestamp": 1791748015198
+      },
+      {
+        "executionId": "64acbecf-2bdb-4c3d-8a49-d33ec3f9fd06",
+        "chatSessionId": "sess_493a4b1a-f6fc-4156-bec3-28c6e5a36a6d",
+        "timestamp": 1791748819075
+      }
+    ],
+    "2.2 Remplacer dans `product_detail_screen.dart`": [
+      {
+        "executionId": "64acbecf-2bdb-4c3d-8a49-d33ec3f9fd06",
+        "chatSessionId": "sess_493a4b1a-f6fc-4156-bec3-28c6e5a36a6d",
+        "timestamp": 1791747994477
+      },
+      {
+        "executionId": "64acbecf-2bdb-4c3d-8a49-d33ec3f9fd06",
+        "chatSessionId": "sess_493a4b1a-f6fc-4156-bec3-28c6e5a36a6d",
+        "timestamp": 1791748823669
+      },
+      {
+        "executionId": "64acbecf-2bdb-4c3d-8a49-d33ec3f9fd06",
+        "chatSessionId": "sess_493a4b1a-f6fc-4156-bec3-28c6e5a36a6d",
+        "timestamp": 1791750409554
+      }
+    ],
+    "2.3 Remplacer dans `rdv_screen.dart`": [
+      {
+        "executionId": "64acbecf-2bdb-4c3d-8a49-d33ec3f9fd06",
+        "chatSessionId": "sess_493a4b1a-f6fc-4156-bec3-28c6e5a36a6d",
+        "timestamp": 1791747994778
+      },
+      {
+        "executionId": "64acbecf-2bdb-4c3d-8a49-d33ec3f9fd06",
+        "chatSessionId": "sess_493a4b1a-f6fc-4156-bec3-28c6e5a36a6d",
+        "timestamp": 1791748828444
+      },
+      {
+        "executionId": "64acbecf-2bdb-4c3d-8a49-d33ec3f9fd06",
+        "chatSessionId": "sess_493a4b1a-f6fc-4156-bec3-28c6e5a36a6d",
+        "timestamp": 1791750413712
+      }
+    ],
+    "2.4 Remplacer dans `checkout_screen.dart`": [
+      {
+        "executionId": "64acbecf-2bdb-4c3d-8a49-d33ec3f9fd06",
+        "chatSessionId": "sess_493a4b1a-f6fc-4156-bec3-28c6e5a36a6d",
+        "timestamp": 1791747994936
+      },
+      {
+        "executionId": "64acbecf-2bdb-4c3d-8a49-d33ec3f9fd06",
+        "chatSessionId": "sess_493a4b1a-f6fc-4156-bec3-28c6e5a36a6d",
+        "timestamp": 1791748832523
+      },
+      {
+        "executionId": "64acbecf-2bdb-4c3d-8a49-d33ec3f9fd06",
+        "chatSessionId": "sess_493a4b1a-f6fc-4156-bec3-28c6e5a36a6d",
+        "timestamp": 1791750417668
+      }
+    ],
+    "2.5 Remplacer dans `cart_screen.dart`, `simulator_screen.dart`, `client_space_screen.dart`": [
+      {
+        "executionId": "64acbecf-2bdb-4c3d-8a49-d33ec3f9fd06",
+        "chatSessionId": "sess_493a4b1a-f6fc-4156-bec3-28c6e5a36a6d",
+        "timestamp": 1791747995095
+      },
+      {
+        "executionId": "64acbecf-2bdb-4c3d-8a49-d33ec3f9fd06",
+        "chatSessionId": "sess_493a4b1a-f6fc-4156-bec3-28c6e5a36a6d",
+        "timestamp": 1791748838038
+      },
+      {
+        "executionId": "64acbecf-2bdb-4c3d-8a49-d33ec3f9fd06",
+        "chatSessionId": "sess_493a4b1a-f6fc-4156-bec3-28c6e5a36a6d",
+        "timestamp": 1791750422347
+      }
+    ],
+    "3. Checkpoint — Vérifier la compilation après les tâches 1.1 et 1.2": [
+      {
+        "executionId": "64acbecf-2bdb-4c3d-8a49-d33ec3f9fd06",
+        "chatSessionId": "sess_493a4b1a-f6fc-4156-bec3-28c6e5a36a6d",
+        "timestamp": 1791747995271
+      }
+    ],
+    "4.1 Corriger `product_detail_screen.dart`": [
+      {
+        "executionId": "64acbecf-2bdb-4c3d-8a49-d33ec3f9fd06",
+        "chatSessionId": "sess_493a4b1a-f6fc-4156-bec3-28c6e5a36a6d",
+        "timestamp": 1791747995620
+      },
+      {
+        "executionId": "64acbecf-2bdb-4c3d-8a49-d33ec3f9fd06",
+        "chatSessionId": "sess_493a4b1a-f6fc-4156-bec3-28c6e5a36a6d",
+        "timestamp": 1791750430656
+      },
+      {
+        "executionId": "55ab0098-36f4-4084-8e09-f95bfd4802f4",
+        "chatSessionId": "sess_493a4b1a-f6fc-4156-bec3-28c6e5a36a6d",
+        "timestamp": 1791754792357
+      }
+    ],
+    "4.2 Corriger `cart_screen.dart`": [
+      {
+        "executionId": "64acbecf-2bdb-4c3d-8a49-d33ec3f9fd06",
+        "chatSessionId": "sess_493a4b1a-f6fc-4156-bec3-28c6e5a36a6d",
+        "timestamp": 1791747995765
+      },
+      {
+        "executionId": "64acbecf-2bdb-4c3d-8a49-d33ec3f9fd06",
+        "chatSessionId": "sess_493a4b1a-f6fc-4156-bec3-28c6e5a36a6d",
+        "timestamp": 1791750440490
+      },
+      {
+        "executionId": "55ab0098-36f4-4084-8e09-f95bfd4802f4",
+        "chatSessionId": "sess_493a4b1a-f6fc-4156-bec3-28c6e5a36a6d",
+        "timestamp": 1791754797017
+      }
+    ],
+    "4.3 Corriger `checkout_screen.dart` (surfaces uniquement)": [
+      {
+        "executionId": "64acbecf-2bdb-4c3d-8a49-d33ec3f9fd06",
+        "chatSessionId": "sess_493a4b1a-f6fc-4156-bec3-28c6e5a36a6d",
+        "timestamp": 1791747995946
+      },
+      {
+        "executionId": "64acbecf-2bdb-4c3d-8a49-d33ec3f9fd06",
+        "chatSessionId": "sess_493a4b1a-f6fc-4156-bec3-28c6e5a36a6d",
+        "timestamp": 1791750447573
+      },
+      {
+        "executionId": "55ab0098-36f4-4084-8e09-f95bfd4802f4",
+        "chatSessionId": "sess_493a4b1a-f6fc-4156-bec3-28c6e5a36a6d",
+        "timestamp": 1791754801509
+      }
+    ],
+    "4.4 Corriger `rdv_screen.dart`": [
+      {
+        "executionId": "64acbecf-2bdb-4c3d-8a49-d33ec3f9fd06",
+        "chatSessionId": "sess_493a4b1a-f6fc-4156-bec3-28c6e5a36a6d",
+        "timestamp": 1791747996074
+      },
+      {
+        "executionId": "64acbecf-2bdb-4c3d-8a49-d33ec3f9fd06",
+        "chatSessionId": "sess_493a4b1a-f6fc-4156-bec3-28c6e5a36a6d",
+        "timestamp": 1791750451451
+      },
+      {
+        "executionId": "55ab0098-36f4-4084-8e09-f95bfd4802f4",
+        "chatSessionId": "sess_493a4b1a-f6fc-4156-bec3-28c6e5a36a6d",
+        "timestamp": 1791754806438
+      }
+    ],
+    "4.5 Corriger `simulator_screen.dart`": [
+      {
+        "executionId": "64acbecf-2bdb-4c3d-8a49-d33ec3f9fd06",
+        "chatSessionId": "sess_493a4b1a-f6fc-4156-bec3-28c6e5a36a6d",
+        "timestamp": 1791747996250
+      },
+      {
+        "executionId": "0037bea7-7395-410b-9a89-a604425d25a3",
+        "chatSessionId": "sess_493a4b1a-f6fc-4156-bec3-28c6e5a36a6d",
+        "timestamp": 1791752430917
+      },
+      {
+        "executionId": "55ab0098-36f4-4084-8e09-f95bfd4802f4",
+        "chatSessionId": "sess_493a4b1a-f6fc-4156-bec3-28c6e5a36a6d",
+        "timestamp": 1791754812868
+      }
+    ],
+    "5. Checkpoint — Tester le dark mode visuellement": [
+      {
+        "executionId": "64acbecf-2bdb-4c3d-8a49-d33ec3f9fd06",
+        "chatSessionId": "sess_493a4b1a-f6fc-4156-bec3-28c6e5a36a6d",
+        "timestamp": 1791747996381
+      }
+    ],
+    "6.1 Nettoyer `product_list_card.dart`": [
+      {
+        "executionId": "64acbecf-2bdb-4c3d-8a49-d33ec3f9fd06",
+        "chatSessionId": "sess_493a4b1a-f6fc-4156-bec3-28c6e5a36a6d",
+        "timestamp": 1791747996540
+      },
+      {
+        "executionId": "55ab0098-36f4-4084-8e09-f95bfd4802f4",
+        "chatSessionId": "sess_493a4b1a-f6fc-4156-bec3-28c6e5a36a6d",
+        "timestamp": 1791754821992
+      },
+      {
+        "executionId": "55ab0098-36f4-4084-8e09-f95bfd4802f4",
+        "chatSessionId": "sess_493a4b1a-f6fc-4156-bec3-28c6e5a36a6d",
+        "timestamp": 1791756619140
+      }
+    ],
+    "6.2 Nettoyer `catalog_screen.dart`": [
+      {
+        "executionId": "64acbecf-2bdb-4c3d-8a49-d33ec3f9fd06",
+        "chatSessionId": "sess_493a4b1a-f6fc-4156-bec3-28c6e5a36a6d",
+        "timestamp": 1791747996850
+      },
+      {
+        "executionId": "55ab0098-36f4-4084-8e09-f95bfd4802f4",
+        "chatSessionId": "sess_493a4b1a-f6fc-4156-bec3-28c6e5a36a6d",
+        "timestamp": 1791754826334
+      },
+      {
+        "executionId": "55ab0098-36f4-4084-8e09-f95bfd4802f4",
+        "chatSessionId": "sess_493a4b1a-f6fc-4156-bec3-28c6e5a36a6d",
+        "timestamp": 1791756624169
+      }
+    ],
+    "6.3 Nettoyer `cart_screen.dart`": [
+      {
+        "executionId": "64acbecf-2bdb-4c3d-8a49-d33ec3f9fd06",
+        "chatSessionId": "sess_493a4b1a-f6fc-4156-bec3-28c6e5a36a6d",
+        "timestamp": 1791747997002
+      },
+      {
+        "executionId": "55ab0098-36f4-4084-8e09-f95bfd4802f4",
+        "chatSessionId": "sess_493a4b1a-f6fc-4156-bec3-28c6e5a36a6d",
+        "timestamp": 1791754831181
+      },
+      {
+        "executionId": "55ab0098-36f4-4084-8e09-f95bfd4802f4",
+        "chatSessionId": "sess_493a4b1a-f6fc-4156-bec3-28c6e5a36a6d",
+        "timestamp": 1791756629615
+      }
+    ],
+    "6.4 Nettoyer `checkout_screen.dart`": [
+      {
+        "executionId": "64acbecf-2bdb-4c3d-8a49-d33ec3f9fd06",
+        "chatSessionId": "sess_493a4b1a-f6fc-4156-bec3-28c6e5a36a6d",
+        "timestamp": 1791747997153
+      },
+      {
+        "executionId": "55ab0098-36f4-4084-8e09-f95bfd4802f4",
+        "chatSessionId": "sess_493a4b1a-f6fc-4156-bec3-28c6e5a36a6d",
+        "timestamp": 1791756061722
+      },
+      {
+        "executionId": "55ab0098-36f4-4084-8e09-f95bfd4802f4",
+        "chatSessionId": "sess_493a4b1a-f6fc-4156-bec3-28c6e5a36a6d",
+        "timestamp": 1791756634189
+      }
+    ],
+    "7.1 Migrer `product_list_card.dart`": [
+      {
+        "executionId": "64acbecf-2bdb-4c3d-8a49-d33ec3f9fd06",
+        "chatSessionId": "sess_493a4b1a-f6fc-4156-bec3-28c6e5a36a6d",
+        "timestamp": 1791747997445
+      },
+      {
+        "executionId": "55ab0098-36f4-4084-8e09-f95bfd4802f4",
+        "chatSessionId": "sess_493a4b1a-f6fc-4156-bec3-28c6e5a36a6d",
+        "timestamp": 1791756638853
+      }
+    ],
+    "7.3 Migrer les chips de `simulator_screen.dart`": [
+      {
+        "executionId": "64acbecf-2bdb-4c3d-8a49-d33ec3f9fd06",
+        "chatSessionId": "sess_493a4b1a-f6fc-4156-bec3-28c6e5a36a6d",
+        "timestamp": 1791747997591
+      },
+      {
+        "executionId": "55ab0098-36f4-4084-8e09-f95bfd4802f4",
+        "chatSessionId": "sess_493a4b1a-f6fc-4156-bec3-28c6e5a36a6d",
+        "timestamp": 1791756646274
+      }
+    ],
+    "7.4 Vérifier et migrer `rdv_screen.dart` (ServiceTypeCard)": [
+      {
+        "executionId": "64acbecf-2bdb-4c3d-8a49-d33ec3f9fd06",
+        "chatSessionId": "sess_493a4b1a-f6fc-4156-bec3-28c6e5a36a6d",
+        "timestamp": 1791747997756
+      },
+      {
+        "executionId": "55ab0098-36f4-4084-8e09-f95bfd4802f4",
+        "chatSessionId": "sess_493a4b1a-f6fc-4156-bec3-28c6e5a36a6d",
+        "timestamp": 1791756651010
+      }
+    ],
+    "9. Checkpoint final — Validation complète du sprint": [
+      {
+        "executionId": "64acbecf-2bdb-4c3d-8a49-d33ec3f9fd06",
+        "chatSessionId": "sess_493a4b1a-f6fc-4156-bec3-28c6e5a36a6d",
+        "timestamp": 1791747997915
+      },
+      {
+        "executionId": "55ab0098-36f4-4084-8e09-f95bfd4802f4",
+        "chatSessionId": "sess_493a4b1a-f6fc-4156-bec3-28c6e5a36a6d",
+        "timestamp": 1791756663295
+      }
+    ],
+    "2. Tâche 1.2 — Remplacer la couleur hardcodée 0xFF1B3A8D dans les 7 fichiers cibles": [
+      {
+        "executionId": "64acbecf-2bdb-4c3d-8a49-d33ec3f9fd06",
+        "chatSessionId": "sess_493a4b1a-f6fc-4156-bec3-28c6e5a36a6d",
+        "timestamp": 1791750422584
+      }
+    ],
+    "4. Tâche 1.3 — Corriger le dark mode sur les écrans non conformes": [
+      {
+        "executionId": "55ab0098-36f4-4084-8e09-f95bfd4802f4",
+        "chatSessionId": "sess_493a4b1a-f6fc-4156-bec3-28c6e5a36a6d",
+        "timestamp": 1791754813113
+      }
+    ],
+    "6. Tâche 1.4 — Unifier la typographie (supprimer GoogleFonts.poppins directs)": [
+      {
+        "executionId": "55ab0098-36f4-4084-8e09-f95bfd4802f4",
+        "chatSessionId": "sess_493a4b1a-f6fc-4156-bec3-28c6e5a36a6d",
+        "timestamp": 1791756634328
+      }
+    ],
+    "7. Tâche 1.5 — Migrer GestureDetector → InkWell": [
+      {
+        "executionId": "55ab0098-36f4-4084-8e09-f95bfd4802f4",
+        "chatSessionId": "sess_493a4b1a-f6fc-4156-bec3-28c6e5a36a6d",
+        "timestamp": 1791756651180
+      }
+    ]
+  }
+}
