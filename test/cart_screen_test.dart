@@ -49,6 +49,30 @@ void main() {
       expect(find.text('Votre panier est vide'), findsOneWidget);
       expect(find.byIcon(Icons.shopping_cart_outlined), findsOneWidget);
     });
+
+    testWidgets('bouton Valider la commande désactivé quand panier vide', (tester) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          child: MaterialApp.router(
+            routerConfig: GoRouter(
+              routes: [
+                GoRoute(
+                  path: '/',
+                  builder: (context, state) => const CartScreen(),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      final btn = tester.widget<ElevatedButton>(
+        find.widgetWithText(ElevatedButton, 'Valider la commande'),
+      );
+      expect(btn.onPressed, isNull);
+    });
   });
 
   group('CartScreen - Panier avec produits', () {
@@ -237,44 +261,6 @@ void main() {
 
       await tester.tap(find.byIcon(Icons.remove));
       expect(decrementCalled, isTrue);
-    });
-  });
-
-  group('CartScreen - Code promo', () {
-    testWidgets('affiche le champ code promo', (tester) async {
-      final product = Product(
-        id: 1,
-        name: 'Climatiseur 9000 BTU',
-        brand: 'Samsung',
-        price: 280000,
-        stock: 5,
-      );
-
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            cartProvider.overrideWith(
-              () => TestCartNotifier([CartLine(product: product, quantity: 1)]),
-            ),
-          ],
-          child: MaterialApp.router(
-            routerConfig: GoRouter(
-              routes: [
-                GoRoute(
-                  path: '/',
-                  builder: (context, state) => const CartScreen(),
-                ),
-              ],
-            ),
-          ),
-        ),
-      );
-
-      await tester.pumpAndSettle();
-
-      expect(find.text('Avez-vous un code promo ?'), findsOneWidget);
-      expect(find.text('Entrez votre code'), findsOneWidget);
-      expect(find.text('Appliquer'), findsOneWidget);
     });
   });
 

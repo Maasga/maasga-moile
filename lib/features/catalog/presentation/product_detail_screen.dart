@@ -1,6 +1,4 @@
-﻿import 'dart:convert';
-
-import 'package:carousel_slider/carousel_slider.dart';
+﻿import 'package:carousel_slider/carousel_slider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
@@ -10,8 +8,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../shared/design_tokens/maasga_tokens.dart';
-import '../../../shared/utils/asset_utils.dart';
 import '../../../shared/utils/price_formatter.dart';
+import '../../../shared/widgets/product_image.dart';
 import '../../cart/presentation/cart_state.dart';
 import '../data/review_repository.dart';
 import '../domain/product.dart';
@@ -80,39 +78,6 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
         ),
       ),
     );
-  }
-
-  Widget _buildImageWidget(String imgUrl, BoxFit fit) {
-    if (imgUrl.isEmpty || imgUrl == '??') {
-      return Image.asset('assets/products/product_placeholder.png', fit: fit);
-    }
-    if (imgUrl.trim().startsWith('data:image')) {
-      try {
-        final base64Str = imgUrl.split(',').last;
-        return Image.memory(
-          base64Decode(base64Str),
-          fit: fit,
-          errorBuilder: (_, _, _) =>
-              Image.asset('assets/products/product_placeholder.png', fit: fit),
-        );
-      } catch (e) {
-        return Image.asset('assets/products/product_placeholder.png', fit: fit);
-      }
-    } else if (imgUrl.startsWith('http')) {
-      return Image.network(
-        imgUrl,
-        fit: fit,
-        errorBuilder: (_, _, _) =>
-            Image.asset('assets/products/product_placeholder.png', fit: fit),
-      );
-    } else {
-      return Image.asset(
-        AssetUtils.getAssetPath(imgUrl),
-        fit: fit,
-        errorBuilder: (_, _, _) =>
-            Image.asset('assets/products/product_placeholder.png', fit: fit),
-      );
-    }
   }
 
   void _showFicheComplete() {
@@ -360,7 +325,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
               return Container(
                 width: double.infinity,
                 color: context.maasga.cardAlt,
-                child: _buildImageWidget(img, BoxFit.contain),
+                child: ProductImage(imageUrl: img, width: double.infinity, height: 300, fit: BoxFit.contain),
               );
             }).toList(),
             carouselController: _carouselController,
@@ -428,9 +393,11 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                 ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(10),
-                  child: _buildImageWidget(
-                    widget.product.images[index],
-                    BoxFit.cover,
+                  child: ProductImage(
+                    imageUrl: widget.product.images[index],
+                    width: 66,
+                    height: 66,
+                    fit: BoxFit.cover,
                   ),
                 ),
               ),

@@ -16,29 +16,9 @@ class CartScreen extends ConsumerStatefulWidget {
 }
 
 class _CartScreenState extends ConsumerState<CartScreen> {
-  final TextEditingController _promoController = TextEditingController();
-  bool _isPromoValid = false;
-  bool _isPromoInvalid = false;
-  static const double _remise = 100.0;
-  static const String _validPromoCode = 'DROPSYEARAND';
-
   @override
   void dispose() {
-    _promoController.dispose();
     super.dispose();
-  }
-
-  void _applyPromo() {
-    final code = _promoController.text.trim().toUpperCase();
-    setState(() {
-      if (code == _validPromoCode) {
-        _isPromoValid = true;
-        _isPromoInvalid = false;
-      } else {
-        _isPromoValid = false;
-        _isPromoInvalid = true;
-      }
-    });
   }
 
   Future<bool?> _showDeleteDialog(BuildContext context) {
@@ -107,8 +87,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
       0.0,
       (sum, line) => sum + line.product.price * line.quantity,
     );
-    final double remise = _isPromoValid ? _remise : 0.0;
-    final double total = sousTotal - remise;
+    final double total = sousTotal;
 
     return Scaffold(
       backgroundColor: palette.pageGradient.colors.first,
@@ -252,131 +231,6 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                             },
                           ),
 
-                          // 3. CODE PROMO
-                          Container(
-                            margin: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 8,
-                            ),
-                            padding: const EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              color: palette.card,
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Avez-vous un code promo ?',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600,
-                                    color: palette.textPrimary,
-                                  ),
-                                ),
-                                const SizedBox(height: 10),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: TextField(
-                                        controller: _promoController,
-                                        textCapitalization: TextCapitalization.characters,
-                                        style: TextStyle(
-                                          fontSize: 13,
-                                          color: palette.textPrimary,
-                                        ),
-                                        decoration: InputDecoration(
-                                          hintText: 'Entrez votre code',
-                                          hintStyle: TextStyle(
-                                            fontSize: 13,
-                                            fontWeight: FontWeight.w400,
-                                            color: palette.textMuted,
-                                          ),
-                                          contentPadding: const EdgeInsets.symmetric(
-                                            horizontal: 12,
-                                            vertical: 14,
-                                          ),
-                                          filled: true,
-                                          fillColor: palette.cardAlt,
-                                          border: OutlineInputBorder(
-                                            borderRadius: BorderRadius.circular(10),
-                                            borderSide: BorderSide(color: palette.cardBorder),
-                                          ),
-                                          enabledBorder: OutlineInputBorder(
-                                            borderRadius: BorderRadius.circular(10),
-                                            borderSide: BorderSide(color: palette.cardBorder),
-                                          ),
-                                          focusedBorder: OutlineInputBorder(
-                                            borderRadius: BorderRadius.circular(10),
-                                            borderSide: BorderSide(color: palette.accent),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(width: 10),
-                                    ElevatedButton(
-                                      onPressed: _applyPromo,
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: palette.accent,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(10),
-                                        ),
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 14,
-                                          vertical: 14,
-                                        ),
-                                      ),
-                                      child: const Text(
-                                        'Appliquer',
-                                        style: TextStyle(
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.w600,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                if (_isPromoValid) ...[
-                                  const SizedBox(height: 10),
-                                  Row(
-                                    children: [
-                                      Icon(Icons.check_circle, color: palette.success, size: 16),
-                                      const SizedBox(width: 6),
-                                      Text(
-                                        _promoController.text.trim(),
-                                        style: TextStyle(
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.w500,
-                                          color: palette.textPrimary,
-                                        ),
-                                      ),
-                                      const Spacer(),
-                                      Text(
-                                        'Disponible',
-                                        style: TextStyle(
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.w500,
-                                          color: palette.success,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ] else if (_isPromoInvalid) ...[
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    'Code invalide',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w400,
-                                      color: palette.danger,
-                                    ),
-                                  ),
-                                ],
-                              ],
-                            ),
-                          ),
-
                           // 4. RÉCAPITULATIF
                           Container(
                             margin: const EdgeInsets.symmetric(
@@ -411,30 +265,6 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                                     ),
                                   ],
                                 ),
-                                if (_isPromoValid) ...[
-                                  const SizedBox(height: 8),
-                                  Row(
-                                    children: [
-                                      Text(
-                                        'Remise',
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w400,
-                                          color: palette.textMuted,
-                                        ),
-                                      ),
-                                      const Spacer(),
-                                      Text(
-                                        '-${PriceFormatter.format(remise.toInt())}',
-                                        style: TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w600,
-                                          color: palette.danger,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
                                 Divider(height: 20, color: palette.divider),
                                 Row(
                                   children: [

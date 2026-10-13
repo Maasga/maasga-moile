@@ -27,6 +27,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
   final _phoneCtrl = TextEditingController();
   final _quartierCtrl = TextEditingController();
   final _notesCtrl = TextEditingController();
+  final _adresseCtrl = TextEditingController();
 
   bool _loading = false;
   String? _error;
@@ -81,6 +82,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     _phoneCtrl.dispose();
     _quartierCtrl.dispose();
     _notesCtrl.dispose();
+    _adresseCtrl.dispose();
     super.dispose();
   }
 
@@ -181,6 +183,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
 
           _buildLabel('Adresse précise (optionnel)'),
           TextField(
+            controller: _adresseCtrl,
             decoration: _buildInputDecoration(
               'Numéro, rue, repère...',
               Icons.location_on_outlined,
@@ -536,6 +539,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
         'total_price': total,
 
         'notes': _notesCtrl.text.trim().isEmpty ? null : _notesCtrl.text.trim(),
+        'adresse_precise': _adresseCtrl.text.trim().isEmpty ? null : _adresseCtrl.text.trim(),
       };
 
       final response = await dio.post('/api/mobile/commandes', data: payload);

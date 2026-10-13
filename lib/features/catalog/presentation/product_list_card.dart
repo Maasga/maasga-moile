@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../shared/utils/asset_utils.dart';
 import '../../../shared/design_tokens/maasga_tokens.dart';
+import '../../../shared/widgets/product_image.dart';
 import '../../../shared/utils/price_formatter.dart';
 import '../data/review_repository.dart';
 import '../domain/product.dart';
@@ -55,37 +55,13 @@ class ProductListCard extends ConsumerWidget {
               // Image (gauche) avec icône cœur en overlay
               Stack(
                 children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: Container(
-                      width: 100,
-                      height: 100,
-                      color: palette.cardAlt,
-                      child: product.imageUrl != null &&
-                              product.imageUrl!.isNotEmpty
-                          ? Image.network(
-                              product.imageUrl!,
-                              fit: BoxFit.contain,
-                              errorBuilder: (context, error, stackTrace) {
-                                return const Center(
-                                  child: Icon(
-                                    Icons.image_not_supported,
-                                    color: Color(0xFFBDBDBD),
-                                    size: 40,
-                                  ),
-                                );
-                              },
-                            )
-                          : Image.asset(
-                              AssetUtils.getAssetPath(product.image),
-                              fit: BoxFit.contain,
-                              errorBuilder: (context, error, stackTrace) {
-                                return Image.asset(
-                                  'assets/products/product_placeholder.png',
-                                );
-                              },
-                            ),
-                    ),
+                  ProductImage(
+                    imageUrl: product.imageUrl,
+                    imagePath: product.image,
+                    width: 100,
+                    height: 100,
+                    fit: BoxFit.contain,
+                    borderRadius: 12,
                   ),
                   Positioned(
                     top: 6,
