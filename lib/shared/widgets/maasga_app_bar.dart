@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../design_tokens/maasga_tokens.dart';
 import '../../app/theme/theme_controller.dart';
 import '../../features/cart/presentation/cart_state.dart';
@@ -38,9 +37,6 @@ class MaasgaAppBar extends ConsumerWidget implements PreferredSizeWidget {
     final resolvedCartCount =
         cartCount ??
         ref.watch(cartProvider).fold<int>(0, (s, l) => s + l.quantity);
-
-    // Compute right section width: theme(40) + cart(40) + notif(40) + optional trailing(40) + gaps
-    final rightWidth = trailingAction != null ? 172.0 : 132.0;
 
     return Container(
       padding: EdgeInsets.only(
@@ -95,87 +91,87 @@ class MaasgaAppBar extends ConsumerWidget implements PreferredSizeWidget {
           ),
 
           // Right Actions (Theme Switcher + Cart + Trailing + Notifications)
-          SizedBox(
-            width: rightWidth.toDouble(),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                // Theme Switcher Button
-                IconButton(
-                  onPressed: () =>
-                      ref.read(themeControllerProvider.notifier).toggleTheme(),
-                  icon: Icon(
-                    themeMode == ThemeMode.system
-                        ? Icons.brightness_auto_outlined
-                        : (themeMode == ThemeMode.dark
-                              ? Icons.dark_mode
-                              : Icons.light_mode),
-                    size: 20,
-                  ),
-                  color: palette.accent,
-                  tooltip: 'Changer le thème',
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              // Theme Switcher Button
+              IconButton(
+                visualDensity: VisualDensity.compact,
+                onPressed: () =>
+                    ref.read(themeControllerProvider.notifier).toggleTheme(),
+                icon: Icon(
+                  themeMode == ThemeMode.system
+                      ? Icons.brightness_auto_outlined
+                      : (themeMode == ThemeMode.dark
+                            ? Icons.dark_mode
+                            : Icons.light_mode),
+                  size: 20,
                 ),
+                color: palette.accent,
+                tooltip: 'Changer le thème',
+              ),
 
-                // Cart icon with badge
-                Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-                    IconButton(
-                      onPressed: () => context.go('/cart'),
-                      icon: const Icon(
-                        Icons.shopping_cart_outlined,
-                        size: 20,
-                      ),
-                      color: colorScheme.onSurface,
+              // Cart icon with badge
+              Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  IconButton(
+                    visualDensity: VisualDensity.compact,
+                    onPressed: () => context.go('/cart'),
+                    icon: const Icon(
+                      Icons.shopping_cart_outlined,
+                      size: 20,
                     ),
-                    if (resolvedCartCount > 0)
-                      Positioned(
-                        right: 4,
-                        top: 4,
-                        child: Container(
-                          padding: const EdgeInsets.all(2),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: palette.danger,
-                            border: Border.all(color: palette.card, width: 1),
-                          ),
-                          constraints: const BoxConstraints(
-                            minWidth: 14,
-                            minHeight: 14,
-                          ),
-                          alignment: Alignment.center,
-                          child: Text(
-                            resolvedCartCount > 9 ? '9+' : '$resolvedCartCount',
-                            style: GoogleFonts.poppins(
-                              fontSize: 8,
-                              color: Colors.white,
-                              fontWeight: FontWeight.w700,
-                            ),
+                    color: colorScheme.onSurface,
+                  ),
+                  if (resolvedCartCount > 0)
+                    Positioned(
+                      right: 2,
+                      top: 2,
+                      child: Container(
+                        padding: const EdgeInsets.all(2),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: palette.danger,
+                          border: Border.all(color: palette.card, width: 1),
+                        ),
+                        constraints: const BoxConstraints(
+                          minWidth: 14,
+                          minHeight: 14,
+                        ),
+                        alignment: Alignment.center,
+                        child: Text(
+                          resolvedCartCount > 9 ? '9+' : '$resolvedCartCount',
+                          style: const TextStyle(
+                            fontSize: 8,
+                            color: Colors.white,
+                            fontWeight: FontWeight.w700,
                           ),
                         ),
                       ),
-                  ],
-                ),
-
-                ?trailingAction,
-
-                // Notifications bell
-                Stack(
-                  clipBehavior: Clip.none,
-                  alignment: Alignment.center,
-                  children: [
-                    IconButton(
-                      padding: EdgeInsets.zero,
-                      alignment: Alignment.centerRight,
-                      onPressed: () {
-                        context.go('/notifications');
-                      },
-                      icon: const Icon(Icons.notifications_outlined),
-                      color: colorScheme.onSurface,
                     ),
+                ],
+              ),
+
+              ?trailingAction,
+
+              // Notifications bell
+              Stack(
+                clipBehavior: Clip.none,
+                alignment: Alignment.center,
+                children: [
+                  IconButton(
+                    visualDensity: VisualDensity.compact,
+                    padding: EdgeInsets.zero,
+                    onPressed: () => context.go('/notifications'),
+                    icon: const Icon(Icons.notifications_outlined),
+                    color: colorScheme.onSurface,
+                  ),
+                  if (notificationsCount > 0)
                     Positioned(
-                      right: 4,
-                      top: 4,
+                      right: 2,
+                      top: 2,
                       child: Container(
                         width: 14,
                         height: 14,
@@ -185,8 +181,8 @@ class MaasgaAppBar extends ConsumerWidget implements PreferredSizeWidget {
                         ),
                         alignment: Alignment.center,
                         child: Text(
-                          notificationsCount > 9 ? '9' : '$notificationsCount',
-                          style: GoogleFonts.poppins(
+                          notificationsCount > 9 ? '9+' : '$notificationsCount',
+                          style: const TextStyle(
                             fontSize: 8,
                             fontWeight: FontWeight.w700,
                             color: Colors.white,
@@ -194,10 +190,9 @@ class MaasgaAppBar extends ConsumerWidget implements PreferredSizeWidget {
                         ),
                       ),
                     ),
-                  ],
-                ),
-              ],
-            ),
+                ],
+              ),
+            ],
           ),
         ],
       ),

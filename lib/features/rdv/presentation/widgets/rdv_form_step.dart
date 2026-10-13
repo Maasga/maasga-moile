@@ -241,7 +241,7 @@ class _RdvFormStepState extends State<RdvFormStep> {
                     ),
                     controlsTextStyle: GoogleFonts.poppins(
                       color: Colors.black,
-                      fontSize: 15,
+                      fontSize: 13,
                       fontWeight: FontWeight.bold,
                     ),
                     dayTextStyle: GoogleFonts.poppins(color: Colors.black),
@@ -266,7 +266,7 @@ class _RdvFormStepState extends State<RdvFormStep> {
                       ),
                     ),
                   ),
-                  dialogSize: const Size(325, 400),
+                  dialogSize: const Size(345, 400),
                   borderRadius: BorderRadius.circular(15),
                   value: [widget.selectedDate ?? initial],
                 );

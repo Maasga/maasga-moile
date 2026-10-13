@@ -17,7 +17,6 @@ class CatalogRepository {
     try {
       final response = await _dio.get(
         '/api/mobile/products',
-        queryParameters: {'available': 'true'},
       );
       final list = response.data as List<dynamic>? ?? const [];
       if (kDebugMode) {
