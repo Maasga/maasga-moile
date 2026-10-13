@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:in_app_review/in_app_review.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/config/maasga_contact.dart';
@@ -9,7 +10,7 @@ import '../../../core/config/maasga_contact.dart';
 ///
 /// L'équipe MAASGA contactera le client par e-mail et WhatsApp
 /// pour finaliser le paiement et la livraison.
-class OrderConfirmationScreen extends StatelessWidget {
+class OrderConfirmationScreen extends StatefulWidget {
   const OrderConfirmationScreen({
     super.key,
     required this.orderId,
@@ -23,15 +24,34 @@ class OrderConfirmationScreen extends StatelessWidget {
   final String clientPhone;
   final int total;
 
+  @override
+  State<OrderConfirmationScreen> createState() =>
+      _OrderConfirmationScreenState();
+}
+
+class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(const Duration(seconds: 2), () async {
+      if (!mounted) return;
+      final inAppReview = InAppReview.instance;
+      if (await inAppReview.isAvailable()) {
+        await inAppReview.requestReview();
+      }
+    });
+  }
+
   Future<void> _openEmail() async {
     final uri = Uri(
       scheme: 'mailto',
       path: MaasgaContact.email,
       queryParameters: {
-        'subject': 'Suivi commande${orderId.isNotEmpty ? " #$orderId" : ""}',
+        'subject':
+            'Suivi commande${widget.orderId.isNotEmpty ? " #${widget.orderId}" : ""}',
         'body':
             'Bonjour,\n\nJe souhaite avoir des informations sur ma commande'
-            '${orderId.isNotEmpty ? " n°$orderId" : ""}.\n\nCordialement,\n$clientName',
+            '${widget.orderId.isNotEmpty ? " n°${widget.orderId}" : ""}.\n\nCordialement,\n${widget.clientName}',
       },
     );
     if (await canLaunchUrl(uri)) {
@@ -90,7 +110,7 @@ class OrderConfirmationScreen extends StatelessWidget {
               const SizedBox(height: 8),
 
               Text(
-                'Merci $clientName, votre commande a bien été reçue.',
+                'Merci ${widget.clientName}, votre commande a bien été reçue.',
                 style: GoogleFonts.poppins(
                   fontSize: 14,
                   color: const Color(0xFF475467),
@@ -98,7 +118,7 @@ class OrderConfirmationScreen extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
 
-              if (orderId.isNotEmpty) ...[
+              if (widget.orderId.isNotEmpty) ...[
                 const SizedBox(height: 8),
                 Container(
                   padding: const EdgeInsets.symmetric(
@@ -110,7 +130,7 @@ class OrderConfirmationScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
-                    'Référence : #$orderId',
+                    'Référence : #${widget.orderId}',
                     style: GoogleFonts.poppins(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
@@ -128,7 +148,7 @@ class OrderConfirmationScreen extends StatelessWidget {
                   _InfoRow(
                     icon: Icons.shopping_bag_outlined,
                     label: 'Total estimé',
-                    value: '$total FCFA',
+                    value: '${widget.total} FCFA',
                     valueColor: const Color(0xFF1B3A8D),
                     valueBold: true,
                   ),
@@ -136,7 +156,7 @@ class OrderConfirmationScreen extends StatelessWidget {
                   _InfoRow(
                     icon: Icons.phone_outlined,
                     label: 'Téléphone enregistré',
-                    value: clientPhone,
+                    value: widget.clientPhone,
                   ),
                 ],
               ),
