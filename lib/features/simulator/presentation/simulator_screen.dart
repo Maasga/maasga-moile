@@ -35,6 +35,7 @@ class _SimulatorScreenState extends ConsumerState<SimulatorScreen> {
   int _btuArrondi = 0;
   String _cvRecommande = '';
   double _surfaceCalculated = 0;
+  MultiUnitOption? _multiUnit;
 
   @override
   void dispose() {
@@ -77,7 +78,7 @@ class _SimulatorScreenState extends ConsumerState<SimulatorScreen> {
 
     int windowsCount = int.tryParse(_selectedFenetres.replaceAll('+', '')) ?? 1;
 
-    final btu = BtuCalculator.calculate(
+    final result = BtuCalculator.calculateFull(
       surface: surface,
       height: heightValue,
       solarExposure: _selectedExposition,
@@ -86,9 +87,10 @@ class _SimulatorScreenState extends ConsumerState<SimulatorScreen> {
     );
 
     setState(() {
-      _btuExact = btu;
-      _btuArrondi = BtuCalculator.getCommercialBtu(btu);
-      _cvRecommande = BtuCalculator.getCvRecommendation(btu);
+      _btuExact = result.btuExact;
+      _btuArrondi = result.btuCommercial;
+      _cvRecommande = result.cvLabel;
+      _multiUnit = result.multiUnit;
       _surfaceCalculated = surface;
       _showResult = true;
     });
@@ -634,19 +636,20 @@ class _SimulatorScreenState extends ConsumerState<SimulatorScreen> {
   }
 
   Widget _buildResultCard({Key? key}) {
-    final isMulti = _surfaceCalculated > 60 || _btuArrondi > 36000;
+    final palette = context.maasga;
+    final hasMulti = _multiUnit != null;
 
     return Container(
       key: key,
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: palette.card,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFF43A047), width: 2),
+        border: Border.all(color: palette.success, width: 2),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF43A047).withValues(alpha: 0.15),
+            color: palette.success.withValues(alpha: 0.15),
             blurRadius: 15,
             offset: const Offset(0, 5),
           ),
@@ -654,120 +657,44 @@ class _SimulatorScreenState extends ConsumerState<SimulatorScreen> {
       ),
       child: Column(
         children: [
+          // ── En-tête résultat ──────────────────────────────────────
           Row(
             children: [
               Container(
                 width: 36,
                 height: 36,
-                decoration: const BoxDecoration(
-                  color: Color(0xFFE8F5E9),
+                decoration: BoxDecoration(
+                  color: palette.successSurface,
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(
-                  Icons.check_circle,
-                  color: Color(0xFF43A047),
-                  size: 22,
-                ),
+                child: Icon(Icons.check_circle, color: palette.success, size: 22),
               ),
               const SizedBox(width: 10),
               Text(
-                'Résultat Recommandé',
-                style: GoogleFonts.poppins(
+                'Résultat recommandé',
+                style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w600,
-                  color: const Color(0xFF43A047),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Text(
-            '$_btuArrondi BTU / $_cvRecommande',
-            style: GoogleFonts.poppins(
-              fontSize: 26,
-              fontWeight: FontWeight.bold,
-              color: context.maasga.accent,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(
-                Icons.meeting_room_outlined,
-                color: Color(0xFF757575),
-                size: 16,
-              ),
-              const SizedBox(width: 4),
-              Text(
-                'Adapté pour votre $_selectedTypePiece',
-                style: GoogleFonts.poppins(
-                  fontSize: 12,
-                  color: const Color(0xFF757575),
+                  color: palette.success,
                 ),
               ),
             ],
           ),
           const SizedBox(height: 20),
-          Container(
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              color: const Color(0xFFF5F5F5),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Column(
-              children: [
-                _buildResultDetail(
-                  'Surface analysée',
-                  '${_surfaceCalculated.toStringAsFixed(1)} m²',
-                ),
-                const Divider(height: 16),
-                _buildResultDetail('Majoration Ouagadougou', '+12%'),
-                const Divider(height: 16),
-                _buildResultDetail(
-                  'BTU calculé exact',
-                  '${_btuExact.round()} BTU',
-                ),
-              ],
-            ),
-          ),
 
-          if (isMulti)
-            Container(
-              margin: const EdgeInsets.only(top: 12),
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: const Color(0xFFFFF3E0),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Row(
-                children: [
-                  const Icon(
-                    Icons.info_outline,
-                    color: Color(0xFFFB8C00),
-                    size: 20,
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      'Installation multi-unités recommandée pour cette surface.',
-                      style: GoogleFonts.poppins(
-                        fontSize: 12,
-                        color: const Color(0xFFFB8C00),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-          const SizedBox(height: 20),
-          ElevatedButton.icon(
-            onPressed: () {
-              final powerKey = BtuCalculator.getPowerKey(_btuExact);
-              // Set global filter
+          // ── Option 1 : unité unique ───────────────────────────────
+          _buildOptionCard(
+            palette: palette,
+            label: 'Option 1 — Unité unique',
+            icon: Icons.ac_unit_outlined,
+            btu: _btuArrondi,
+            cv: _cvRecommande,
+            subtitle: 'Adapté pour votre $_selectedTypePiece',
+            isRecommended: !hasMulti,
+            accentColor: palette.accent,
+            onTap: () {
               ref.read(catalogFilterProvider.notifier).updateFilters({
-                'powers': {powerKey},
+                'powers': {BtuCalculator.getPowerKey(_btuExact)},
                 'brands': <String>{},
                 'minPrice': 0.0,
                 'maxPrice': 2000000.0,
@@ -775,44 +702,76 @@ class _SimulatorScreenState extends ConsumerState<SimulatorScreen> {
               });
               context.push('/catalog');
             },
-            icon: const Icon(
-              Icons.grid_view_outlined,
-              color: Colors.white,
-              size: 20,
+          ),
+
+          // ── Option 2 : multi-unités (si disponible) ───────────────
+          if (hasMulti) ...[
+            const SizedBox(height: 12),
+            _buildOptionCard(
+              palette: palette,
+              label: 'Option 2 — Multi-unités',
+              icon: Icons.device_hub_outlined,
+              btu: _multiUnit!.btuPerUnit,
+              cv: _multiUnit!.cvPerUnit,
+              subtitle: _multiUnit!.label,
+              isRecommended: true,
+              accentColor: palette.info,
+              badge: 'Recommandé',
+              onTap: () {
+                ref.read(catalogFilterProvider.notifier).updateFilters({
+                  'powers': {_multiUnit!.powerKey},
+                  'brands': <String>{},
+                  'minPrice': 0.0,
+                  'maxPrice': 2000000.0,
+                  'category': null,
+                });
+                context.push('/catalog');
+              },
             ),
-            label: Text(
-              'Voir les climatiseurs compatibles',
-              style: GoogleFonts.poppins(
-                fontWeight: FontWeight.w600,
-                fontSize: 14,
+            const SizedBox(height: 4),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4),
+              child: Text(
+                'La solution multi-unités permet une meilleure répartition du froid, '
+                'une installation plus flexible et souvent un coût total réduit.',
+                style: TextStyle(
+                  fontSize: 11,
+                  color: palette.textMuted,
+                  fontStyle: FontStyle.italic,
+                ),
               ),
             ),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: context.maasga.accent,
-              foregroundColor: Colors.white,
-              minimumSize: const Size(double.infinity, 50),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
+          ],
+
+          // ── Détails du calcul ─────────────────────────────────────
+          const SizedBox(height: 16),
+          Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: palette.cardAlt,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Column(
+              children: [
+                _buildResultDetail(palette, 'Surface analysée',
+                    '${_surfaceCalculated.toStringAsFixed(1)} m²'),
+                Divider(height: 16, color: palette.divider),
+                _buildResultDetail(palette, 'BTU calculé exact',
+                    '${_btuExact.round()} BTU'),
+                Divider(height: 16, color: palette.divider),
+                _buildResultDetail(palette, 'Majoration Ouagadougou', '+12%'),
+              ],
             ),
           ),
-          const SizedBox(height: 10),
+
+          const SizedBox(height: 16),
           OutlinedButton.icon(
-            onPressed: () {
-              // Navigator.push ServiceScreen avec Devis pré-sélectionné
-              context.push('/rdv');
-            },
+            onPressed: () => context.push('/rdv'),
             icon: const Icon(Icons.design_services_outlined, size: 20),
-            label: Text(
-              'Demander un devis personnalisé',
-              style: GoogleFonts.poppins(
-                fontWeight: FontWeight.w600,
-                fontSize: 14,
-                color: context.maasga.accent,
-              ),
-            ),
+            label: const Text('Demander un devis personnalisé'),
             style: OutlinedButton.styleFrom(
-              side: BorderSide(color: context.maasga.accent),
+              side: BorderSide(color: palette.accent),
+              foregroundColor: palette.accent,
               minimumSize: const Size(double.infinity, 50),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -824,23 +783,126 @@ class _SimulatorScreenState extends ConsumerState<SimulatorScreen> {
     );
   }
 
-  Widget _buildResultDetail(String label, String value) {
+  /// Carte d'une option de configuration (unité unique ou multi).
+  Widget _buildOptionCard({
+    required MaasgaPalette palette,
+    required String label,
+    required IconData icon,
+    required int btu,
+    required String cv,
+    required String subtitle,
+    required bool isRecommended,
+    required Color accentColor,
+    required VoidCallback onTap,
+    String? badge,
+  }) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(14),
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: palette.card,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: accentColor.withValues(alpha: 0.4),
+            width: 1.5,
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(icon, size: 18, color: accentColor),
+                const SizedBox(width: 8),
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: palette.textMuted,
+                  ),
+                ),
+                if (badge != null) ...[
+                  const Spacer(),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: accentColor.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      badge,
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w700,
+                        color: accentColor,
+                      ),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+            const SizedBox(height: 10),
+            Text(
+              '$btu BTU / $cv',
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: accentColor,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              subtitle,
+              style: TextStyle(fontSize: 12, color: palette.textMuted),
+            ),
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    decoration: BoxDecoration(
+                      color: accentColor.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.grid_view_outlined, size: 16, color: accentColor),
+                        const SizedBox(width: 6),
+                        Text(
+                          'Voir les climatiseurs',
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: accentColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+  Widget _buildResultDetail(MaasgaPalette palette, String label, String value) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          label,
-          style: GoogleFonts.poppins(
-            fontSize: 12,
-            color: const Color(0xFF757575),
-          ),
-        ),
+        Text(label, style: TextStyle(fontSize: 12, color: palette.textMuted)),
         Text(
           value,
-          style: GoogleFonts.poppins(
+          style: TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w600,
-            color: const Color(0xFF1A1A1A),
+            color: palette.textPrimary,
           ),
         ),
       ],
