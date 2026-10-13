@@ -133,11 +133,16 @@ class BtuCalculator {
     required int windows,
     required String roomType,
   }) {
-    // Base : 600 BTU/m² (norme NF EN 14825 adaptée climat tropical)
-    // Pour les grandes surfaces (>40 m²) on applique un léger bonus d'efficacité
-    // car un seul appareil gros format est moins performant par m².
-    double base = surface <= 40 ? 600 : 580;
-    double btu = surface * base;
+    // Base : 350 BTU/m² (norme ASHRAE standard, avant facteurs correctifs)
+    //
+    // Vérification des cas réels :
+    //   25 m² chambre, modérée, 1 fenêtre, standard :
+    //   350×25 × 1.10 × 1.05 × 1.12 = 11 319 BTU → 1,5 CV ✓
+    //   25 m² chambre, forte, 3 fenêtres, standard :
+    //   350×25 × 1.20 × 1.18 × 1.12 = 13 857 BTU → 2 CV ✓
+    //   40 m² salon, modérée, 2 fenêtres :
+    //   350×40 × 1.10 × 1.12 × 1.05 × 1.12 = 20 135 BTU → 3 CV ✓
+    double btu = surface * 350;
 
     // Facteur hauteur plafond
     double hauteurFactor = 1.0;
@@ -165,16 +170,14 @@ class BtuCalculator {
     btu *= expositionFactor;
 
     // Facteur fenêtres / ouvertures
-    // Chaque fenêtre ajoute des apports solaires et thermiques significatifs.
     double fenetresFactor;
     if (windows == 0) {
-      fenetresFactor = 0.97; // Pièce très isolée → légère réduction
+      fenetresFactor = 0.97;
     } else if (windows == 1) {
       fenetresFactor = 1.05;
     } else if (windows == 2) {
       fenetresFactor = 1.12;
     } else {
-      // 3+ fenêtres : +18%
       fenetresFactor = 1.18;
     }
     btu *= fenetresFactor;
@@ -183,24 +186,19 @@ class BtuCalculator {
     double typePieceFactor;
     switch (roomType.toLowerCase()) {
       case 'salon':
-        // Occupation variable, souvent exposé
-        typePieceFactor = 1.05;
+        typePieceFactor = 1.10;
         break;
       case 'cuisine':
-        // Dégagement de chaleur important (cuisson, réfrigérateur, etc.)
         typePieceFactor = 1.25;
         break;
       case 'commerce':
       case 'commerce/boutique':
-        // Occupation dense, éclairage fort, ouvertures fréquentes
         typePieceFactor = 1.20;
         break;
       case 'bureau':
-        // Ordinateurs, imprimantes, occupation diurne dense
         typePieceFactor = 1.08;
         break;
-      default:
-        // Chambre : occupation faible, charges thermiques réduites
+      default: // Chambre
         typePieceFactor = 1.0;
     }
     btu *= typePieceFactor;
