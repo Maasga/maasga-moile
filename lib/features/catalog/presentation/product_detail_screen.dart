@@ -73,8 +73,9 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
           label: 'VOIR',
           textColor: Colors.white,
           onPressed: () {
+            final router = GoRouter.of(context);
             ScaffoldMessenger.of(context).hideCurrentSnackBar();
-            context.push('/cart');
+            router.push('/cart');
           },
         ),
       ),

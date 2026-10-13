@@ -55,8 +55,9 @@ class _CatalogScreenState extends ConsumerState<CatalogScreen> {
           label: 'VOIR',
           textColor: context.maasga.onAccent,
           onPressed: () {
+            final router = GoRouter.of(context);
             ScaffoldMessenger.of(context).hideCurrentSnackBar();
-            context.push('/cart');
+            router.push('/cart');
           },
         ),
       ),

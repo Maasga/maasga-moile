@@ -26,8 +26,6 @@ class RdvScreen extends ConsumerStatefulWidget {
 }
 
 class _RdvScreenState extends ConsumerState<RdvScreen> {
-  static const _bgColor = Color(0xFFF5F5F5);
-
   final PageController _pageController = PageController();
   int _currentStep = 0;
 
@@ -247,7 +245,7 @@ class _RdvScreenState extends ConsumerState<RdvScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: _bgColor,
+      backgroundColor: context.maasga.pageGradient.colors.first,
       resizeToAvoidBottomInset: false,
       appBar: MaasgaAppBar(
         notificationsCount: ref.watch(unreadNotificationCountProvider),
@@ -301,10 +299,10 @@ class _RdvScreenState extends ConsumerState<RdvScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: Text(
             'Choisissez votre service',
-            style: GoogleFonts.poppins(
+            style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
-              color: const Color(0xFF1A1A1A),
+              color: context.maasga.textPrimary,
             ),
           ),
         ),
@@ -316,6 +314,85 @@ class _RdvScreenState extends ConsumerState<RdvScreen> {
             description: type.desc,
             isSelected: _selectedServiceType == type.title,
             onTap: () => setState(() => _selectedServiceType = type.title),
+          ),
+        ),
+
+        // ── Accès aux contrats de maintenance ──────────────────────────────
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
+          child: Divider(color: context.maasga.divider),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+          child: Text(
+            'Contrats & Abonnements',
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: context.maasga.textMuted,
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(16),
+            onTap: () => context.push('/maintenance'),
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: context.maasga.infoSurface,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: context.maasga.cardBorder),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      color: context.maasga.card,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(
+                      Icons.verified_user_outlined,
+                      color: context.maasga.accent,
+                      size: 26,
+                    ),
+                  ),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Contrat de maintenance',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: context.maasga.textPrimary,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Souscrivez à un abonnement entretien annuel ou semestriel',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: context.maasga.textMuted,
+                          ),
+                          maxLines: 2,
+                        ),
+                      ],
+                    ),
+                  ),
+                  Icon(
+                    Icons.arrow_forward_ios,
+                    size: 16,
+                    color: context.maasga.textMuted,
+                  ),
+                ],
+              ),
+            ),
           ),
         ),
       ],
@@ -362,15 +439,16 @@ class _RdvScreenState extends ConsumerState<RdvScreen> {
   }
 
   Widget _buildFooter() {
+    final palette = context.maasga;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: const BoxDecoration(
-        color: Colors.white,
+      decoration: BoxDecoration(
+        color: palette.card,
         boxShadow: [
           BoxShadow(
-            color: Colors.black12,
+            color: palette.shadow.withValues(alpha: 0.08),
             blurRadius: 4,
-            offset: Offset(0, -2),
+            offset: const Offset(0, -2),
           ),
         ],
       ),

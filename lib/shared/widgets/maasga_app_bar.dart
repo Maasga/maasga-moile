@@ -39,8 +39,8 @@ class MaasgaAppBar extends ConsumerWidget implements PreferredSizeWidget {
         cartCount ??
         ref.watch(cartProvider).fold<int>(0, (s, l) => s + l.quantity);
 
-    // Compute right section width based on presence of trailingAction
-    final rightWidth = trailingAction != null ? 168 : 120;
+    // Compute right section width: theme(40) + cart(40) + notif(40) + optional trailing(40) + gaps
+    final rightWidth = trailingAction != null ? 172.0 : 132.0;
 
     return Container(
       padding: EdgeInsets.only(
