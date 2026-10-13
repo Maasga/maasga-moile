@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -554,9 +555,11 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
           quartier: _quartierCtrl.text.trim(),
         );
       } else {
-        debugPrint(
-          'UserPrefsService non disponible, sauvegarde auto-remplissage ignorée',
-        );
+        if (kDebugMode) {
+          debugPrint(
+            'UserPrefsService non disponible, sauvegarde auto-remplissage ignorée',
+          );
+        }
       }
 
       // Sauvegarder dans l'historique local pour affichage immédiat dans le profil
@@ -578,9 +581,11 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
         };
         await prefs.saveLocalOrder(user.uid, orderMap);
       } else if (user != null) {
-        debugPrint(
-          'UserPrefsService non disponible, sauvegarde locale de commande ignorée',
-        );
+        if (kDebugMode) {
+          debugPrint(
+            'UserPrefsService non disponible, sauvegarde locale de commande ignorée',
+          );
+        }
       }
 
       // Invalider le dashboard et les activités pour rafraîchir l'espace client

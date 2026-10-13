@@ -1,5 +1,6 @@
 import 'dart:io';
 import '../domain/user_profile.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -511,7 +512,9 @@ class _LoggedInView extends ConsumerWidget {
       Uri.parse(url),
       mode: LaunchMode.externalApplication,
     );
-    if (!ok) debugPrint('Could not launch $url');
+    if (!ok) {
+      if (kDebugMode) debugPrint('Could not launch $url');
+    }
   }
 
   void _showLogoutDialog(BuildContext context, WidgetRef ref) {

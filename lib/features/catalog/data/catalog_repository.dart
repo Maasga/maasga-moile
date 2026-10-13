@@ -10,7 +10,9 @@ class CatalogRepository {
   final Dio _dio;
 
   Future<List<Product>> getProducts() async {
-    debugPrint('📦 Chargement des produits depuis /api/mobile/products');
+    if (kDebugMode) {
+      debugPrint('📦 Chargement des produits depuis /api/mobile/products');
+    }
 
     try {
       final response = await _dio.get(
@@ -18,14 +20,18 @@ class CatalogRepository {
         queryParameters: {'available': 'true'},
       );
       final list = response.data as List<dynamic>? ?? const [];
-      debugPrint('📦 Réponse API : ${list.length} produits reçus');
+      if (kDebugMode) {
+        debugPrint('📦 Réponse API : ${list.length} produits reçus');
+      }
 
       final products = list
           .map((e) => Product.fromJson(e as Map<String, dynamic>))
           .map(_normalizeProductFromSite)
           .toList();
 
-      debugPrint('📦 Produits normalisés : ${products.length} produits');
+      if (kDebugMode) {
+        debugPrint('📦 Produits normalisés : ${products.length} produits');
+      }
       return products;
     } catch (e) {
       debugPrint('❌ Erreur chargement produits : $e');
