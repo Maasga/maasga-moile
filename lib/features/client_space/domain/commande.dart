@@ -44,6 +44,7 @@ enum CommandeStatus {
     switch (status?.toLowerCase()) {
       case 'pending':
       case 'en attente':
+      case 'en_attente':
         return CommandeStatus.pending;
       case 'paid':
       case 'payée':
@@ -101,6 +102,7 @@ class Commande {
     this.messageClient,
     this.devisClientEmail,
     this.devisClientQuartier,
+    this.notes,
     this.clientId,
   });
 
@@ -130,6 +132,46 @@ class Commande {
   final String? messageClient;
   final String? devisClientEmail;
   final String? devisClientQuartier;
+  final String? notes;
+
+  /// Résout le nom du produit depuis les différents champs possibles de la réponse API.
+  ///
+  /// Les commandes créées via l'app mobile stockent les produits dans `notes`
+  /// sous la forme "[Méthode] Produits: 1x NomProduit | 2x AutreProduit".
+  /// Les commandes créées via l'admin ont `product_name` ou `climatiseur_nom`.
+  static String _resolveProductName(Map<String, dynamic> json) {
+    // 1. Champs directs (commandes admin / devis)
+    final direct =
+        json['product_name'] as String? ??
+        json['climatiseur_nom'] as String? ??
+        json['produit_nom'] as String? ??
+        json['name'] as String?;
+    if (direct != null && direct.isNotEmpty && direct != 'Produit MAASGA') {
+      return direct;
+    }
+
+    // 2. Extraire depuis le champ notes du format mobile :
+    //    "[Téléphone] Produits: 1x Daikin 1.5CV | 1x Mitsubishi 2CV"
+    final notes = json['notes'] as String?;
+    if (notes != null && notes.contains('Produits:')) {
+      final match = RegExp(r'Produits:\s*(.+?)(?:\s*\|?\s*$)').firstMatch(notes);
+      if (match != null) {
+        final products = match.group(1)?.trim();
+        if (products != null && products.isNotEmpty) return products;
+      }
+      // Fallback : tout ce qui est après "Produits:"
+      final idx = notes.indexOf('Produits:');
+      final extracted = notes.substring(idx + 9).trim();
+      if (extracted.isNotEmpty) return extracted;
+    }
+
+    // 3. Si notes contient juste un nom de produit (commandes très anciennes)
+    if (notes != null && notes.isNotEmpty && !notes.startsWith('[')) {
+      return notes;
+    }
+
+    return 'Commande MAASGA';
+  }
 
   factory Commande.fromJson(Map<String, dynamic> json) {
     // Universal price mapping with all possible keys
@@ -178,11 +220,7 @@ class Commande {
 
     return Commande(
       id: json['id']?.toString() ?? '',
-      productName:
-          json['product_name'] ??
-          json['climatiseur_nom'] ??
-          json['produit_nom'] ??
-          'Produit MAASGA',
+      productName: _resolveProductName(json),
       date: json['date'] ?? json['created_at'] ?? '',
       price: formattedPrice,
       status: CommandeStatus.fromString(json['status']),
@@ -215,6 +253,7 @@ class Commande {
       devisStatus: json['devis_status'] ?? json['status'],
       brand: json['brand'],
       btu: safeInt(json['btu'] ?? json['produit_btu']),
+      notes: json['notes'] as String?,
       clientId: safeInt(json['client_id']),
     );
   }
