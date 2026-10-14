@@ -45,6 +45,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 .animate()
                 .fadeIn(delay: 300.ms)
                 .scale(begin: const Offset(0.95, 0.95)),
+            const _ServicesSection().animate().fadeIn(delay: 400.ms),
             const _RecentProductsSection(),
             const _FavoritesSection(),
             _InnovationsSection(formatPrice: PriceFormatter.format),
@@ -361,6 +362,138 @@ class _HomeProductCard extends StatelessWidget {
       ),
     );
   }
+}
+
+// ─── Services Section ─────────────────────────────────────────────────────────
+class _ServicesSection extends StatelessWidget {
+  const _ServicesSection();
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = context.maasga;
+
+    final services = [
+      _ServiceTile(
+        name: 'Vente & Installation',
+        description: 'Climatiseurs toutes marques, pose en 24h',
+        icon: Icons.shopping_bag_outlined,
+        color: palette.accent,
+        onTap: () => context.go('/catalog'),
+      ),
+      _ServiceTile(
+        name: 'Maintenance',
+        description: 'Entretien & contrats annuels',
+        icon: Icons.build_outlined,
+        color: palette.success,
+        onTap: () => context.push('/maintenance'),
+      ),
+      _ServiceTile(
+        name: 'Diagnostic & Devis',
+        description: 'Visite technique gratuite',
+        icon: Icons.design_services_outlined,
+        color: palette.warning,
+        onTap: () => context.push('/rdv'),
+      ),
+      _ServiceTile(
+        name: 'Dépannage',
+        description: 'Intervention rapide',
+        icon: Icons.warning_amber_outlined,
+        color: palette.danger,
+        onTap: () => context.push('/rdv'),
+      ),
+    ];
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Nos Services',
+            style: GoogleFonts.poppins(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: palette.textPrimary,
+            ),
+          ),
+          const SizedBox(height: 12),
+          GridView.count(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            crossAxisCount: 2,
+            crossAxisSpacing: 12,
+            mainAxisSpacing: 12,
+            childAspectRatio: 1.3,
+            children: services
+                .map(
+                  (s) => InkWell(
+                    onTap: s.onTap,
+                    borderRadius: BorderRadius.circular(16),
+                    child: Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: palette.card,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: palette.cardBorder),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              color: s.color.withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Icon(s.icon, color: s.color, size: 22),
+                          ),
+                          const SizedBox(height: 10),
+                          Text(
+                            s.name,
+                            style: GoogleFonts.poppins(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              color: palette.textPrimary,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            s.description,
+                            style: GoogleFonts.poppins(
+                              fontSize: 11,
+                              color: palette.textMuted,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                )
+                .toList(),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ServiceTile {
+  const _ServiceTile({
+    required this.name,
+    required this.description,
+    required this.icon,
+    required this.color,
+    required this.onTap,
+  });
+
+  final String name;
+  final String description;
+  final IconData icon;
+  final Color color;
+  final VoidCallback onTap;
 }
 
 // ─── Innovations Section (uses real API data) ──────────────────────────────────

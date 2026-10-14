@@ -19,12 +19,12 @@ class Promo {
 
   factory Promo.fromJson(Map<String, dynamic> json) {
     return Promo(
-      id: json['id'] as int,
-      title: json['title'] as String,
+      id: (json['id'] as num?)?.toInt() ?? 0,
+      title: (json['title'] as String?) ?? 'Offre MAASGA',
       subtitle: json['subtitle'] as String?,
-      imageUrl: json['image_url'] as String,
+      imageUrl: (json['image_url'] as String?) ?? '',
       targetPage: json['target_page'] as String?,
-      displayOrder: json['display_order'] as int? ?? 0,
+      displayOrder: (json['display_order'] as num?)?.toInt() ?? 0,
       isActive: (json['is_active'] == 1 || json['is_active'] == true),
     );
   }

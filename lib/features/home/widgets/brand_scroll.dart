@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../shared/design_tokens/maasga_tokens.dart';
 import '../data/home_repository.dart';
 import '../models/brand.dart';
 
@@ -55,7 +56,7 @@ class BrandScroll extends ConsumerWidget {
 
   Widget _buildList(List<Brand> brands) {
     return SizedBox(
-      height: 70,
+      height: 80,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         physics: const BouncingScrollPhysics(),
@@ -65,7 +66,7 @@ class BrandScroll extends ConsumerWidget {
           final brand = brands[index];
           return Container(
             margin: const EdgeInsets.only(right: 16),
-            constraints: const BoxConstraints(maxWidth: 70),
+            constraints: const BoxConstraints(maxWidth: 90),
             child: _BrandItem(brand: brand),
           );
         },
@@ -80,41 +81,68 @@ class _BrandItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textMuted = context.maasga.textMuted;
+
+    Widget logoWidget;
+
     // Priorité 1 : URL distante
     if (brand.logoUrl != null && brand.logoUrl!.isNotEmpty) {
-      return CachedNetworkImage(
+      logoWidget = CachedNetworkImage(
         imageUrl: brand.logoUrl!,
-        height: 30,
-        width: 70,
+        height: 28,
+        width: 90,
         fit: BoxFit.contain,
-        errorWidget: (_, _, _) => _localAsset(brand),
+        errorWidget: (_, _, _) => _localAssetImage(brand),
       );
+    } else {
+      // Priorité 2 : asset local
+      logoWidget = _localAssetImage(brand);
     }
-    // Priorité 2 : asset local
-    return _localAsset(brand);
+
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        logoWidget,
+        const SizedBox(height: 2),
+        Text(
+          brand.name,
+          style: TextStyle(
+            fontSize: 8,
+            fontWeight: FontWeight.w600,
+            color: textMuted,
+          ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          textAlign: TextAlign.center,
+        ),
+      ],
+    );
   }
 
-  Widget _localAsset(Brand brand) {
+  Widget _localAssetImage(Brand brand) {
     final assetKey =
         brand.assetKey?.toLowerCase() ??
         brand.name.toLowerCase().replaceAll(' ', '_');
     final path = 'assets/brands/$assetKey.png';
     return Image.asset(
       path,
-      height: 30,
-      width: 70,
+      height: 28,
+      width: 90,
       fit: BoxFit.contain,
-      errorBuilder: (_, _, _) => SizedBox(
-        height: 30,
-        width: 70,
+      errorBuilder: (context, _, _) => SizedBox(
+        height: 28,
+        width: 90,
         child: Center(
           child: Text(
-            brand.name.substring(0, brand.name.length.clamp(0, 3)),
-            style: const TextStyle(
-              fontSize: 9,
+            brand.name,
+            style: TextStyle(
+              fontSize: 8,
               fontWeight: FontWeight.w700,
-              color: Color(0xFF64748B),
+              color: context.maasga.textMuted,
             ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
           ),
         ),
       ),

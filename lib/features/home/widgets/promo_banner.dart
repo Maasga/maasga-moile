@@ -68,7 +68,7 @@ class _PromoBannerState extends ConsumerState<PromoBanner> {
 
   Widget _buildLoadingState() {
     return Container(
-      height: 160,
+      height: 180,
       margin: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
         color: Colors.grey[200],
@@ -96,8 +96,15 @@ class _PromoBannerState extends ConsumerState<PromoBanner> {
   }
 
   Widget _buildDynamicCarousel(List<Promo> banners) {
+    // Filtrer les bannières avec titre invalide
+    final validBanners = banners
+        .where((b) => b.title.isNotEmpty && !b.title.contains('undefined'))
+        .toList();
+
+    if (validBanners.isEmpty) return _buildStaticCarousel();
+
     return _buildCarousel(
-      items: banners
+      items: validBanners
           .map(
             (p) => _renderPromoItem(
               p.title,
@@ -107,7 +114,7 @@ class _PromoBannerState extends ConsumerState<PromoBanner> {
             ),
           )
           .toList(),
-      count: banners.length,
+      count: validBanners.length,
     );
   }
 
@@ -119,7 +126,7 @@ class _PromoBannerState extends ConsumerState<PromoBanner> {
           child: CarouselSlider(
             items: items,
             options: CarouselOptions(
-              height: 160,
+              height: 180,
               autoPlay: true,
               autoPlayInterval: const Duration(seconds: 4),
               autoPlayCurve: Curves.easeInOut,
@@ -155,6 +162,12 @@ class _PromoBannerState extends ConsumerState<PromoBanner> {
     String imageUrl,
     String? targetPage,
   ) {
+    // Fallback pour les titres malformés côté admin
+    final displayTitle =
+        title.isEmpty || title.contains('undefined')
+            ? 'Offre spéciale MAASGA'
+            : title;
+
     return ClipRRect(
       borderRadius: BorderRadius.circular(16),
       child: Stack(
@@ -187,15 +200,15 @@ class _PromoBannerState extends ConsumerState<PromoBanner> {
           ),
           Positioned(
             left: 16,
-            top: 20,
-            bottom: 20,
+            top: 14,
+            bottom: 12,
             right: 16,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  title,
+                  displayTitle,
                   style: GoogleFonts.poppins(
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
@@ -211,7 +224,7 @@ class _PromoBannerState extends ConsumerState<PromoBanner> {
                       color: Colors.white.withValues(alpha: 0.9),
                     ),
                   ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 8),
                 SizedBox(
                   height: 34,
                   child: ElevatedButton(
