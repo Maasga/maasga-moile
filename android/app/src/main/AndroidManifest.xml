@@ -1,7 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 
     <application
@@ -49,24 +47,6 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
-        <!--
-        ╔══════════════════════════════════════════════════════════════╗
-        ║  ACTION REQUISE AVANT TOUTE MISE EN PRODUCTION              ║
-        ║  Restreindre cette clé dans Google Cloud Console :          ║
-        ║  APIs & Services → Credentials → AIzaSyA7...               ║
-        ║  • Application restriction : Android apps                   ║
-        ║  • Package : com.maasga.app                                 ║
-        ║  • SHA-1   : 54:C1:F8:B2:A6:5A:27:83:8F:70:               ║
-        ║              75:FA:11:AD:F4:55:57:29:8C:2B                  ║
-        ║  • API restriction : Maps SDK for Android uniquement        ║
-        ║  Sans cette restriction, la clé est utilisable par          ║
-        ║  n'importe quelle app Android, ce qui peut entraîner        ║
-        ║  des frais non prévus sur le compte GCP.                    ║
-        ╚══════════════════════════════════════════════════════════════╝
-        -->
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyCk_jfEfhaVbdloYN12DEgbrBXPyZqorlY" />
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and

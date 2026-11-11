@@ -11,7 +11,8 @@ ce dépôt. Les sprints V1 et V1.1 de stabilisation sont terminés.
   Google Sign-In). Réinitialisation de mot de passe et vérification d'e-mail
   en place.
 - **Réseau** : Dio + cookie jar persistant, token Firebase ID en `Bearer`,
-  retry automatique sur 401 (`lib/core/network/api_client.dart`).
+  un seul rejeu sur 401 après rafraîchissement du token
+  (`lib/core/network/auth_interceptor.dart`).
 - **Endpoints consommés** : `/api/mobile/products`, `/api/mobile/banners`,
   `/api/mobile/commandes`, `/api/mobile/commandes/{id}/annuler`,
   `/api/mobile/rdv`, `/api/mobile/maintenance`,
@@ -21,6 +22,23 @@ ce dépôt. Les sprints V1 et V1.1 de stabilisation sont terminés.
 - **Plateformes** : Android uniquement. `web/` et `windows/` sont des
   scaffolds Flutter jamais testés, pas de dossier `ios/`.
 - **Paiement en ligne : retiré** — décision V1.1 en attente.
+
+---
+
+## ✅ Accompli — Audit sécurité (11 nov. 2026)
+
+Rapport complet : `../AUDIT_2026-11-11.md`.
+
+- [x] Boucle infinie sur 401 persistant : `FirebaseAuthInterceptor` rejoue une
+  seule fois (flag `extra`) sans écraser le token rafraîchi — testé
+  (`test/core/auth_interceptor_test.dart`)
+- [x] `/catalog/product` sans `Product` en `extra` → redirection `/catalog`
+  au lieu d'un crash de cast — testé (`test/core/app_router_guard_test.dart`)
+- [x] `debugPrint` de `auth_controller.dart` limités au mode debug
+- [x] Clé Google Maps inutilisée et permissions de localisation retirées du
+  manifeste (la clé reste à supprimer dans Google Cloud Console)
+- [ ] Reste : Sentry à brancher, `catch (_) {}` silencieux, `debugPrint` non gardés dans
+  les repositories, gate `dart format` en échec sur 39 fichiers
 
 ---
 

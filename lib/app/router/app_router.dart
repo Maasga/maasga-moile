@@ -82,14 +82,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/home',
         pageBuilder: (context, state) => _buildPage(state, const HomeScreen()),
       ),
-      GoRoute(
-        path: '/catalogue',
-        redirect: (context, state) => '/catalog',
-      ),
-      GoRoute(
-        path: '/rendez-vous',
-        redirect: (context, state) => '/rdv',
-      ),
+      GoRoute(path: '/catalogue', redirect: (context, state) => '/catalog'),
+      GoRoute(path: '/rendez-vous', redirect: (context, state) => '/rdv'),
       GoRoute(
         path: '/espace-client',
         redirect: (context, state) => '/client-space',
@@ -101,9 +95,13 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/catalog/product',
+        // Sans Product en `extra` (deep link, restauration d'état, retour
+        // arrière après kill), l'ancien cast `as Product` faisait crasher l'app.
+        redirect: (context, state) =>
+            state.extra is Product ? null : '/catalog',
         pageBuilder: (context, state) => _buildPage(
           state,
-          ProductDetailScreen(product: state.extra as Product),
+          ProductDetailScreen(product: state.extra! as Product),
         ),
       ),
       GoRoute(
