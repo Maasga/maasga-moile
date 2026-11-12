@@ -45,7 +45,7 @@ class NotificationsScreen extends ConsumerWidget {
 
     return MaasgaShell(
       title: 'Mon Activité',
-      bottomNavigationBar: const MainBottomNav(currentPath: '/home'),
+      bottomNavigationBar: const MainBottomNav(),
       child: activityAsync.when(
         loading: () => const Center(
           child: CircularProgressIndicator(color: Color(0xFF1B3A8D)),

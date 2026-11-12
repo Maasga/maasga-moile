@@ -37,6 +37,26 @@ class Product {
   final String description;
   final Map<String, String> technicalSpecs;
 
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'brand': brand,
+      'price': price,
+      'stock': stock,
+      'category': category,
+      'power': power,
+      'specs': specs,
+      'image': image,
+      'imageUrl': imageUrl,
+      'btu': btu,
+      'images': images,
+      'old_price': oldPrice,
+      'description': description,
+      'techSpecs': technicalSpecs,
+    };
+  }
+
   factory Product.fromJson(Map<String, dynamic> json) {
     return Product(
       id: (json['id'] as num?)?.toInt() ?? 0,

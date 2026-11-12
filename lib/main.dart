@@ -5,11 +5,11 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 
 import 'app/app.dart';
 import 'core/config/firebase_options.dart';
 import 'core/logging/logger_service.dart';
-// import 'core/monitoring/sentry_service.dart'; // Temporairement désactivé
 import 'features/notifications/data/push_service.dart';
 import 'services/review_service.dart';
 
@@ -39,12 +39,14 @@ Future<void> main() async {
   await reviewService.initialize();
   logger.info('Service de demandes d\'avis initialisé');
 
-  // Initialiser Sentry (seulement en mode release) - Temporairement désactivé
-  // final sentryService = SentryService();
-  // await sentryService.initialize();
-  // logger.info('Service Sentry initialisé');
-
   await initializeDateFormatting('fr_FR', null);
 
-  runApp(const ProviderScope(child: MaasgaMobileApp()));
+  await SentryFlutter.init(
+    (options) {
+      options.dsn = const String.fromEnvironment('SENTRY_DSN', defaultValue: '');
+      options.tracesSampleRate = kDebugMode ? 0.0 : 0.1;
+      options.environment = kDebugMode ? 'debug' : 'release';
+    },
+    appRunner: () => runApp(const ProviderScope(child: MaasgaMobileApp())),
+  );
 }

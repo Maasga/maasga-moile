@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import '../design_tokens/maasga_tokens.dart';
 import 'main_bottom_nav.dart';
 import 'maasga_app_bar.dart';
@@ -41,10 +40,7 @@ class MaasgaShell extends ConsumerWidget {
           child: SafeArea(child: child),
         ),
         bottomNavigationBar:
-            bottomNavigationBar ??
-            MainBottomNav(
-              currentPath: GoRouterState.of(context).uri.toString(),
-            ),
+            bottomNavigationBar ?? const MainBottomNav(),
       ),
     );
   }

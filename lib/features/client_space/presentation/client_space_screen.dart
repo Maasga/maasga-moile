@@ -1,5 +1,6 @@
 import 'dart:io';
 import '../domain/user_profile.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -9,6 +10,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../core/config/maasga_contact.dart';
 import '../../../core/network/api_client.dart';
+import '../../../shared/design_tokens/maasga_tokens.dart';
 import '../../auth/presentation/auth_controller.dart';
 import '../../../shared/widgets/main_bottom_nav.dart';
 import '../../../shared/widgets/maasga_app_bar.dart';
@@ -80,7 +82,7 @@ class ClientSpaceScreen extends ConsumerWidget {
                           style: TextStyle(color: Colors.white),
                         ),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF1B3A8D),
+                          backgroundColor: context.maasga.accent,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -102,16 +104,17 @@ class ClientSpaceScreen extends ConsumerWidget {
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (err, _) => Center(child: Text('Erreur session: $err')),
       ),
-      bottomNavigationBar: const MainBottomNav(currentPath: '/client-space'),
+      bottomNavigationBar: const MainBottomNav(),
     );
   }
 
   Widget _buildLoggedOutView(BuildContext context) {
+    final palette = context.maasga;
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(Icons.lock_outline, size: 64, color: Color(0xFF1B3A8D)),
+          Icon(Icons.lock_outline, size: 64, color: palette.accent),
           const SizedBox(height: 16),
           Text(
             'Connectez-vous pour accéder à votre espace',
@@ -124,7 +127,7 @@ class ClientSpaceScreen extends ConsumerWidget {
           ElevatedButton(
             onPressed: () => context.go('/auth/login'),
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF1B3A8D),
+              backgroundColor: palette.accent,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -212,7 +215,7 @@ class _LoggedInView extends ConsumerWidget {
                 ),
               ),
               ListTile(
-                leading: const Icon(Icons.camera_alt_outlined, color: Color(0xFF1B3A8D)),
+                leading: const Icon(Icons.camera_alt_outlined, color: MaasgaTokens.blue900),
                 title: Text('Prendre une photo', style: GoogleFonts.poppins()),
                 onTap: () {
                   Navigator.pop(bottomSheetCtx);
@@ -220,7 +223,7 @@ class _LoggedInView extends ConsumerWidget {
                 },
               ),
               ListTile(
-                leading: const Icon(Icons.photo_library_outlined, color: Color(0xFF1B3A8D)),
+                leading: const Icon(Icons.photo_library_outlined, color: MaasgaTokens.blue900),
                 title: Text('Choisir dans la galerie', style: GoogleFonts.poppins()),
                 onTap: () {
                   Navigator.pop(bottomSheetCtx);
@@ -308,7 +311,7 @@ class _LoggedInView extends ConsumerWidget {
                                   onTap: () => showPhotoPickerOptions(ctx, setState),
                                   child: CircleAvatar(
                                     radius: 44,
-                                    backgroundColor: const Color(0xFF1B3A8D),
+                                    backgroundColor: ctx.maasga.accent,
                                     backgroundImage: photoImage,
                                     child: photoImage == null
                                         ? Text(
@@ -332,7 +335,7 @@ class _LoggedInView extends ConsumerWidget {
                                     child: Container(
                                       padding: const EdgeInsets.all(6),
                                       decoration: BoxDecoration(
-                                        color: const Color(0xFF1B3A8D),
+                                        color: ctx.maasga.accent,
                                         shape: BoxShape.circle,
                                         border: Border.all(color: Colors.white, width: 2),
                                       ),
@@ -355,7 +358,7 @@ class _LoggedInView extends ConsumerWidget {
                               style: GoogleFonts.poppins(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w500,
-                                color: const Color(0xFF1B3A8D),
+                                color: ctx.maasga.accent,
                               ),
                             ),
                           ),
@@ -463,7 +466,7 @@ class _LoggedInView extends ConsumerWidget {
                                       }
                                     },
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFF1B3A8D),
+                                backgroundColor: ctx.maasga.accent,
                                 padding: const EdgeInsets.symmetric(vertical: 14),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
@@ -509,7 +512,9 @@ class _LoggedInView extends ConsumerWidget {
       Uri.parse(url),
       mode: LaunchMode.externalApplication,
     );
-    if (!ok) debugPrint('Could not launch $url');
+    if (!ok) {
+      if (kDebugMode) debugPrint('Could not launch $url');
+    }
   }
 
   void _showLogoutDialog(BuildContext context, WidgetRef ref) {
@@ -764,10 +769,10 @@ class _LoggedInView extends ConsumerWidget {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(
+                        Icon(
                           Icons.edit_outlined,
                           size: 16,
-                          color: Color(0xFF1B3A8D),
+                          color: context.maasga.accent,
                         ),
                         const SizedBox(width: 4),
                         Text(
@@ -775,7 +780,7 @@ class _LoggedInView extends ConsumerWidget {
                           style: GoogleFonts.poppins(
                             fontSize: 13,
                             fontWeight: FontWeight.w500,
-                            color: const Color(0xFF1B3A8D),
+                            color: context.maasga.accent,
                           ),
                         ),
                       ],
@@ -803,7 +808,7 @@ class _LoggedInView extends ConsumerWidget {
               children: [
                 CircleAvatar(
                   radius: 32,
-                  backgroundColor: const Color(0xFF1B3A8D),
+                  backgroundColor: context.maasga.accent,
                   backgroundImage: _getProfileImageProvider(profile.photoUrl),
                   child: _getProfileImageProvider(profile.photoUrl) == null
                       ? Text(
@@ -1141,7 +1146,7 @@ class _LoggedInView extends ConsumerWidget {
         ElevatedButton(
           onPressed: onBtnPressed,
           style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF1B3A8D),
+            backgroundColor: MaasgaTokens.blue900,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20),
             ),
@@ -1203,7 +1208,7 @@ class _ActionBtn extends StatelessWidget {
     required this.onPressed,
     this.icon,
     this.isFilled = false,
-    this.color = const Color(0xFF1B3A8D),
+    this.color = MaasgaTokens.blue900,
   });
   final String label;
   final VoidCallback onPressed;

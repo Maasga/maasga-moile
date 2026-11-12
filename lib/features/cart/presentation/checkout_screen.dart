@@ -1,16 +1,18 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../../../core/network/api_client.dart';
+import '../../../shared/design_tokens/maasga_tokens.dart';
 import '../../../shared/services/user_prefs_service.dart';
+import '../../../shared/utils/price_formatter.dart';
 import '../../../shared/widgets/maasga_primary_button.dart';
 import '../../../shared/widgets/maasga_shell.dart';
+import '../../../shared/widgets/quartier_picker.dart';
 import '../../client_space/data/client_dashboard_repository.dart';
 import '../../notifications/data/activity_repository.dart';
-import '../../rdv/domain/neighborhoods.dart';
 import 'cart_state.dart';
 
 class CheckoutScreen extends ConsumerStatefulWidget {
@@ -25,6 +27,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
   final _phoneCtrl = TextEditingController();
   final _quartierCtrl = TextEditingController();
   final _notesCtrl = TextEditingController();
+  final _adresseCtrl = TextEditingController();
 
   bool _loading = false;
   String? _error;
@@ -41,7 +44,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
       final dashboard = ref.read(clientDashboardProvider);
       if (dashboard.hasValue) {
         final profile = dashboard.value!.profile;
-        if (_isMounted()) {
+        if (mounted) {
           setState(() {
             if (_nameCtrl.text.isEmpty && profile.fullName.isNotEmpty) {
               _nameCtrl.text = profile.fullName;
@@ -61,7 +64,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     // 2. Fallback : UserPrefsService (Firebase Auth + SharedPreferences)
     try {
       final prefs = ref.read(userPrefsProvider);
-      if (prefs != null && _isMounted()) {
+      if (prefs != null && mounted) {
         setState(() {
           if (_nameCtrl.text.isEmpty) _nameCtrl.text = prefs.savedName;
           if (_phoneCtrl.text.isEmpty) _phoneCtrl.text = prefs.savedPhone;
@@ -79,6 +82,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     _phoneCtrl.dispose();
     _quartierCtrl.dispose();
     _notesCtrl.dispose();
+    _adresseCtrl.dispose();
     super.dispose();
   }
 
@@ -87,7 +91,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (ctx) => _QuartierSearchDialog(
+      builder: (ctx) => QuartierSearchBottomSheet(
         currentSelection: _quartierCtrl.text,
         onSelected: (val) {
           setState(() => _quartierCtrl.text = val);
@@ -99,6 +103,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.maasga;
     final cart = ref.watch(cartProvider);
     final total = ref.watch(cartTotalProvider);
 
@@ -122,9 +127,9 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
               'Votre nom',
               Icons.person_outline,
             ),
-            style: GoogleFonts.poppins(
+            style: const TextStyle(
               fontSize: 14,
-              color: const Color(0xFF1A1A1A),
+              color: Color(0xFF1A1A1A),
             ),
           ),
           const SizedBox(height: 16),
@@ -137,9 +142,9 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
               'XX XX XX XX',
               Icons.phone_outlined,
             ),
-            style: GoogleFonts.poppins(
+            style: const TextStyle(
               fontSize: 14,
-              color: const Color(0xFF1A1A1A),
+              color: Color(0xFF1A1A1A),
             ),
           ),
           const SizedBox(height: 24),
@@ -162,14 +167,14 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                       'Sélectionner votre quartier',
                       Icons.location_city_outlined,
                     ).copyWith(
-                      suffixIcon: const Icon(
+                      suffixIcon: Icon(
                         Icons.arrow_drop_down,
-                        color: Color(0xFF1B3A8D),
+                        color: palette.accent,
                       ),
                     ),
-                style: GoogleFonts.poppins(
+                style: const TextStyle(
                   fontSize: 14,
-                  color: const Color(0xFF1A1A1A),
+                  color: Color(0xFF1A1A1A),
                 ),
               ),
             ),
@@ -178,13 +183,14 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
 
           _buildLabel('Adresse précise (optionnel)'),
           TextField(
+            controller: _adresseCtrl,
             decoration: _buildInputDecoration(
               'Numéro, rue, repère...',
               Icons.location_on_outlined,
             ),
-            style: GoogleFonts.poppins(
+            style: const TextStyle(
               fontSize: 14,
-              color: const Color(0xFF1A1A1A),
+              color: Color(0xFF1A1A1A),
             ),
           ),
 
@@ -203,9 +209,9 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
             decoration: InputDecoration(
               hintText:
                   'Instructions spéciales, informations complémentaires...',
-              hintStyle: GoogleFonts.poppins(
+              hintStyle: const TextStyle(
                 fontSize: 13,
-                color: const Color(0xFF6B7280),
+                color: Color(0xFF6B7280),
                 fontWeight: FontWeight.w400,
               ),
               filled: true,
@@ -216,16 +222,16 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(
-                  color: Color(0xFF1B3A8D),
+                borderSide: BorderSide(
+                  color: palette.accent,
                   width: 1.5,
                 ),
               ),
               contentPadding: const EdgeInsets.all(14),
             ),
-            style: GoogleFonts.poppins(
+            style: const TextStyle(
               fontSize: 14,
-              color: const Color(0xFF1A1A1A),
+              color: Color(0xFF1A1A1A),
             ),
           ),
 
@@ -244,18 +250,18 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
               children: [
                 Row(
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.info_outline,
-                      color: Color(0xFF1B3A8D),
+                      color: palette.accent,
                       size: 18,
                     ),
                     const SizedBox(width: 8),
                     Text(
                       'Comment ça marche ?',
-                      style: GoogleFonts.poppins(
+                      style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w700,
-                        color: const Color(0xFF1B3A8D),
+                        color: palette.accent,
                       ),
                     ),
                   ],
@@ -296,17 +302,17 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                 children: [
                   Text(
                     'Total estimé',
-                    style: GoogleFonts.poppins(
+                    style: TextStyle(
                       fontWeight: FontWeight.w500,
                       color: const Color(0xFF757575),
                     ),
                   ),
                   Text(
-                    '$total FCFA',
-                    style: GoogleFonts.poppins(
+                    PriceFormatter.format(total),
+                    style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w800,
-                      color: const Color(0xFF1B3A8D),
+                      color: palette.accent,
                     ),
                   ),
                 ],
@@ -329,7 +335,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                   Expanded(
                     child: Text(
                       _error!,
-                      style: GoogleFonts.poppins(
+                      style: const TextStyle(
                         color: Colors.red,
                         fontSize: 13,
                       ),
@@ -355,14 +361,14 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
   Widget _buildSectionHeader({required IconData icon, required String title}) {
     return Row(
       children: [
-        Icon(icon, color: const Color(0xFF1B3A8D), size: 20),
+        Icon(icon, color: MaasgaTokens.blue900, size: 20),
         const SizedBox(width: 8),
         Text(
           title,
-          style: GoogleFonts.poppins(
+          style: const TextStyle(
             fontSize: 15,
             fontWeight: FontWeight.w700,
-            color: const Color(0xFF1A1A1A),
+            color: Color(0xFF1A1A1A),
           ),
         ),
       ],
@@ -374,10 +380,10 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
       padding: const EdgeInsets.only(bottom: 8),
       child: Text(
         label,
-        style: GoogleFonts.poppins(
+        style: const TextStyle(
           fontSize: 13,
           fontWeight: FontWeight.w600,
-          color: const Color(0xFF1A1A1A),
+          color: Color(0xFF1A1A1A),
         ),
       ),
     );
@@ -393,13 +399,13 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
             width: 22,
             height: 22,
             decoration: BoxDecoration(
-              color: const Color(0xFF1B3A8D),
+              color: MaasgaTokens.blue900,
               borderRadius: BorderRadius.circular(11),
             ),
             child: Center(
               child: Text(
                 number,
-                style: GoogleFonts.poppins(
+                style: const TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.w700,
                   color: Colors.white,
@@ -411,9 +417,9 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
           Expanded(
             child: Text(
               text,
-              style: GoogleFonts.poppins(
+              style: const TextStyle(
                 fontSize: 12,
-                color: const Color(0xFF475467),
+                color: Color(0xFF475467),
               ),
             ),
           ),
@@ -425,9 +431,9 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
   InputDecoration _buildInputDecoration(String hint, IconData icon) {
     return InputDecoration(
       hintText: hint,
-      hintStyle: GoogleFonts.poppins(
+      hintStyle: const TextStyle(
         fontSize: 14,
-        color: const Color(0xFF6B7280),
+        color: Color(0xFF6B7280),
         fontWeight: FontWeight.w400,
       ),
       prefixIcon: Icon(icon, color: const Color(0xFF1B3A8D), size: 20),
@@ -450,8 +456,6 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     if (clean.startsWith('226')) return '+$clean';
     return '+226$clean';
   }
-
-  bool _isMounted() => mounted;
 
   Future<void> _submitOrder(
     BuildContext context,
@@ -535,6 +539,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
         'total_price': total,
 
         'notes': _notesCtrl.text.trim().isEmpty ? null : _notesCtrl.text.trim(),
+        'adresse_precise': _adresseCtrl.text.trim().isEmpty ? null : _adresseCtrl.text.trim(),
       };
 
       final response = await dio.post('/api/mobile/commandes', data: payload);
@@ -543,7 +548,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
       final orderId =
           resData['orderId'] ?? resData['id'] ?? resData['order_id'];
 
-      if (!_isMounted()) return;
+      if (!mounted) return;
 
       // Sauvegarder pour auto-remplissage futur
       if (prefs != null) {
@@ -554,9 +559,11 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
           quartier: _quartierCtrl.text.trim(),
         );
       } else {
-        debugPrint(
-          'UserPrefsService non disponible, sauvegarde auto-remplissage ignorée',
-        );
+        if (kDebugMode) {
+          debugPrint(
+            'UserPrefsService non disponible, sauvegarde auto-remplissage ignorée',
+          );
+        }
       }
 
       // Sauvegarder dans l'historique local pour affichage immédiat dans le profil
@@ -578,9 +585,11 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
         };
         await prefs.saveLocalOrder(user.uid, orderMap);
       } else if (user != null) {
-        debugPrint(
-          'UserPrefsService non disponible, sauvegarde locale de commande ignorée',
-        );
+        if (kDebugMode) {
+          debugPrint(
+            'UserPrefsService non disponible, sauvegarde locale de commande ignorée',
+          );
+        }
       }
 
       // Invalider le dashboard et les activités pour rafraîchir l'espace client
@@ -588,7 +597,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
       ref.invalidate(userActivityProvider);
       ref.read(cartProvider.notifier).clear();
 
-      if (!_isMounted()) return;
+      if (!mounted) return;
 
       // Rediriger vers l'écran de confirmation avec les infos utiles
       // ignore: use_build_context_synchronously
@@ -602,111 +611,13 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
         },
       );
     } catch (e) {
-      if (_isMounted()) {
+      if (mounted) {
         setState(() => _error = 'Erreur lors de l\'envoi de la commande : $e');
       }
     } finally {
-      if (_isMounted()) setState(() => _loading = false);
+      if (mounted) setState(() => _loading = false);
     }
   }
 }
 
-// ── Sélecteur de quartier ──────────────────────────────────────────────────
 
-class _QuartierSearchDialog extends StatefulWidget {
-  final String currentSelection;
-  final Function(String) onSelected;
-
-  const _QuartierSearchDialog({
-    required this.currentSelection,
-    required this.onSelected,
-  });
-
-  @override
-  State<_QuartierSearchDialog> createState() => _QuartierSearchDialogState();
-}
-
-class _QuartierSearchDialogState extends State<_QuartierSearchDialog> {
-  String _search = '';
-
-  @override
-  Widget build(BuildContext context) {
-    final filtered = ouagaNeighborhoods
-        .where((q) => q.toLowerCase().contains(_search.toLowerCase()))
-        .toList();
-
-    return Container(
-      height: MediaQuery.of(context).size.height * 0.75,
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      child: Column(
-        children: [
-          const SizedBox(height: 12),
-          Container(
-            width: 40,
-            height: 4,
-            decoration: BoxDecoration(
-              color: Colors.grey[300],
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
-          const SizedBox(height: 20),
-          Text(
-            'Choisir un quartier',
-            style: GoogleFonts.poppins(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 16),
-          TextField(
-            onChanged: (v) => setState(() => _search = v),
-            decoration: InputDecoration(
-              hintText: 'Rechercher un quartier...',
-              prefixIcon: const Icon(Icons.search),
-              filled: true,
-              fillColor: const Color(0xFFF5F5F5),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide.none,
-              ),
-            ),
-            style: GoogleFonts.poppins(fontSize: 14),
-          ),
-          const SizedBox(height: 12),
-          Expanded(
-            child: ListView.separated(
-              itemCount: filtered.length,
-              separatorBuilder: (context, index) => const Divider(height: 1),
-              itemBuilder: (context, index) {
-                final q = filtered[index];
-                final isSelected = q == widget.currentSelection;
-                return ListTile(
-                  title: Text(
-                    q,
-                    style: GoogleFonts.poppins(
-                      fontSize: 14,
-                      color: isSelected
-                          ? const Color(0xFF1B3A8D)
-                          : Colors.black87,
-                      fontWeight: isSelected
-                          ? FontWeight.w600
-                          : FontWeight.w400,
-                    ),
-                  ),
-                  trailing: isSelected
-                      ? const Icon(Icons.check, color: Color(0xFF1B3A8D))
-                      : null,
-                  onTap: () => widget.onSelected(q),
-                );
-              },
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}

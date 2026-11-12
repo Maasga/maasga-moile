@@ -13,7 +13,7 @@ class SupportScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaasgaShell(
       title: 'Support',
-      bottomNavigationBar: const MainBottomNav(currentPath: '/service'),
+      bottomNavigationBar: const MainBottomNav(),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(

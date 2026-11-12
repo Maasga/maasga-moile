@@ -2,17 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:intl/intl.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 import '../../catalog/data/catalog_repository.dart';
 import '../../catalog/domain/product.dart';
+import '../../catalog/presentation/favorites_notifier.dart';
+import '../../catalog/presentation/recent_products_notifier.dart';
 import '../widgets/brand_scroll.dart';
 import '../../../shared/widgets/main_bottom_nav.dart';
 import '../../../shared/widgets/maasga_app_bar.dart';
 import '../../../shared/utils/asset_utils.dart';
+import '../../../shared/utils/price_formatter.dart';
 import '../widgets/promo_banner.dart';
 import '../../../shared/design_tokens/maasga_tokens.dart';
 
@@ -24,15 +26,6 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
-  String _formatPrice(int price) {
-    final f = NumberFormat.currency(
-      locale: 'fr_FR',
-      symbol: 'FCFA',
-      decimalDigits: 0,
-    );
-    return f.format(price);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -52,12 +45,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 .animate()
                 .fadeIn(delay: 300.ms)
                 .scale(begin: const Offset(0.95, 0.95)),
-            _InnovationsSection(formatPrice: _formatPrice),
+            const _ServicesSection().animate().fadeIn(delay: 400.ms),
+            const _RecentProductsSection(),
+            const _FavoritesSection(),
+            _InnovationsSection(formatPrice: PriceFormatter.format),
             const SizedBox(height: 18),
           ],
         ),
       ),
-      bottomNavigationBar: const MainBottomNav(currentPath: '/home'),
+      bottomNavigationBar: const MainBottomNav(),
     );
   }
 }
@@ -85,8 +81,6 @@ class _SearchBar extends StatelessWidget {
       ),
       child: InkWell(
         borderRadius: BorderRadius.circular(25),
-        // `push` et non `go` : la recherche est un détour depuis l'accueil, le
-        // retour système doit ramener ici et non quitter l'app.
         onTap: () => context.push('/search'),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
@@ -133,6 +127,373 @@ class _LocationRow extends StatelessWidget {
       ),
     );
   }
+}
+
+// ─── Récemment consultés ───────────────────────────────────────────────────────
+class _RecentProductsSection extends ConsumerWidget {
+  const _RecentProductsSection();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final recents = ref.watch(recentProductsProvider);
+    if (recents.isEmpty) return const SizedBox.shrink();
+
+    final palette = context.maasga;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 16, 0, 0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(right: 16),
+            child: Row(
+              children: [
+                Text(
+                  'Récemment consultés',
+                  style: GoogleFonts.poppins(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: palette.textPrimary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 10),
+          SizedBox(
+            height: 200,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: recents.length,
+              itemBuilder: (context, index) {
+                final p = recents[index];
+                return _HomeProductCard(product: p);
+              },
+            ),
+          ),
+          const SizedBox(height: 8),
+        ],
+      ),
+    );
+  }
+}
+
+// ─── Mes Favoris ──────────────────────────────────────────────────────────────
+class _FavoritesSection extends ConsumerWidget {
+  const _FavoritesSection();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final favoriteIds = ref.watch(favoritesProvider);
+    if (favoriteIds.isEmpty) return const SizedBox.shrink();
+
+    final productsAsync = ref.watch(productsProvider);
+    final favoriteProducts = productsAsync.maybeWhen(
+      data: (products) =>
+          products.where((p) => favoriteIds.contains(p.id)).toList(),
+      orElse: () => <Product>[],
+    );
+
+    if (favoriteProducts.isEmpty) return const SizedBox.shrink();
+
+    final palette = context.maasga;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 16, 0, 0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(right: 16),
+            child: Row(
+              children: [
+                Text(
+                  'Mes Favoris',
+                  style: GoogleFonts.poppins(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: palette.textPrimary,
+                  ),
+                ),
+                const Spacer(),
+                TextButton(
+                  onPressed: () => context.go('/catalog'),
+                  child: Text(
+                    'Voir tout',
+                    style: GoogleFonts.poppins(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                      color: palette.accent,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+              ],
+            ),
+          ),
+          const SizedBox(height: 10),
+          SizedBox(
+            height: 200,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: favoriteProducts.length,
+              itemBuilder: (context, index) {
+                final p = favoriteProducts[index];
+                return _HomeProductCard(product: p);
+              },
+            ),
+          ),
+          const SizedBox(height: 8),
+        ],
+      ),
+    );
+  }
+}
+
+// ─── Carte produit carrousel ───────────────────────────────────────────────────
+class _HomeProductCard extends StatelessWidget {
+  const _HomeProductCard({required this.product});
+
+  final Product product;
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = context.maasga;
+    return GestureDetector(
+      onTap: () => context.push('/catalog/product', extra: product),
+      child: Container(
+        width: 140,
+        margin: const EdgeInsets.only(right: 12),
+        decoration: BoxDecoration(
+          color: palette.card,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: palette.cardBorder),
+          boxShadow: [
+            BoxShadow(
+              color: palette.shadow.withValues(
+                alpha: context.isDarkMode ? 0.35 : 0.07,
+              ),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ClipRRect(
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(16),
+              ),
+              child: Container(
+                width: double.infinity,
+                height: 110,
+                color: palette.cardAlt,
+                alignment: Alignment.center,
+                child: product.imageUrl != null &&
+                        product.imageUrl!.isNotEmpty &&
+                        !AssetUtils.getAssetPath(
+                          product.imageUrl!,
+                        ).contains('logo_maasga')
+                    ? CachedNetworkImage(
+                        imageUrl: product.imageUrl!,
+                        width: 90,
+                        height: 90,
+                        fit: BoxFit.contain,
+                        placeholder: (context, url) => const Center(
+                          child: SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          ),
+                        ),
+                        errorWidget: (context, url, error) => Image.asset(
+                          'assets/products/product_placeholder.png',
+                          width: 70,
+                          height: 70,
+                        ),
+                      )
+                    : Image.asset(
+                        AssetUtils.getAssetPath(
+                          product.image.isNotEmpty
+                              ? product.image
+                              : (product.imageUrl ??
+                                    'assets/products/product_placeholder.png'),
+                        ),
+                        width: 90,
+                        height: 90,
+                        fit: BoxFit.contain,
+                        errorBuilder: (_, _, _) => Image.asset(
+                          'assets/products/product_placeholder.png',
+                          width: 70,
+                          height: 70,
+                        ),
+                      ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(8, 6, 8, 8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    product.name,
+                    style: GoogleFonts.poppins(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w500,
+                      color: palette.textPrimary,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    PriceFormatter.format(product.price),
+                    style: GoogleFonts.poppins(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      color: palette.accent,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ─── Services Section ─────────────────────────────────────────────────────────
+class _ServicesSection extends StatelessWidget {
+  const _ServicesSection();
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = context.maasga;
+
+    final services = [
+      _ServiceTile(
+        name: 'Vente & Installation',
+        description: 'Climatiseurs toutes marques, pose en 24h',
+        icon: Icons.shopping_bag_outlined,
+        color: palette.accent,
+        onTap: () => context.go('/catalog'),
+      ),
+      _ServiceTile(
+        name: 'Maintenance',
+        description: 'Entretien & contrats annuels',
+        icon: Icons.build_outlined,
+        color: palette.success,
+        onTap: () => context.push('/maintenance'),
+      ),
+      _ServiceTile(
+        name: 'Diagnostic & Devis',
+        description: 'Visite technique gratuite',
+        icon: Icons.design_services_outlined,
+        color: palette.warning,
+        onTap: () => context.push('/rdv'),
+      ),
+      _ServiceTile(
+        name: 'Dépannage',
+        description: 'Intervention rapide',
+        icon: Icons.warning_amber_outlined,
+        color: palette.danger,
+        onTap: () => context.push('/rdv'),
+      ),
+    ];
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Nos Services',
+            style: GoogleFonts.poppins(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: palette.textPrimary,
+            ),
+          ),
+          const SizedBox(height: 12),
+          GridView.count(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            crossAxisCount: 2,
+            crossAxisSpacing: 12,
+            mainAxisSpacing: 12,
+            childAspectRatio: 1.3,
+            children: services
+                .map(
+                  (s) => InkWell(
+                    onTap: s.onTap,
+                    borderRadius: BorderRadius.circular(16),
+                    child: Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: palette.card,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: palette.cardBorder),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              color: s.color.withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Icon(s.icon, color: s.color, size: 22),
+                          ),
+                          const SizedBox(height: 10),
+                          Text(
+                            s.name,
+                            style: GoogleFonts.poppins(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              color: palette.textPrimary,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            s.description,
+                            style: GoogleFonts.poppins(
+                              fontSize: 11,
+                              color: palette.textMuted,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                )
+                .toList(),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ServiceTile {
+  const _ServiceTile({
+    required this.name,
+    required this.description,
+    required this.icon,
+    required this.color,
+    required this.onTap,
+  });
+
+  final String name;
+  final String description;
+  final IconData icon;
+  final Color color;
+  final VoidCallback onTap;
 }
 
 // ─── Innovations Section (uses real API data) ──────────────────────────────────

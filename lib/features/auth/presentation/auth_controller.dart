@@ -36,8 +36,6 @@ class AuthController extends AsyncNotifier<bool> {
     } catch (e) {
       if (kDebugMode) {
         debugPrint('_syncBackendSession erreur: $e');
-      } else {
-        debugPrint('_syncBackendSession erreur: $e');
       }
     }
   }
@@ -48,8 +46,6 @@ class AuthController extends AsyncNotifier<bool> {
       await ref.read(pushServiceProvider).initialize(dio: dio);
     } catch (e) {
       if (kDebugMode) {
-        debugPrint('_registerForPush erreur: $e');
-      } else {
         debugPrint('_registerForPush erreur: $e');
       }
     }
@@ -69,8 +65,6 @@ class AuthController extends AsyncNotifier<bool> {
       await clearSessionCookies(ref);
     } catch (e) {
       if (kDebugMode) {
-        debugPrint('_startCleanSession erreur: $e');
-      } else {
         debugPrint('_startCleanSession erreur: $e');
       }
     }
@@ -120,10 +114,10 @@ class AuthController extends AsyncNotifier<bool> {
           quartier: quartier,
         );
         if (!success) {
-          debugPrint('syncProfile échoué (retour false)');
+          if (kDebugMode) debugPrint('syncProfile échoué (retour false)');
         }
       } catch (e) {
-        debugPrint('syncProfile exception: $e');
+        if (kDebugMode) debugPrint('syncProfile exception: $e');
       }
       await _registerForPush();
       return true;
@@ -195,7 +189,7 @@ class AuthController extends AsyncNotifier<bool> {
     try {
       await clearSessionCookies(ref);
     } catch (e) {
-      debugPrint('logout clearSessionCookies erreur: $e');
+      if (kDebugMode) debugPrint('logout clearSessionCookies erreur: $e');
     }
 
     ref.read(cartProvider.notifier).clear();
@@ -204,7 +198,7 @@ class AuthController extends AsyncNotifier<bool> {
       final prefs = await ref.read(userPrefsServiceProvider.future);
       await prefs.clear();
     } catch (e) {
-      debugPrint('logout prefs.clear erreur: $e');
+      if (kDebugMode) debugPrint('logout prefs.clear erreur: $e');
     }
 
     state = const AsyncData(false);

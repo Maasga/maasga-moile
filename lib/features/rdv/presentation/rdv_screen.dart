@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../shared/design_tokens/maasga_tokens.dart';
 import '../../../shared/widgets/main_bottom_nav.dart';
 import '../../../shared/widgets/maasga_app_bar.dart';
 import '../../../shared/services/user_prefs_service.dart';
@@ -25,9 +26,6 @@ class RdvScreen extends ConsumerStatefulWidget {
 }
 
 class _RdvScreenState extends ConsumerState<RdvScreen> {
-  static const _primaryBlue = Color(0xFF1B3A8D);
-  static const _bgColor = Color(0xFFF5F5F5);
-
   final PageController _pageController = PageController();
   int _currentStep = 0;
 
@@ -247,7 +245,7 @@ class _RdvScreenState extends ConsumerState<RdvScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: _bgColor,
+      backgroundColor: context.maasga.pageGradient.colors.first,
       resizeToAvoidBottomInset: false,
       appBar: MaasgaAppBar(
         notificationsCount: ref.watch(unreadNotificationCountProvider),
@@ -266,7 +264,7 @@ class _RdvScreenState extends ConsumerState<RdvScreen> {
           if (_currentStep < 2) _buildFooter(),
         ],
       ),
-      bottomNavigationBar: const MainBottomNav(currentPath: '/rdv'),
+      bottomNavigationBar: const MainBottomNav(),
     );
   }
 
@@ -301,10 +299,10 @@ class _RdvScreenState extends ConsumerState<RdvScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: Text(
             'Choisissez votre service',
-            style: GoogleFonts.poppins(
+            style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
-              color: const Color(0xFF1A1A1A),
+              color: context.maasga.textPrimary,
             ),
           ),
         ),
@@ -316,6 +314,85 @@ class _RdvScreenState extends ConsumerState<RdvScreen> {
             description: type.desc,
             isSelected: _selectedServiceType == type.title,
             onTap: () => setState(() => _selectedServiceType = type.title),
+          ),
+        ),
+
+        // ── Accès aux contrats de maintenance ──────────────────────────────
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
+          child: Divider(color: context.maasga.divider),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+          child: Text(
+            'Contrats & Abonnements',
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: context.maasga.textMuted,
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(16),
+            onTap: () => context.push('/maintenance'),
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: context.maasga.infoSurface,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: context.maasga.cardBorder),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      color: context.maasga.card,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(
+                      Icons.verified_user_outlined,
+                      color: context.maasga.accent,
+                      size: 26,
+                    ),
+                  ),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Contrat de maintenance',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: context.maasga.textPrimary,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Souscrivez à un abonnement entretien annuel ou semestriel',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: context.maasga.textMuted,
+                          ),
+                          maxLines: 2,
+                        ),
+                      ],
+                    ),
+                  ),
+                  Icon(
+                    Icons.arrow_forward_ios,
+                    size: 16,
+                    color: context.maasga.textMuted,
+                  ),
+                ],
+              ),
+            ),
           ),
         ),
       ],
@@ -362,15 +439,16 @@ class _RdvScreenState extends ConsumerState<RdvScreen> {
   }
 
   Widget _buildFooter() {
+    final palette = context.maasga;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: const BoxDecoration(
-        color: Colors.white,
+      decoration: BoxDecoration(
+        color: palette.card,
         boxShadow: [
           BoxShadow(
-            color: Colors.black12,
+            color: palette.shadow.withValues(alpha: 0.08),
             blurRadius: 4,
-            offset: Offset(0, -2),
+            offset: const Offset(0, -2),
           ),
         ],
       ),
@@ -380,7 +458,7 @@ class _RdvScreenState extends ConsumerState<RdvScreen> {
             ? ElevatedButton(
                 onPressed: _selectedServiceType != null ? _nextPage : null,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: _primaryBlue,
+                  backgroundColor: context.maasga.accent,
                   disabledBackgroundColor: const Color(0xFFE0E0E0),
                   minimumSize: const Size(double.infinity, 50),
                   shape: RoundedRectangleBorder(
@@ -408,12 +486,12 @@ class _RdvScreenState extends ConsumerState<RdvScreen> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        side: const BorderSide(color: _primaryBlue),
+                        side: BorderSide(color: context.maasga.accent),
                       ),
                       child: Text(
                         'Retour',
                         style: GoogleFonts.poppins(
-                          color: _primaryBlue,
+                          color: context.maasga.accent,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -425,7 +503,7 @@ class _RdvScreenState extends ConsumerState<RdvScreen> {
                     child: ElevatedButton(
                       onPressed: _isLoading ? null : _submitDemande,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: _primaryBlue,
+                        backgroundColor: context.maasga.accent,
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),

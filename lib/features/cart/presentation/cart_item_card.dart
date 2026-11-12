@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../shared/utils/asset_utils.dart';
+import '../../../shared/utils/price_formatter.dart';
 import 'cart_state.dart';
 
 class CartItemCard extends StatelessWidget {
@@ -15,10 +16,6 @@ class CartItemCard extends StatelessWidget {
   final CartLine line;
   final VoidCallback onIncrement;
   final VoidCallback onDecrement;
-
-  String _formatPrice(int price) {
-    return '${price.toString().replaceAllMapped(RegExp(r"(\d{1,3})(?=(\d{3})+(?!\d))"), (m) => "${m[1]} ")} FCFA';
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -75,7 +72,7 @@ class CartItemCard extends StatelessWidget {
                   Row(
                     children: [
                       Text(
-                        _formatPrice(line.product.price),
+                      PriceFormatter.format(line.product.price),
                         style: GoogleFonts.poppins(
                           fontSize: 15,
                           fontWeight: FontWeight.w700,

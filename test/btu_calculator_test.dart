@@ -13,14 +13,14 @@ void main() {
         roomType: 'chambre',
       );
 
-      // Base: 20 * 600 = 12000
+      // Base: 20 * 350 = 7000
       // Height factor (2.5m): 1.0
       // Solar exposure (faible): 1.0
-      // Windows (0): 1.0
+      // Windows (0): 0.97
       // Room type (chambre): 1.0
       // Tropical majoration: 1.12
-      // Expected: 12000 * 1.0 * 1.0 * 1.0 * 1.0 * 1.12 = 13440
-      expect(btu, closeTo(13440, 0.001));
+      // Expected: 7000 * 1.0 * 1.0 * 0.97 * 1.0 * 1.12 = 7604.8
+      expect(btu, closeTo(7604.8, 0.001));
     });
 
     test('should apply height factor correctly', () {
@@ -86,10 +86,9 @@ void main() {
         roomType: 'chambre',
       );
 
-      // Windows 0: factor 1.0
-      // Windows 3+: factor 1.15
-      // Difference should be 15% increase
-      expect(btuThree, closeTo(btuZero * 1.15, 0.001));
+      // Windows 0: factor 0.97
+      // Windows 3+: factor 1.18
+      expect(btuThree, closeTo(btuZero / 0.97 * 1.18, 0.001));
     });
 
     test('should apply room type factor correctly', () {
@@ -110,9 +109,9 @@ void main() {
       );
 
       // Chambre: factor 1.0
-      // Cuisine: factor 1.20
-      // Difference should be 20% increase
-      expect(btuCuisine, closeTo(btuChambre * 1.20, 0.001));
+      // Cuisine: factor 1.25
+      // Difference should be 25% increase
+      expect(btuCuisine, closeTo(btuChambre * 1.25, 0.001));
     });
 
     test('should apply all factors cumulatively', () {
@@ -124,14 +123,14 @@ void main() {
         roomType: 'salon',
       );
 
-      // Base: 30 * 600 = 18000
+      // Base: 30 * 350 = 10500
       // Height factor (3.0m): 1.15
-      // Solar exposure (forte): 1.2
-      // Windows (2): 1.10
-      // Room type (salon): 1.05
+      // Solar exposure (forte): 1.20
+      // Windows (2): 1.12
+      // Room type (salon): 1.10
       // Tropical majoration: 1.12
-      // Expected: 18000 * 1.15 * 1.2 * 1.10 * 1.05 * 1.12
-      final expected = 18000 * 1.15 * 1.2 * 1.10 * 1.05 * 1.12;
+      // Expected: 10500 * 1.15 * 1.2 * 1.12 * 1.10 * 1.12
+      final expected = 10500 * 1.15 * 1.2 * 1.12 * 1.10 * 1.12;
       expect(btu, closeTo(expected, 0.001));
     });
   });
@@ -143,8 +142,8 @@ void main() {
     });
 
     test('should return correct CV for medium BTU', () {
-      expect(BtuCalculator.getCvRecommendation(10000), '1.5 CV');
-      expect(BtuCalculator.getCvRecommendation(12000), '1.5 CV');
+      expect(BtuCalculator.getCvRecommendation(10000), '1,5 CV');
+      expect(BtuCalculator.getCvRecommendation(12000), '1,5 CV');
     });
 
     test('should return correct CV for high BTU', () {

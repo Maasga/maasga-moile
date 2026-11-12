@@ -1,13 +1,21 @@
-import 'dart:convert';
-import 'package:carousel_slider/carousel_slider.dart';
+﻿import 'package:carousel_slider/carousel_slider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:share_plus/share_plus.dart';
 
-import '../../../shared/utils/asset_utils.dart';
+import '../../../shared/design_tokens/maasga_tokens.dart';
+import '../../../shared/utils/price_formatter.dart';
+import '../../../shared/widgets/product_image.dart';
 import '../../cart/presentation/cart_state.dart';
+import '../data/review_repository.dart';
 import '../domain/product.dart';
+import '../domain/product_review.dart';
+import 'favorites_notifier.dart';
+import 'recent_products_notifier.dart';
 import 'widgets/compare_bottom_sheet.dart';
 import 'widgets/fiche_complete_bottom_sheet.dart';
 import 'widgets/spec_card.dart';
@@ -24,25 +32,28 @@ class ProductDetailScreen extends ConsumerStatefulWidget {
 
 class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
   int _selectedImageIndex = 0;
-  bool _isFavorite = false;
   int _quantity = 1;
   final CarouselSliderController _carouselController =
       CarouselSliderController();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(recentProductsProvider.notifier).addRecent(widget.product);
+    });
+  }
 
   void _incrementQty() => setState(() => _quantity++);
   void _decrementQty() {
     if (_quantity > 1) setState(() => _quantity--);
   }
 
-  void _toggleFavorite() {
-    setState(() => _isFavorite = !_isFavorite);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          _isFavorite ? 'Ajouté aux favoris' : 'Retiré des favoris',
-        ),
-        duration: const Duration(seconds: 1),
-      ),
+  void _shareProduct() {
+    Share.share(
+      'Découvrez le ${widget.product.name} de ${widget.product.brand} — '
+      '${PriceFormatter.format(widget.product.price)}\n\n'
+      'Voir le catalogue MAASGA : https://maasga.com',
     );
   }
 
@@ -55,50 +66,18 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
         content: Text('${widget.product.name} ajouté au panier'),
         behavior: SnackBarBehavior.floating,
         duration: const Duration(seconds: 3),
-        backgroundColor: const Color(0xFF1B3A8D),
+        backgroundColor: context.maasga.accent,
         action: SnackBarAction(
           label: 'VOIR',
           textColor: Colors.white,
           onPressed: () {
+            final router = GoRouter.of(context);
             ScaffoldMessenger.of(context).hideCurrentSnackBar();
-            context.push('/cart');
+            router.push('/cart');
           },
         ),
       ),
     );
-  }
-
-  Widget _buildImageWidget(String imgUrl, BoxFit fit) {
-    if (imgUrl.isEmpty || imgUrl == '??') {
-      return Image.asset('assets/products/product_placeholder.png', fit: fit);
-    }
-    if (imgUrl.trim().startsWith('data:image')) {
-      try {
-        final base64Str = imgUrl.split(',').last;
-        return Image.memory(
-          base64Decode(base64Str),
-          fit: fit,
-          errorBuilder: (_, _, _) =>
-              Image.asset('assets/products/product_placeholder.png', fit: fit),
-        );
-      } catch (e) {
-        return Image.asset('assets/products/product_placeholder.png', fit: fit);
-      }
-    } else if (imgUrl.startsWith('http')) {
-      return Image.network(
-        imgUrl,
-        fit: fit,
-        errorBuilder: (_, _, _) =>
-            Image.asset('assets/products/product_placeholder.png', fit: fit),
-      );
-    } else {
-      return Image.asset(
-        AssetUtils.getAssetPath(imgUrl),
-        fit: fit,
-        errorBuilder: (_, _, _) =>
-            Image.asset('assets/products/product_placeholder.png', fit: fit),
-      );
-    }
   }
 
   void _showFicheComplete() {
@@ -119,10 +98,136 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
     );
   }
 
+  void _showReviewBottomSheet() {
+    double rating = 0;
+    final commentController = TextEditingController();
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (ctx, setModalState) {
+            final palette = ctx.maasga;
+            return Padding(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(ctx).viewInsets.bottom,
+              ),
+              child: Container(
+                padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
+                decoration: BoxDecoration(
+                  color: palette.card,
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(24),
+                  ),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Center(
+                      child: Container(
+                        width: 40,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: palette.divider,
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Laisser un avis',
+                      style: GoogleFonts.poppins(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: palette.textPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Center(
+                      child: RatingBar.builder(
+                        initialRating: rating,
+                        minRating: 1,
+                        itemCount: 5,
+                        itemPadding:
+                            const EdgeInsets.symmetric(horizontal: 4),
+                        itemBuilder: (context, _) => Icon(
+                          Icons.star,
+                          color: palette.warning,
+                        ),
+                        onRatingUpdate: (r) {
+                          setModalState(() => rating = r);
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: commentController,
+                      maxLines: 3,
+                      style: palette.inputTextStyle,
+                      decoration: InputDecoration(
+                        hintText: 'Votre commentaire...',
+                        hintStyle: TextStyle(color: palette.textMuted),
+                        filled: true,
+                        fillColor: palette.cardAlt,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 52,
+                      child: ElevatedButton(
+                        onPressed: rating == 0
+                            ? null
+                            : () {
+                                ref
+                                    .read(
+                                      reviewsProvider(
+                                        widget.product.id,
+                                      ).notifier,
+                                    )
+                                    .submitReview(
+                                      rating.round(),
+                                      commentController.text.trim(),
+                                    );
+                                Navigator.of(ctx).pop();
+                              },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: palette.accent,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                        ),
+                        child: Text(
+                          'Envoyer',
+                          style: GoogleFonts.poppins(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: context.maasga.pageGradient.colors.first,
       body: Stack(
         children: [
           CustomScrollView(
@@ -133,10 +238,11 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
               _buildThumbnails(),
               _buildProductInfo(),
               _buildTechnicalBrief(),
+              _buildReviewsSection(),
               _buildFullSheetButton(),
               const SliverToBoxAdapter(
                 child: SizedBox(height: 120),
-              ), // Space for fixed bottom bar
+              ),
             ],
           ),
           _buildBottomAction(),
@@ -147,7 +253,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
 
   Widget _buildAppBar() {
     return SliverAppBar(
-      backgroundColor: Colors.white,
+      backgroundColor: context.maasga.card,
       elevation: 0,
       pinned: true,
       leading: Padding(
@@ -162,11 +268,18 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
         style: GoogleFonts.poppins(
           fontSize: 17,
           fontWeight: FontWeight.w600,
-          color: const Color(0xFF1A1A1A),
+          color: context.maasga.textPrimary,
         ),
       ),
       centerTitle: true,
       actions: [
+        Padding(
+          padding: const EdgeInsets.only(right: 8),
+          child: _buildCircleButton(
+            icon: Icons.share_outlined,
+            onTap: _shareProduct,
+          ),
+        ),
         Padding(
           padding: const EdgeInsets.only(right: 16),
           child: _buildCircleButton(
@@ -188,7 +301,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
         width: 36,
         height: 36,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: context.maasga.card,
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
@@ -198,7 +311,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
             ),
           ],
         ),
-        child: Icon(icon, color: const Color(0xFF1A1A1A), size: 20),
+        child: Icon(icon, color: context.maasga.textPrimary, size: 20),
       ),
     );
   }
@@ -211,8 +324,8 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
             items: widget.product.images.map((img) {
               return Container(
                 width: double.infinity,
-                color: const Color(0xFFF5F5F5),
-                child: _buildImageWidget(img, BoxFit.contain),
+                color: context.maasga.cardAlt,
+                child: ProductImage(imageUrl: img, width: double.infinity, height: 300, fit: BoxFit.contain),
               );
             }).toList(),
             carouselController: _carouselController,
@@ -231,7 +344,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.85),
+                color: context.maasga.card.withValues(alpha: 0.9),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
@@ -239,7 +352,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                 style: GoogleFonts.poppins(
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
-                  color: const Color(0xFF1A1A1A),
+                  color: context.maasga.textPrimary,
                 ),
               ),
             ),
@@ -273,16 +386,18 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
                     color: isSelected
-                        ? const Color(0xFF1B3A8D)
+                        ? context.maasga.accent
                         : const Color(0xFFE0E0E0),
                     width: isSelected ? 2 : 1,
                   ),
                 ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(10),
-                  child: _buildImageWidget(
-                    widget.product.images[index],
-                    BoxFit.cover,
+                  child: ProductImage(
+                    imageUrl: widget.product.images[index],
+                    width: 66,
+                    height: 66,
+                    fit: BoxFit.cover,
                   ),
                 ),
               ),
@@ -294,6 +409,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
   }
 
   Widget _buildProductInfo() {
+    final isFavorite = ref.watch(favoritesProvider).contains(widget.product.id);
     final discount = widget.product.oldPrice != null
         ? (((widget.product.oldPrice! - widget.product.price) /
                       widget.product.oldPrice!) *
@@ -319,21 +435,36 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                         style: GoogleFonts.poppins(
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
-                          color: const Color(0xFF1A1A1A),
+                          color: context.maasga.textPrimary,
                         ),
                       ),
                       Text(
                         'Marque: ${widget.product.brand} · ${widget.product.category}',
                         style: GoogleFonts.poppins(
                           fontSize: 14,
-                          color: const Color(0xFF757575),
+                          color: context.maasga.textMuted,
                         ),
                       ),
                     ],
                   ),
                 ),
                 GestureDetector(
-                  onTap: _toggleFavorite,
+                  onTap: () {
+                    final wasFavorite = isFavorite;
+                    ref
+                        .read(favoritesProvider.notifier)
+                        .toggle(widget.product.id);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          wasFavorite
+                              ? 'Retiré des favoris'
+                              : 'Ajouté aux favoris',
+                        ),
+                        duration: const Duration(seconds: 1),
+                      ),
+                    );
+                  },
                   child: Container(
                     width: 44,
                     height: 44,
@@ -342,10 +473,10 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                       border: Border.all(color: const Color(0xFFE0E0E0)),
                     ),
                     child: Icon(
-                      _isFavorite ? Icons.favorite : Icons.favorite_border,
-                      color: _isFavorite
-                          ? const Color(0xFFE53935)
-                          : const Color(0xFF9E9E9E),
+                      isFavorite ? Icons.favorite : Icons.favorite_border,
+                      color: isFavorite
+                          ? context.maasga.danger
+                          : context.maasga.textMuted,
                       size: 24,
                     ),
                   ),
@@ -356,20 +487,20 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
             Row(
               children: [
                 Text(
-                  '${widget.product.price} FCFA',
+                  PriceFormatter.format(widget.product.price),
                   style: GoogleFonts.poppins(
                     fontSize: 26,
                     fontWeight: FontWeight.bold,
-                    color: const Color(0xFF1B3A8D),
+                    color: context.maasga.accent,
                   ),
                 ),
                 if (widget.product.oldPrice != null) ...[
                   const SizedBox(width: 12),
                   Text(
-                    '${widget.product.oldPrice} FCFA',
+                    PriceFormatter.format(widget.product.oldPrice!),
                     style: GoogleFonts.poppins(
                       fontSize: 16,
-                      color: const Color(0xFF9E9E9E),
+                      color: context.maasga.textMuted,
                       decoration: TextDecoration.lineThrough,
                     ),
                   ),
@@ -380,7 +511,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFE8F5E9),
+                      color: context.maasga.successSurface,
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
@@ -388,7 +519,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                       style: GoogleFonts.poppins(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
-                        color: const Color(0xFF43A047),
+                        color: context.maasga.success,
                       ),
                     ),
                   ),
@@ -396,7 +527,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
               ],
             ),
             const SizedBox(height: 20),
-            const Divider(height: 1, color: Color(0xFFF0F0F0)),
+            Divider(height: 1, color: context.maasga.divider),
           ],
         ),
       ),
@@ -416,7 +547,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                 fontSize: 13,
                 fontWeight: FontWeight.bold,
                 letterSpacing: 1.2,
-                color: const Color(0xFF1A1A1A),
+                color: context.maasga.textPrimary,
               ),
             ),
             const SizedBox(height: 16),
@@ -458,6 +589,180 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
     );
   }
 
+  Widget _buildReviewsSection() {
+    final palette = context.maasga;
+    final reviewsAsync = ref.watch(reviewsProvider(widget.product.id));
+    final avg = ref.watch(averageRatingProvider(widget.product.id));
+    final isLoggedIn = FirebaseAuth.instance.currentUser != null;
+
+    return SliverToBoxAdapter(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Divider(height: 1, color: palette.divider),
+            const SizedBox(height: 20),
+            Text(
+              'AVIS CLIENTS',
+              style: GoogleFonts.poppins(
+                fontSize: 13,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 1.2,
+                color: palette.textPrimary,
+              ),
+            ),
+            const SizedBox(height: 12),
+            reviewsAsync.when(
+              loading: () => const Center(
+                child: Padding(
+                  padding: EdgeInsets.all(16),
+                  child: CircularProgressIndicator(),
+                ),
+              ),
+              error: (_, _) => Text(
+                'Impossible de charger les avis',
+                style: GoogleFonts.poppins(
+                  fontSize: 13,
+                  color: palette.textMuted,
+                ),
+              ),
+              data: (reviews) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (reviews.isNotEmpty) ...[
+                      Row(
+                        children: [
+                          RatingBarIndicator(
+                            rating: avg,
+                            itemBuilder: (context, _) => Icon(
+                              Icons.star,
+                              color: palette.warning,
+                            ),
+                            itemCount: 5,
+                            itemSize: 18,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            '${avg.toStringAsFixed(1)} (${reviews.length} avis)',
+                            style: GoogleFonts.poppins(
+                              fontSize: 13,
+                              color: palette.textSecondary,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      ...reviews.take(3).map(_buildReviewItem),
+                      if (reviews.length > 3)
+                        TextButton(
+                          onPressed: () {},
+                          child: Text(
+                            'Voir tous les avis (${reviews.length})',
+                            style: GoogleFonts.poppins(
+                              fontSize: 13,
+                              color: palette.accent,
+                            ),
+                          ),
+                        ),
+                    ] else
+                      Text(
+                        'Aucun avis pour ce produit.',
+                        style: GoogleFonts.poppins(
+                          fontSize: 13,
+                          color: palette.textMuted,
+                        ),
+                      ),
+                    if (isLoggedIn) ...[
+                      const SizedBox(height: 12),
+                      OutlinedButton.icon(
+                        onPressed: _showReviewBottomSheet,
+                        icon: const Icon(Icons.rate_review_outlined, size: 18),
+                        label: Text(
+                          'Laisser un avis',
+                          style: GoogleFonts.poppins(fontSize: 13),
+                        ),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: palette.accent,
+                          side: BorderSide(color: palette.accent),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
+                );
+              },
+            ),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildReviewItem(ProductReview review) {
+    final palette = context.maasga;
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: palette.cardAlt,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  review.userName,
+                  style: GoogleFonts.poppins(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: palette.textPrimary,
+                  ),
+                ),
+              ),
+              RatingBarIndicator(
+                rating: review.rating.toDouble(),
+                itemBuilder: (context, _) => Icon(
+                  Icons.star,
+                  color: palette.warning,
+                ),
+                itemCount: 5,
+                itemSize: 14,
+              ),
+            ],
+          ),
+          if (review.comment.isNotEmpty) ...[
+            const SizedBox(height: 4),
+            Text(
+              review.comment,
+              style: GoogleFonts.poppins(
+                fontSize: 12,
+                color: palette.textSecondary,
+              ),
+            ),
+          ],
+          const SizedBox(height: 4),
+          Text(
+            '${review.createdAt.day.toString().padLeft(2, '0')}/'
+            '${review.createdAt.month.toString().padLeft(2, '0')}/'
+            '${review.createdAt.year}',
+            style: GoogleFonts.poppins(
+              fontSize: 11,
+              color: palette.textMuted,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildFullSheetButton() {
     return SliverToBoxAdapter(
       child: Padding(
@@ -465,7 +770,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
         child: OutlinedButton(
           onPressed: _showFicheComplete,
           style: OutlinedButton.styleFrom(
-            side: const BorderSide(color: Color(0xFF1B3A8D), width: 2),
+            side: BorderSide(color: context.maasga.accent, width: 2),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(14),
             ),
@@ -477,7 +782,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
               fontSize: 13,
               fontWeight: FontWeight.bold,
               letterSpacing: 1.0,
-              color: const Color(0xFF1B3A8D),
+              color: context.maasga.accent,
             ),
           ),
         ),
@@ -498,7 +803,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
           MediaQuery.of(context).padding.bottom + 12,
         ),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: context.maasga.card,
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: 0.08),
@@ -509,11 +814,10 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
         ),
         child: Row(
           children: [
-            // Quantity Selector
             Container(
               padding: const EdgeInsets.all(4),
               decoration: BoxDecoration(
-                color: const Color(0xFFF5F5F5),
+                color: context.maasga.cardAlt,
                 borderRadius: BorderRadius.circular(30),
               ),
               child: Row(
@@ -559,7 +863,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                   ),
                 ),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF1B3A8D),
+                  backgroundColor: context.maasga.accent,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14),
                   ),
@@ -584,16 +888,16 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
         width: 38,
         height: 38,
         decoration: BoxDecoration(
-          color: isRemove ? Colors.white : const Color(0xFF1B3A8D),
+          color: isRemove ? context.maasga.card : context.maasga.accent,
           shape: BoxShape.circle,
           border: isRemove
-              ? Border.all(color: const Color(0xFF1B3A8D), width: 2)
+              ? Border.all(color: context.maasga.accent, width: 2)
               : null,
         ),
         child: Icon(
           icon,
           size: 18,
-          color: isRemove ? const Color(0xFF1B3A8D) : Colors.white,
+          color: isRemove ? context.maasga.accent : Colors.white,
         ),
       ),
     );

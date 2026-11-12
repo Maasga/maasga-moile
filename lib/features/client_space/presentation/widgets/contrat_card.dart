@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import '../../../../shared/design_tokens/maasga_tokens.dart';
 import '../../domain/contrat_maintenance.dart';
+import 'contrat_detail_sheet.dart';
 
 class ContratCard extends StatelessWidget {
   const ContratCard({required this.contrat, this.onViewInvoice, super.key});
@@ -10,173 +11,219 @@ class ContratCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.maasga;
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: palette.card,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFF0F0F0)),
+        border: Border.all(color: palette.cardBorder),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Column(
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(12),
+        child: InkWell(
+          onTap: () => ContratDetailSheet.show(context, contrat),
+          borderRadius: BorderRadius.circular(12),
+          child: Padding(
+            padding: const EdgeInsets.all(12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      contrat.type,
-                      style: GoogleFonts.poppins(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: const Color(0xFF1A1A1A),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            contrat.type,
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: palette.textPrimary,
+                            ),
+                          ),
+                          Text(
+                            contrat.period,
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: palette.textSecondary,
+                            ),
+                          ),
+                          Text(
+                            contrat.quartier,
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: palette.textSecondary,
+                            ),
+                          ),
+                          if (contrat.nbClimatiseurs != null)
+                            Text(
+                              '${contrat.nbClimatiseurs} climatiseur(s)',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: palette.textMuted,
+                              ),
+                            ),
+                          if (contrat.frequenceVisites != null)
+                            Text(
+                              contrat.frequenceVisites!,
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: palette.textMuted,
+                              ),
+                            ),
+                          const SizedBox(height: 4),
+                          Text(
+                            contrat.price,
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                              color: palette.accent,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
+                    _StatusBadge(contrat: contrat, palette: palette),
+                    const SizedBox(width: 6),
+                    Icon(
+                      Icons.arrow_forward_ios,
+                      size: 12,
+                      color: palette.textMuted,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                // Progression visites
+                Row(
+                  children: [
                     Text(
-                      contrat.period,
-                      style: GoogleFonts.poppins(
+                      'Visites : ${contrat.visitesEffectuees}/${contrat.visitesTotales}',
+                      style: TextStyle(
                         fontSize: 12,
-                        color: const Color(0xFF757575),
-                      ),
-                    ),
-                    Text(
-                      contrat.quartier,
-                      style: GoogleFonts.poppins(
-                        fontSize: 12,
-                        color: const Color(0xFF757575),
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      contrat.price,
-                      style: GoogleFonts.poppins(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w700,
-                        color: const Color(0xFF1B3A8D),
+                        fontWeight: FontWeight.w500,
+                        color: palette.textSecondary,
                       ),
                     ),
                   ],
                 ),
-              ),
-              Builder(
-                builder: (context) {
-                  final st = contrat.status.toLowerCase();
-                  final isPending = st.contains('attente') || st == 'pending';
-                  final isCancelled = st.contains('annul') || st.contains('refus') || st == 'cancelled';
-                  final bgColor = isPending
-                      ? const Color(0xFFFFF3E0)
-                      : isCancelled
-                          ? const Color(0xFFFFEBEE)
-                          : const Color(0xFFE8F5E9);
-                  final textColor = isPending
-                      ? const Color(0xFFE65100)
-                      : isCancelled
-                          ? const Color(0xFFC62828)
-                          : const Color(0xFF2E7D32);
-                  final label = isPending
-                      ? 'En attente de validation'
-                      : isCancelled
-                          ? 'Annulé'
-                          : contrat.status;
-                  return Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: bgColor,
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: Text(
-                      label,
-                      style: GoogleFonts.poppins(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
-                        color: textColor,
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          // Progress visits
-          Row(
-            children: [
-              Text(
-                'Visites : ${contrat.visitesEffectuees}/${contrat.visitesTotales}',
-                style: GoogleFonts.poppins(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 6),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(4),
-            child: LinearProgressIndicator(
-              value: contrat.visitesTotales > 0
-                  ? contrat.visitesEffectuees / contrat.visitesTotales
-                  : 0,
-              backgroundColor: const Color(0xFFF0F0F0),
-              valueColor: const AlwaysStoppedAnimation<Color>(
-                Color(0xFF1B3A8D),
-              ),
-              minHeight: 6,
-            ),
-          ),
-          const SizedBox(height: 12),
-          OutlinedButton.icon(
-            onPressed: onViewInvoice,
-            icon: const Icon(Icons.picture_as_pdf, size: 16),
-            label: Text(
-              'Facture PDF',
-              style: GoogleFonts.poppins(fontSize: 11),
-            ),
-            style: OutlinedButton.styleFrom(
-              foregroundColor: const Color(0xFF1B3A8D),
-              side: const BorderSide(color: Color(0xFF1B3A8D)),
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-          ),
-          if (contrat.visites.isNotEmpty) ...[
-            const Divider(height: 24, color: Color(0xFFF0F0F0)),
-            Theme(
-              data: Theme.of(
-                context,
-              ).copyWith(dividerColor: Colors.transparent),
-              child: ExpansionTile(
-                tilePadding: EdgeInsets.zero,
-                dense: true,
-                title: Text(
-                  'VISITES EFFECTUÉES (${contrat.visitesEffectuees})',
-                  style: GoogleFonts.poppins(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: const Color(0xFF1B3A8D),
+                const SizedBox(height: 6),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(4),
+                  child: LinearProgressIndicator(
+                    value: contrat.visitesTotales > 0
+                        ? contrat.visitesEffectuees / contrat.visitesTotales
+                        : 0,
+                    backgroundColor: palette.cardBorder,
+                    valueColor: AlwaysStoppedAnimation<Color>(palette.accent),
+                    minHeight: 6,
                   ),
                 ),
-                children: contrat.visites
-                    .map((v) => _VisiteItem(visite: v))
-                    .toList(),
-              ),
+                const SizedBox(height: 12),
+                OutlinedButton.icon(
+                  onPressed: onViewInvoice,
+                  icon: const Icon(Icons.picture_as_pdf, size: 16),
+                  label: Text(
+                    'Facture PDF',
+                    style: TextStyle(fontSize: 11),
+                  ),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: palette.accent,
+                    side: BorderSide(color: palette.accent),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 4,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                ),
+                if (contrat.visites.isNotEmpty) ...[
+                  Divider(height: 24, color: palette.divider),
+                  Theme(
+                    data: Theme.of(
+                      context,
+                    ).copyWith(dividerColor: Colors.transparent),
+                    child: ExpansionTile(
+                      tilePadding: EdgeInsets.zero,
+                      dense: true,
+                      title: Text(
+                        'VISITES EFFECTUÉES (${contrat.visitesEffectuees})',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: palette.accent,
+                        ),
+                      ),
+                      children: contrat.visites
+                          .map((v) => _VisiteItem(visite: v, palette: palette))
+                          .toList(),
+                    ),
+                  ),
+                ],
+              ],
             ),
-          ],
-        ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _StatusBadge extends StatelessWidget {
+  const _StatusBadge({required this.contrat, required this.palette});
+  final ContratMaintenance contrat;
+  final MaasgaPalette palette;
+
+  @override
+  Widget build(BuildContext context) {
+    final st = contrat.status.toLowerCase();
+    final isPending = st.contains('attente') || st == 'pending';
+    final isCancelled =
+        st.contains('annul') || st.contains('refus') || st == 'cancelled';
+    final bgColor = isPending
+        ? palette.warningSurface
+        : isCancelled
+            ? palette.dangerSurface
+            : palette.successSurface;
+    final textColor = isPending
+        ? palette.warning
+        : isCancelled
+            ? palette.danger
+            : palette.success;
+    final label = isPending
+        ? 'En attente'
+        : isCancelled
+            ? 'Annulé'
+            : contrat.status;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w600,
+          color: textColor,
+        ),
       ),
     );
   }
 }
 
 class _VisiteItem extends StatelessWidget {
-  const _VisiteItem({required this.visite});
+  const _VisiteItem({required this.visite, required this.palette});
   final VisiteContrat visite;
+  final MaasgaPalette palette;
 
   @override
   Widget build(BuildContext context) {
@@ -187,39 +234,31 @@ class _VisiteItem extends StatelessWidget {
           Icon(
             visite.isCompleted ? Icons.check_circle : Icons.pending_outlined,
             size: 16,
-            color: visite.isCompleted
-                ? const Color(0xFF43A047)
-                : const Color(0xFFFB8C00),
+            color: visite.isCompleted ? palette.success : palette.warning,
           ),
           const SizedBox(width: 8),
           Text(
             visite.date,
-            style: GoogleFonts.poppins(
-              fontSize: 12,
-              color: const Color(0xFF1A1A1A),
-            ),
+            style: TextStyle(fontSize: 12, color: palette.textPrimary),
           ),
           const Spacer(),
           Text(
             'Tech: ${visite.technicianName}',
-            style: GoogleFonts.poppins(
-              fontSize: 11,
-              color: const Color(0xFF757575),
-            ),
+            style: TextStyle(fontSize: 11, color: palette.textMuted),
           ),
           const SizedBox(width: 8),
           if (visite.isCompleted)
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
               decoration: BoxDecoration(
-                color: const Color(0xFFE8F5E9),
+                color: palette.successSurface,
                 borderRadius: BorderRadius.circular(4),
               ),
               child: Text(
                 'Effectuée',
-                style: GoogleFonts.poppins(
+                style: TextStyle(
                   fontSize: 9,
-                  color: const Color(0xFF43A047),
+                  color: palette.success,
                   fontWeight: FontWeight.w600,
                 ),
               ),
